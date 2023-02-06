@@ -95,7 +95,7 @@ class UR5(Robot):
                 if assets_root_path is None:
                     carb.log_error("Could not find Isaac Sim assets folder")
                     return
-                gripper_usd = assets_root_path + "/Isaac/Robots/Robotiq/2F-85/2f85_instanceable.usd"
+                gripper_usd = assets_root_path + "/Isaac/Robots/Robotiq/2F-140/2f140_instanceable.usd"
                 add_reference_to_stage(usd_path=gripper_usd, prim_path=self._end_effector_prim_path)
                 end_effector_prim_path = self._end_effector_prim_path + "/right_inner_finger_pad"
                 if gripper_dof_names is None:

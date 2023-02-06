@@ -6,8 +6,13 @@
 # distribution of this software and related documentation without an express
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 #
+
+from omni.isaac.core.utils.stage import add_reference_to_stage
 import omni.isaac.core.tasks as tasks
+from omni.isaac.core.utils.nucleus import get_assets_root_path
 from ur5 import UR5
+from omni.isaac.manipulators import SingleManipulator
+from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.core.utils.prims import is_prim_path_valid
 from omni.isaac.core.utils.string import find_unique_string_name
 from omni.isaac.core.utils.stage import get_stage_units
@@ -61,33 +66,43 @@ class PickPlace(tasks.PickPlace):
         Returns:
             UR5: [description]
         """
-        ur5_prim_path = find_unique_string_name(
-            initial_name="/World/ur5", is_unique_fn=lambda x: not is_prim_path_valid(x)
+        # ur5_prim_path = find_unique_string_name(
+        #     initial_name="/World/ur5", is_unique_fn=lambda x: not is_prim_path_valid(x)
+        # )
+        # ur5_robot_name = find_unique_string_name(
+        #     initial_name="my_ur5", is_unique_fn=lambda x: not self.scene.object_exists(x)
+        # )
+        # self._ur5_robot = UR5(prim_path=ur5_prim_path, name=ur5_robot_name, attach_gripper=True, gripper_usd=self.gripper_name)
+        # self._ur5_robot.set_joints_default_state(
+        #     positions=np.array([-np.pi / 2, -np.pi / 2, -np.pi / 2, -np.pi / 2, np.pi / 2, 0])
+        # )
+        assets_root_path = get_assets_root_path()
+        if assets_root_path is None:
+            raise Exception("Could not find Isaac Sim assets folder")
+        asset_path = assets_root_path + "/Isaac/Robots/UniversalRobots/ur5/ur5.usd"
+        add_reference_to_stage(usd_path=asset_path, prim_path="/World/ur5")
+
+        gripper_usd = assets_root_path + "/Isaac/Robots/Robotiq/2F-140/2f140_instanceable.usd"
+        add_reference_to_stage(usd_path=gripper_usd, prim_path="/World/ur5/tool0")
+        
+        gripper = ParallelGripper(
+            # We chose the following values while inspecting the articulation
+            end_effector_prim_path="/World/ur5/tool0/robotiq_arg2f_base_link",
+            joint_prim_names=["finger_joint", "right_outer_knuckle_joint"],
+            joint_opened_positions=np.array([0.0, 0.0]),
+            joint_closed_positions=np.array([0.628, -0.628]),
+            action_deltas=np.array([0.05, 0.05]) / get_stage_units(),
         )
-        ur5_robot_name = find_unique_string_name(
-            initial_name="my_ur5", is_unique_fn=lambda x: not self.scene.object_exists(x)
-        )
-        self._ur5_robot = UR5(prim_path=ur5_prim_path, name=ur5_robot_name, attach_gripper=True, gripper_usd=self.gripper_name)
+        # define the manipulator
+        self._ur5_robot = SingleManipulator(
+                prim_path="/World/ur5",
+                name="ur5",
+                end_effector_prim_name="tool0/robotiq_arg2f_base_link",
+                gripper=gripper,
+            )
         self._ur5_robot.set_joints_default_state(
             positions=np.array([-np.pi / 2, -np.pi / 2, -np.pi / 2, -np.pi / 2, np.pi / 2, 0])
         )
-        # gripper = ParallelGripper(
-        #     # We chose the following values while inspecting the articulation
-        #     end_effector_prim_path="/World/ur5/tool0",
-        #     joint_prim_names=["finger_joint", "right_outer_knuckle_joint"],
-        #     joint_opened_positions=np.array([0.0, 0.0]),
-        #     joint_closed_positions=np.array([0.628, -0.628]),
-        #     action_deltas=np.array([-0.628, 0.628]),
-        # )
-        # # define the manipulator
-        # my_ur5 = my_world.scene.add(
-        #     SingleManipulator(
-        #         prim_path="/World/ur5",
-        #         name="ur5",
-        #         end_effector_prim_name="tool0",
-        #         gripper=gripper,
-        #     )
-        # )
         return self._ur5_robot
 
     def pre_step(self, time_step_index: int, simulation_time: float) -> None:
