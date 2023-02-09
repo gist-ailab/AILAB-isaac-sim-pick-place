@@ -26,7 +26,8 @@ import omni.replicator.core as rep
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
-import PIL
+# import PIL
+import cv2
 
 
 
@@ -132,8 +133,8 @@ cube = scene.add(
 # assets_root_path = get_assets_root_path()
 # if assets_root_path is None:
 #     raise Exception("Could not find Isaac Sim assets folder")
-# asset_path = "workspace/ur5_robotiq_2f140.usd"
-# add_reference_to_stage(usd_path=asset_path, prim_path="/World")
+# asset_path = "workspace/ur5e_gripper/ur5e_gripper.usd"
+# add_reference_to_stage(usd_path=asset_path, prim_path="/World/ur5e_gripper")
 # gripper = ParallelGripper(
 #     end_effector_prim_path="/World/ur5/tool0",
 #     joint_prim_names=["finger_joint", "right_outer_knuckle_joint"],
@@ -165,20 +166,11 @@ my_franka = Franka(prim_path=franka_prim_path, name=franka_robot_name)
 hand_camera = Camera(
     prim_path="/World/Franka/panda_hand/geometry/realsense/realsense_camera",
     frequency=20,
-    resolution=(256, 256),
-)
-
-camera = Camera(
-    prim_path="/World/camera",
-    position=np.array([1.0, 1.0, 1.0]),
-    frequency=20,
-    resolution=(256, 256),
-    orientation=rot_utils.euler_angles_to_quats(np.array([-90, 45, 0]), degrees=True),
+    resolution=(1920, 1080),
 )
 
 my_world.reset()
 hand_camera.initialize()
-camera.initialize()
 
 
 i = 0
@@ -191,15 +183,6 @@ hand_camera.add_semantic_segmentation_to_frame()
 hand_camera.set_focus_distance(4)
 hand_camera.set_horizontal_aperture(0.05)
 # hand_camera.set_vertical_aperture(0.05)
-
-camera.add_distance_to_camera_to_frame()
-camera.add_instance_segmentation_to_frame()
-camera.add_instance_id_segmentation_to_frame()
-camera.add_semantic_segmentation_to_frame()
-hand_camera.set_focal_length(0.001)
-# camera.set_focus_distance(4)
-camera.set_horizontal_aperture(15)
-# hand_camera.set_vertical_aperture(15)
 
 stage = get_current_stage()
 # plane_prim = stage.DefinePrim("World/defaultGroundPlane")
@@ -236,16 +219,10 @@ while simulation_app.is_running():
         # print(vertical_aperture)
         # print(max_fov)
         # print(hand_camera.get_current_frame()["instance_id_segmentation"])
-        print(hand_camera.get_current_frame()["instance_segmentation"])
-        print(np.unique(hand_instance_segmentation_image))
-        print(hand_camera.get_current_frame()["semantic_segmentation"])
-        print(np.unique(hand_semantic_segmentation_image))
-        
-        rgb_image = camera.get_rgba()[:, :, :3]
-        depth_image = camera.get_current_frame()["distance_to_camera"]
-        instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
-        instance_id_segmentation_image = hand_camera.get_current_frame()["instance_id_segmentation"]["data"]
-        semantic_segmentation_image = hand_camera.get_current_frame()["semantic_segmentation"]["data"]
+        # print(hand_camera.get_current_frame()["instance_segmentation"])
+        # print(np.unique(hand_instance_segmentation_image))
+        # print(hand_camera.get_current_frame()["semantic_segmentation"])
+        # print(np.unique(hand_semantic_segmentation_image))
         
         hand_imgplot = plt.imshow(hand_rgb_image)
         plt.show()
@@ -253,21 +230,18 @@ while simulation_app.is_running():
         plt.show()
         hand_inssegplot = plt.imshow(hand_instance_segmentation_image)
         plt.show()
-        hand_insidsegplot = plt.imshow(hand_instance_id_segmentation_image)
-        plt.show()
-        hand_semsegplot = plt.imshow(hand_semantic_segmentation_image)
-        plt.show()
-        
-        # hand_imgplot = plt.imshow(rgb_image)
+        # hand_insidsegplot = plt.imshow(hand_instance_id_segmentation_image)
         # plt.show()
-        # hand_depthplot = plt.imshow(depth_image)
+        # hand_semsegplot = plt.imshow(hand_semantic_segmentation_image)
         # plt.show()
-        # hand_inssegplot = plt.imshow(instance_segmentation_image)
-        # plt.show()
-        # hand_insidsegplot = plt.imshow(instance_id_segmentation_image)
-        # plt.show()
-        # hand_semsegplot = plt.imshow(semantic_segmentation_image)
-        # plt.show()
-        
+        print(np.unique(hand_depth_image))
+        print(np.unique(hand_instance_segmentation_image))
+        print(hand_instance_segmentation_image)
+        hand_rgb_image = cv2.cvtColor(hand_rgb_image, cv2.COLOR_BGR2RGB)
+        hand_instance_segmentation_image = np.array(hand_instance_segmentation_image, dtype=type(hand_depth_image[0][0]))
+        cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image.png', hand_rgb_image)
+        cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image.png', hand_depth_image)
+        cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask.png', hand_instance_segmentation_image)
+                
         
     i += 1
