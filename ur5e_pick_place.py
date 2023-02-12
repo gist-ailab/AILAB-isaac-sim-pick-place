@@ -14,19 +14,20 @@ simulation_app = SimulationApp({"headless": False})
 from omni.isaac.core import World
 from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
-from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
+from omni.isaac.core.utils.stage import add_reference_to_stage
 from pick_place_controller import PickPlaceController
 from omni.isaac.core.objects import DynamicCuboid
-from omni.isaac.sensor import Camera
-from omni.isaac.core.utils.semantics import add_update_semantics
 import carb
 import sys
 import numpy as np
 import argparse
 import os
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
+=======
+>>>>>>> 245004108e1fdf4463e710ddff694e04680d7ae4
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", default=False, action="store_true", help="Run in test mode")
@@ -35,7 +36,7 @@ args, unknown = parser.parse_known_args()
 my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
-ur5e_usd_path = "workspace/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -54,6 +55,7 @@ my_ur5e = my_world.scene.add(
         prim_path="/World/UR5e", name="my_ur5e", end_effector_prim_name="right_inner_finger_pad", gripper=gripper
     )
 )
+<<<<<<< HEAD
 # my_ur5e.set_joints_default_state(
 #     positions=np.array([-np.pi / 2, -np.pi / 2, -np.pi / 2, -np.pi / 2, np.pi / 2, 0])
 # )
@@ -69,6 +71,10 @@ depth_camera = Camera(
 )
 size_scale = 0.07
 # size_scale_z = 0.03
+=======
+size_scale = 0.03
+size_scale_z = 0.03
+>>>>>>> 245004108e1fdf4463e710ddff694e04680d7ae4
 cube = my_world.scene.add(
     DynamicCuboid(
         name="cube",
@@ -76,27 +82,13 @@ cube = my_world.scene.add(
         prim_path="/World/Cube",
         scale=np.array([size_scale, size_scale, size_scale]),
         size=1.0,
-        color=np.array([1, 0, 0]),
+        color=np.array([0, 0, 1]),
         mass=0
     )
 )
 my_world.scene.add_default_ground_plane()
 my_ur5e.gripper.set_default_state(my_ur5e.gripper.joint_opened_positions)
 my_world.reset()
-rgb_camera.initialize()
-depth_camera.initialize()
-
-rgb_camera.add_distance_to_camera_to_frame()
-rgb_camera.add_instance_segmentation_to_frame()
-rgb_camera.add_bounding_box_2d_loose_to_frame()
-rgb_camera.add_bounding_box_2d_tight_to_frame()
-depth_camera.add_distance_to_camera_to_frame()
-depth_camera.add_instance_segmentation_to_frame()
-# depth_camera.set_horizontal_aperture(0.05)
-
-stage = get_current_stage()
-cube_prim = stage.DefinePrim("/World/Cube")
-add_update_semantics(prim=cube_prim, semantic_label="cube")
 
 my_controller = PickPlaceController(
     name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
@@ -110,6 +102,7 @@ while simulation_app.is_running():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
+<<<<<<< HEAD
         # elif my_world.current_time_step_index == 200:
         if my_controller._event == 0:
             if my_controller._t >= 0.99:
@@ -147,12 +140,14 @@ while simulation_app.is_running():
                 
                 my_controller.resume()
         # elif my_world.current_time_step_index > 210:
+=======
+>>>>>>> 245004108e1fdf4463e710ddff694e04680d7ae4
         observations = my_world.get_observations()
         actions = my_controller.forward(
             picking_position=cube.get_local_pose()[0],
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
-            end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
         )
         if my_controller.is_done():
             print("done picking and placing")
