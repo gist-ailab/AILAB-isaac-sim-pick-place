@@ -1,6 +1,11 @@
 gqcnn/
+<<<<<<< HEAD
 ggcnn/
 Pytorch-GQCNN/
 data/
 ur5_robotiq_2f140.usd
 ur5.usd
+=======
+ur5_robotiq_2f140.usd
+__pycache__/*
+>>>>>>> 7e820fbdd41f398abd88c75cdddef391aac7f21b
