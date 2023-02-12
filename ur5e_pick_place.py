@@ -102,7 +102,6 @@ while simulation_app.is_running():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
-<<<<<<< HEAD
         # elif my_world.current_time_step_index == 200:
         if my_controller._event == 0:
             if my_controller._t >= 0.99:
@@ -140,8 +139,6 @@ while simulation_app.is_running():
                 
                 my_controller.resume()
         # elif my_world.current_time_step_index > 210:
-=======
->>>>>>> 245004108e1fdf4463e710ddff694e04680d7ae4
         observations = my_world.get_observations()
         actions = my_controller.forward(
             picking_position=cube.get_local_pose()[0],
