@@ -26,6 +26,7 @@ import argparse
 import os
 import matplotlib.pyplot as plt
 import cv2
+from PIL import Image
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", default=False, action="store_true", help="Run in test mode")
@@ -66,8 +67,8 @@ depth_camera = Camera(
     frequency=20,
     resolution=(1920, 1080),
 )
-size_scale = 0.03
-size_scale_z = 0.03
+size_scale = 0.07
+# size_scale_z = 0.03
 cube = my_world.scene.add(
     DynamicCuboid(
         name="cube",
@@ -98,7 +99,7 @@ cube_prim = stage.DefinePrim("/World/Cube")
 add_update_semantics(prim=cube_prim, semantic_label="cube")
 
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
+    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
 )
 articulation_controller = my_ur5e.get_articulation_controller()
 
@@ -117,7 +118,8 @@ while simulation_app.is_running():
                 # print(my_controller._t)
                 # print(my_world.current_time_step_index)
                 rgb_image = rgb_camera.get_rgba()[:, :, :3]
-                depth_image = depth_camera.get_current_frame()["distance_to_camera"]
+                # depth_image = depth_camera.get_current_frame()["distance_to_camera"]
+                depth_image = rgb_camera.get_current_frame()["distance_to_camera"]
                 instance_segmentation_image = rgb_camera.get_current_frame()["instance_segmentation"]["data"]
                 # loose_bbox = rgb_camera.get_current_frame()["bounding_box_2d_loose"]
                 tight_bbox = rgb_camera.get_current_frame()["bounding_box_2d_tight"]
@@ -130,12 +132,18 @@ while simulation_app.is_running():
                 plt.show()
                 depthplot = plt.imshow(depth_image)
                 plt.show()
-                
+                print(depth_image.shape)
+                print(instance_segmentation_image.shape)
+                print(np.unique(depth_image))
+                print(type(depth_image[0][0]))
+                                
                 rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
                 instance_segmentation_image = np.array(instance_segmentation_image, dtype=type(depth_image[0][0]))
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image.png', rgb_image)
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image.png', depth_image)
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask.png', instance_segmentation_image)
+                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image_2.png', rgb_image)
+                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_2.png', depth_image*255)
+                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask_2.png', instance_segmentation_image)
+                
+                print(cube.get_local_pose()[0])
                 
                 my_controller.resume()
         # elif my_world.current_time_step_index > 210:
