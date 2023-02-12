@@ -83,7 +83,7 @@ while simulation_app.is_running():
             picking_position=cube.get_local_pose()[0],
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
-            end_effector_offset=np.array([0, 0, 0.25-size/2]),
+            end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
         )
         if my_controller.is_done():
             print("done picking and placing")
