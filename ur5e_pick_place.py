@@ -67,8 +67,8 @@ depth_camera = Camera(
     frequency=20,
     resolution=(1920, 1080),
 )
-size_scale = 0.07
-size_scale_z = 0.07
+size_scale = 0.03
+size_scale_z = 0.03
 cube = my_world.scene.add(
     DynamicCuboid(
         name="cube",
@@ -76,7 +76,7 @@ cube = my_world.scene.add(
         prim_path="/World/Cube",
         scale=np.array([size_scale, size_scale, size_scale]),
         size=1.0,
-        color=np.array([0, 0, 1]),
+        color=np.array([1, 0, 1]),
         mass=0
     )
 )
@@ -127,6 +127,7 @@ while simulation_app.is_running():
                 tight_bbox = rgb_camera.get_current_frame()["bounding_box_2d_tight"]
                 # print(loose_bbox)
                 print(tight_bbox)
+                print(np.unique(depth_image))
                 
                 imgplot = plt.imshow(rgb_image)
                 plt.show()
@@ -134,18 +135,21 @@ while simulation_app.is_running():
                 plt.show()
                 depthplot = plt.imshow(depth_image)
                 plt.show()
-                print(depth_image.shape)
-                print(instance_segmentation_image.shape)
-                print(np.unique(depth_image))
-                print(type(depth_image[0][0]))
-                print(rgb_camera.get_world_pose())
-                print(rgb_camera.get_local_pose())
-                                
+                # print(depth_image.shape)
+                # print(instance_segmentation_image.shape)
+                # print(np.unique(depth_image))
+                # print(type(depth_image[0][0]))
+                # print(rgb_camera.get_world_pose())
+                # print(rgb_camera.get_local_pose())
+                
                 rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
                 instance_segmentation_image = np.array(instance_segmentation_image, dtype=type(depth_image[0][0]))
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image_2.png', rgb_image)
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_2.png', depth_image*255)
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask_2.png', instance_segmentation_image)
+                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image_3.png', rgb_image)
+                # depth_image = depth_image.astype(np.uint8)
+                # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png', depth_image*255)
+                depth_image = Image.fromarray((depth_image * 255.0).astype(np.uint8))
+                depth_image.save('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png')
+                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask_3.png', instance_segmentation_image)
                 
                 # print(cube.get_local_pose()[0])
                 
