@@ -81,7 +81,7 @@ import_config.create_physics_scene = False
 # import_config.default_drive_strength = 1047.19751
 # import_config.default_position_drive_damping = 52.35988
 # import_config.default_drive_type = _urdf.UrdfJointTargetType.JOINT_DRIVE_POSITION
-import_config.distance_scale = 100
+import_config.distance_scale = 0.5
 
 path = '/home/nam/workspace/preprocessed_ycb'
 objects = os.listdir(path)
@@ -119,9 +119,10 @@ for i in range(3):
 
     print(status, stage_path)
     
-    textured_material = OmniPBR(prim_path='{}/omniPBR'.format(stage_path), texture_path=os.path.join('/home/nam/workspace/YCB', objects[a], 'google_16k/texture_map.png'))
-    ob.apply_visual_material(visual_material=textured_material, weaker_than_descendants=False)
+    # textured_material = OmniPBR(prim_path='{}/omniPBR'.format(stage_path), texture_path=os.path.join('/home/nam/workspace/YCB', objects[a], 'google_16k/texture_map.png'))
+    # ob.apply_visual_material(visual_material=textured_material, weaker_than_descendants=False)
     print(ob.is_visual_material_applied())
+    # scene.add(ob)
     
     obs.append(ob)
 
