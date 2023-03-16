@@ -3,7 +3,7 @@
 ## Environment Setup
 
 ### 1. Download Isaac Sim
- - [Isaac sim](https://developer.nvidia.com/isaac-sim) Download
+ - [Download Omniverse](https://developer.nvidia.com/isaac-sim)
  - [Workstation Setup](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_basic.html)
  - [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
 
@@ -16,10 +16,13 @@
     ```
  - Preprocessing from obj file to urdf file
     ```
-    python workspace/preprocess/preprocess_ycb.py
+    python isaac-sim-pick-place/preprocess/preprocess_ycb.py
     ```
 
 
 ## Run Pick and Place
 
-- 
+- Run Pick and Place
+    ```
+    python isaac-sim-pick-place/preprocess/ur5e_pick_place.py
+    ```
