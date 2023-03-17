@@ -12,6 +12,8 @@ from omni.isaac.core.articulations import Articulation
 from rmpflow_controller import RMPFlowController
 from typing import Optional, List
 
+import numpy as np
+
 
 class PickPlaceController(manipulators_controllers.PickPlaceController):
     """[summary]
