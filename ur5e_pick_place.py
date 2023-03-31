@@ -15,6 +15,7 @@ from omni.isaac.core import World
 from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
+from omni.isaac.core.utils.prims import create_prim, delete_prim
 from omni.isaac.core.utils.semantics import add_update_semantics
 from pick_place_controller import PickPlaceController
 from omni.isaac.core.objects import DynamicCuboid
@@ -27,6 +28,8 @@ import os
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
+import glob
+import random
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", default=False, action="store_true", help="Run in test mode")
@@ -35,7 +38,7 @@ args, unknown = parser.parse_known_args()
 my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
-ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -57,42 +60,42 @@ my_ur5e = my_world.scene.add(
 # my_ur5e.set_joints_default_state(
 #     positions=np.array([-np.pi / 2, -np.pi / 2, -np.pi / 2, -np.pi / 2, np.pi / 2, 0])
 # )
-rgb_camera = Camera(
-    prim_path="/World/UR5e/realsense/RGB",
-    frequency=20,
-    resolution=(1920, 1080),
-)
-depth_camera = Camera(
-    prim_path="/World/UR5e/realsense/Depth",
-    frequency=20,
-    resolution=(1920, 1080),
-)
-size_scale = 0.03
-size_scale_z = 0.03
-cube = my_world.scene.add(
-    DynamicCuboid(
-        name="cube",
-        position=np.array([0.4, 0.33, 0.1 + size_scale/2]),
-        prim_path="/World/Cube",
-        scale=np.array([size_scale, size_scale, size_scale]),
-        size=1.0,
-        color=np.array([1, 0, 1]),
-        mass=0
-    )
-)
+# rgb_camera = Camera(
+#     prim_path="/World/UR5e/realsense/RGB",
+#     frequency=20,
+#     resolution=(1920, 1080),
+# )
+# depth_camera = Camera(
+#     prim_path="/World/UR5e/realsense/Depth",
+#     frequency=20,
+#     resolution=(1920, 1080),
+# )
+size_z = 0.3
+# size_scale_z = 0.03
+pos_y = (random.random()*1.2+0.8)/4
+pos_x = (random.random()*1.2-0.4)/4
+pos_z = size_z
+objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
+
+cube = create_prim(usd_path=objects[1], prim_path="/World/object", position=[pos_x,pos_y,pos_z], scale=[0.3,0.3,0.3])
+# cube.
+stage = get_current_stage()
+obj_prim = stage.DefinePrim("/World/object")
+add_update_semantics(prim=obj_prim, semantic_label=str(1))
+
 my_world.scene.add_default_ground_plane()
 my_ur5e.gripper.set_default_state(my_ur5e.gripper.joint_opened_positions)
 my_world.reset()
 
-rgb_camera.initialize()
-depth_camera.initialize()
-rgb_camera.add_distance_to_camera_to_frame()
-rgb_camera.add_instance_segmentation_to_frame()
-rgb_camera.add_instance_id_segmentation_to_frame()
-rgb_camera.add_semantic_segmentation_to_frame()
-rgb_camera.add_bounding_box_2d_loose_to_frame()
-rgb_camera.add_bounding_box_2d_tight_to_frame()
-depth_camera.add_distance_to_camera_to_frame()
+# rgb_camera.initialize()
+# depth_camera.initialize()
+# rgb_camera.add_distance_to_camera_to_frame()
+# rgb_camera.add_instance_segmentation_to_frame()
+# rgb_camera.add_instance_id_segmentation_to_frame()
+# rgb_camera.add_semantic_segmentation_to_frame()
+# rgb_camera.add_bounding_box_2d_loose_to_frame()
+# rgb_camera.add_bounding_box_2d_tight_to_frame()
+# depth_camera.add_distance_to_camera_to_frame()
 
 stage = get_current_stage()
 cube_prim = stage.DefinePrim("/World/Cube")
@@ -119,22 +122,22 @@ while simulation_app.is_running():
                 my_controller.pause()
                 # print(my_controller._t)
                 # print(my_world.current_time_step_index)
-                rgb_image = rgb_camera.get_rgba()[:, :, :3]
+                # rgb_image = rgb_camera.get_rgba()[:, :, :3]
                 # depth_image = depth_camera.get_current_frame()["distance_to_camera"]
-                depth_image = rgb_camera.get_current_frame()["distance_to_camera"]
-                instance_segmentation_image = rgb_camera.get_current_frame()["instance_segmentation"]["data"]
+                # depth_image = rgb_camera.get_current_frame()["distance_to_camera"]
+                # instance_segmentation_image = rgb_camera.get_current_frame()["instance_segmentation"]["data"]
                 # loose_bbox = rgb_camera.get_current_frame()["bounding_box_2d_loose"]
-                tight_bbox = rgb_camera.get_current_frame()["bounding_box_2d_tight"]
+                # tight_bbox = rgb_camera.get_current_frame()["bounding_box_2d_tight"]
                 # print(loose_bbox)
-                print(tight_bbox)
-                print(np.unique(depth_image))
+                # print(tight_bbox)
+                # print(np.unique(depth_image))
                 
-                imgplot = plt.imshow(rgb_image)
-                plt.show()
-                inssegplot = plt.imshow(instance_segmentation_image)
-                plt.show()
-                depthplot = plt.imshow(depth_image)
-                plt.show()
+                # imgplot = plt.imshow(rgb_image)
+                # plt.show()
+                # inssegplot = plt.imshow(instance_segmentation_image)
+                # plt.show()
+                # depthplot = plt.imshow(depth_image)
+                # plt.show()
                 # print(depth_image.shape)
                 # print(instance_segmentation_image.shape)
                 # print(np.unique(depth_image))
@@ -142,14 +145,14 @@ while simulation_app.is_running():
                 # print(rgb_camera.get_world_pose())
                 # print(rgb_camera.get_local_pose())
                 
-                rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-                instance_segmentation_image = np.array(instance_segmentation_image, dtype=type(depth_image[0][0]))
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image_3.png', rgb_image)
-                # depth_image = depth_image.astype(np.uint8)
-                # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png', depth_image*255)
-                depth_image = Image.fromarray((depth_image * 255.0).astype(np.uint8))
-                depth_image.save('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png')
-                cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask_3.png', instance_segmentation_image)
+                # rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
+                # instance_segmentation_image = np.array(instance_segmentation_image, dtype=type(depth_image[0][0]))
+                # cv2.imwrite('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/rgb_image_3.png', rgb_image)
+                # # depth_image = depth_image.astype(np.uint8)
+                # # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png', depth_image*255)
+                # depth_image = Image.fromarray((depth_image * 255.0).astype(np.uint8))
+                # depth_image.save('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/depth_image_3.png')
+                # cv2.imwrite('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/mask_3.png', instance_segmentation_image)
                 
                 # print(cube.get_local_pose()[0])
                 
@@ -157,10 +160,10 @@ while simulation_app.is_running():
         # elif my_world.current_time_step_index > 210:
         observations = my_world.get_observations()
         actions = my_controller.forward(
-            picking_position=cube.get_local_pose()[0],
+            picking_position=np.array([pos_x,pos_y, 0.00]),
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
-            end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
+            end_effector_offset=np.array([0, 0, 0.25]),
         )
         if my_controller.is_done():
             print("done picking and placing")
