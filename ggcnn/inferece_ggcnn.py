@@ -15,10 +15,10 @@ import matplotlib.pyplot as plt
 # print(np.unique(depth))
 # depth = (1 - depth) * 700
 # cv2.imwrite("output/depth_for_ggcnn.png", depth)
-rgb = cv2.imread("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_rgb.png")
-depth = cv2.imread("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_newd.png")
+rgb = cv2.imread("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb_image_3.png")
+depth = cv2.imread("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png")
 depth = depth / 255
-mask = cv2.imread("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_mask.png")
+mask = cv2.imread("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/mask_3.png")
 # print(np.unique(mask))
 print(np.unique(depth))
 
@@ -55,7 +55,7 @@ print(np.unique(cropped_depth))
 depthT = torch.from_numpy(cropped_depth.reshape(1, 1, 400, 400).astype(np.float32)).cuda()
 print(torch.unique(depthT))
 net = GGCNN()
-net.load_state_dict(torch.load("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
+net.load_state_dict(torch.load("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
 net.cuda()
 
 with torch.no_grad():

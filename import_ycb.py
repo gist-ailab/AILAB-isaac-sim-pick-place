@@ -28,6 +28,8 @@ from pxr import Sdf, Gf, UsdPhysics, UsdLux, PhysxSchema
 from omni.isaac.core.materials import OmniPBR, OmniGlass
 from omni.isaac.core.prims.rigid_prim import RigidPrim
 from omni.isaac.core.prims.xform_prim import XFormPrim
+from omni.isaac.urdf import _urdf
+from omni.kit.importer.cad import _cad_importer
 
 import numpy as np
 import argparse
@@ -69,7 +71,10 @@ scene.add_default_ground_plane()
 #########
 
 # Setting up import configuration:
-status, import_config = omni.kit.commands.execute("URDFCreateImportConfig")
+# status, import_config = omni.kit.commands.execute("URDFCreateImportConfig")
+# urdf_interface = _urdf.acquire_urdf_interface()
+import_config = _urdf.ImportConfig()
+# import_config = _cad_importer.ImportConfig()
 
 import_config.merge_fixed_joints = False
 import_config.convex_decomp = False
@@ -119,8 +124,8 @@ for i in range(3):
 
     print(status, stage_path)
     
-    # textured_material = OmniPBR(prim_path='{}/omniPBR'.format(stage_path), texture_path=os.path.join('/home/nam/workspace/YCB', objects[a], 'google_16k/texture_map.png'))
-    # ob.apply_visual_material(visual_material=textured_material, weaker_than_descendants=False)
+    textured_material = OmniPBR(prim_path='{}/omniPBR'.format(stage_path), texture_path=os.path.join('/home/nam/workspace/YCB', objects[a], 'google_16k/texture_map.png'))
+    ob.apply_visual_material(visual_material=textured_material, weaker_than_descendants=False)
     print(ob.is_visual_material_applied())
     # scene.add(ob)
     
