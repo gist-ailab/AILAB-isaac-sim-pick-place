@@ -16,9 +16,12 @@ from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
+from omni.isaac.core.utils.extensions import get_extension_path_from_name
 from pick_place_controller import PickPlaceController
 from omni.isaac.core.objects import DynamicCuboid
 from omni.isaac.sensor import Camera
+from omni.isaac.core.prims.xform_prim import XFormPrim
+import omni.kit.commands
 import carb
 import sys
 import numpy as np
@@ -27,6 +30,7 @@ import os
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
+import random
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", default=False, action="store_true", help="Run in test mode")
@@ -67,19 +71,60 @@ depth_camera = Camera(
     frequency=20,
     resolution=(1920, 1080),
 )
+
+##########
+#Add cube
+###########
 size_scale = 0.03
-size_scale_z = 0.03
-cube = my_world.scene.add(
-    DynamicCuboid(
-        name="cube",
-        position=np.array([0.4, 0.33, 0.1 + size_scale/2]),
-        prim_path="/World/Cube",
-        scale=np.array([size_scale, size_scale, size_scale]),
-        size=1.0,
-        color=np.array([1, 0, 1]),
-        mass=0
-    )
+# size_scale_z = 0.03
+# cube = my_world.scene.add(
+#     DynamicCuboid(
+#         name="cube",
+#         position=np.array([0.4, 0.33, 0.1 + size_scale/2]),
+#         prim_path="/World/Cube",
+#         scale=np.array([size_scale, size_scale, size_scale]),
+#         size=1.0,
+#         color=np.array([1, 0, 1]),
+#         mass=0
+#     )
+# )
+
+#######
+#Add ycb object
+#########
+# Setting up import configuration:
+status, import_config = omni.kit.commands.execute("URDFCreateImportConfig")
+import_config.merge_fixed_joints = False
+import_config.convex_decomp = False
+import_config.import_inertia_tensor = True
+import_config.fix_base = False
+import_config.make_default_prim = True
+import_config.self_collision = False
+import_config.create_physics_scene = True
+import_config.import_inertia_tensor = False
+# import_config.default_drive_strength = 1047.19751
+# import_config.default_position_drive_damping = 52.35988
+# import_config.default_drive_type = _urdf.UrdfJointTargetType.JOINT_DRIVE_POSITION
+
+import_config.distance_scale = 0.1
+path = '/home/nam/workspace/preprocessed_ycb'
+objects = os.listdir(path)
+# for i in range(3):
+a = random.randint(0, len(objects))
+print(objects[a])
+ycb_file = os.path.join(path, objects[a], 'raw_mesh.urdf')
+# Import URDF, stage_path contains the path the path to the usd prim in the stage.
+status, stage_path = omni.kit.commands.execute(
+    "URDFParseAndImportFile",
+    urdf_path = ycb_file,
+    import_config=import_config,
 )
+
+ob = XFormPrim(stage_path)
+# ob_scale = 
+ob.set_world_pose(np.array([0, 0, 20]), np.array([1, 0, 0, 0]))
+np.array([0.4, 0.33, 0.1 + size_scale/2])
+
 my_world.scene.add_default_ground_plane()
 my_ur5e.gripper.set_default_state(my_ur5e.gripper.joint_opened_positions)
 my_world.reset()
