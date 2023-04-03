@@ -11,12 +11,15 @@ from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.stage import get_stage_units
 from omni.isaac.core.utils.string import find_unique_string_name
 from omni.isaac.core.utils.stage import add_reference_to_stage
+from omni.isaac.core.utils.stage import create_new_stage
 from omni.isaac.core.robots import Robot
 from omni.isaac.universal_robots import UR10
 from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.core.utils.prims import is_prim_path_valid
 from omni.isaac.sensor import Camera
+from omni.isaac.core.prims import XFormPrim
+from omni.isaac.core.utils.prims import create_prim, delete_prim
 from ur5 import UR5
 import omni.isaac.core.utils.numpy.rotations as rot_utils
 from omni.syntheticdata import SyntheticData
@@ -30,7 +33,7 @@ from PIL import Image as im
 import torchvision.transforms as T
 import os
 import random
-
+import glob
 
 
 ##########
@@ -107,57 +110,21 @@ my_world.reset()
 
 transform = T.ToPILImage()
 
+objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
 
 while simulation_app.is_running():
     my_world.step(render=True)
-    
-    # if i % 150 == 1:
-    #     size = random.random()*0.09+0.03
-    #     pos_y = random.random()*1.2+0.8
-    #     pos_x = random.random()*1.2-0.4
-    #     pos_z = size/2
-        
-    #     cube_prim_path = find_unique_string_name(
-    #     initial_name="/World/Cube", is_unique_fn=lambda x: not is_prim_path_valid(x))   
-    #     cube = scene.add(
-    #         DynamicCuboid(
-    #             name='cube',
-    #             position=np.array([pos_x, pos_y, pos_z]),
-    #             orientation=np.array([1, 0, 0, 0]),
-    #             prim_path=cube_prim_path,
-    #             scale=np.array([size, size, size]),
-    #             size=1.0,
-    #             color=np.array([255, 0, 0]),
-    #         )
-    #     )
-    #     # plane_prim = stage.DefinePrim("World/defaultGroundPlane")
-    #     cube_prim = stage.DefinePrim("/World/Cube")
-    #     # add_update_semantics(prim=plane_prim, semantic_label="plane")
-    #     add_update_semantics(prim=cube_prim, semantic_label="cube")
-        
-    #     my_world.reset()
-        
     if i % 150 == 1:
-        size_z = (random.random()*0.09+0.03)
-        size = size_z/2
-        pos_y = random.random()*1.2+0.8
-        pos_x = random.random()*1.2-0.4
-        pos_z = size_z/2
-        
-        cube_prim_path = find_unique_string_name(
-        initial_name="/World/Cube", is_unique_fn=lambda x: not is_prim_path_valid(x))   
-        cube = scene.add(
-            DynamicCylinder(
-                name='cube',
-                position=np.array([pos_x, pos_y, pos_z]),
-                orientation=np.array([1, 0, 0, 0]),
-                prim_path=cube_prim_path,
-                scale=np.array([size, size, size_z]),
-                color=np.array([255, 0, 0]),
-            )
-        )
-        cube_prim = stage.DefinePrim("/World/Cube")
-        add_update_semantics(prim=cube_prim, semantic_label="cube")
+        for l in range(3):
+            size_z = (random.random()*0.09+0.03)*2
+            size = size_z
+            pos_y = (random.random()*1.2+0.8)
+            pos_x = (random.random()*1.2-0.4)
+            pos_z = size_z
+            a = random.randint(0, len(objects)-1)
+            print(a)
+            create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=[pos_x,pos_y,pos_z], scale=[0.3,0.3,0.3])
+            # pr = XFormPrim(prim_path ="/World/object"+str(l), position=[pos_x,pos_y,pos_z])
         
         my_world.reset()
         
@@ -172,13 +139,16 @@ while simulation_app.is_running():
         print(np.unique(hand_instance_segmentation_image))
         
         hand_imgplot = transform(hand_rgb_image)
-        # hand_imgplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/img/img"+str(int(i/150))+".png")
+        hand_imgplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/img/img"+str(int(i/150))+".png")
        
         hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
-        # hand_inssegplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/mask/mask"+str(int(i/150))+".png")
-    
-        scene.remove_object('cube')
+        hand_inssegplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/mask/mask"+str(int(i/150))+".png")
+
+        delete_prim('/World/object0')
+        delete_prim('/World/object1')
+        delete_prim('/World/object2')
         my_world.reset()
+        
     if i == 15000:
         simulation_app.close()
 
