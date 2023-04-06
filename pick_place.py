@@ -23,15 +23,11 @@ working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
 objects_list = glob.glob(objects_path)
 objects_list = random.sample(objects_list, 3)
-# objects_list = objects_list[random.randrange(1, 79)]
-# objects_list = objects_list[14]
-# objects_list = objects_list[41]
-# objects_list = objects_list[2]
+# get three objects randomly
 
 objects_position = np.array([[0.3, 0.3, 0.1],
                              [-0.3, 0.3, 0.1],
                              [-0.3, -0.3, 0.1]])
-
 offset = np.array([0, 0, 0.1])
 target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
 target_orientation = np.array([0, 0, 0, 1])
