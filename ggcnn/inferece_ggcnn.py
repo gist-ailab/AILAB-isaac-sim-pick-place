@@ -6,13 +6,14 @@ from ggcnn.models.ggcnn import GGCNN
 from ggcnn.models.common import post_process_output
 from ggcnn.utils.dataset_processing import evaluation, grasp
 
-def inference_ggcnn(depth, bbox):
-    cy, cx = int((bbox[1]+bbox[3])/2), int((bbox[2]+bbox[4])/2)
+def inference_ggcnn(rgb, depth, bbox):
+    cx, cy = int((bbox[1]+bbox[3])/2), int((bbox[2]+bbox[4])/2)
     crop_range = 150
-    cx = 1080-crop_range
     
-    cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth.png', depth*255)
-    cropped_depth = depth[cx-crop_range: cx+crop_range, cy-crop_range: cy+crop_range]
+    cropped_depth = depth[cy-crop_range: cy+crop_range, cx-crop_range: cx+crop_range]
+    cropped_rgb = rgb[cy-crop_range: cy+crop_range, cx-crop_range: cx+crop_range]
+    # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth.png', depth*255)
+    cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/cropped_depth.png', cropped_depth*255)
     # cropped_depth = np.transpose(cropped_depth, (2, 0, 1))
     # cropped_depth = cropped_depth[0]
     cropped_depth = np.clip((cropped_depth - cropped_depth.mean()), -1, 1)
@@ -20,8 +21,8 @@ def inference_ggcnn(depth, bbox):
     
     ## GGCNN Network
     net = GGCNN()
-    # net.load_state_dict(torch.load("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
-    net.load_state_dict(torch.load("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
+    net.load_state_dict(torch.load("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
+    # net.load_state_dict(torch.load("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
     net.cuda()
     
     with torch.no_grad():
@@ -36,7 +37,8 @@ def inference_ggcnn(depth, bbox):
         width = grasps[0].width
         center = grasps[0].center
         
-    center = [cx + center[0] - crop_range, cy + center[1] - crop_range]
-    
+    evaluation.plot_output(cropped_rgb, cropped_depth, q_img, ang_img, no_grasps=1)
+                
+    center = [cx + center[1] - crop_range, cy + center[0] - crop_range]
     return angle, length, width, center
         

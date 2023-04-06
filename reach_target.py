@@ -44,8 +44,8 @@ args, unknown = parser.parse_known_args()
 my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
-# ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
-ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
+# ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -146,11 +146,11 @@ def capture_img(mode, camera, camera_intrinsics, num):
 
     ## save image
     rgb_image = Image.fromarray((rgb_image).astype(np.uint8))
-    rgb_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_rgb.png')
     instance_segmentation_image = Image.fromarray((instance_segmentation_image*255).astype(np.uint8))
-    instance_segmentation_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_mask.png')
     n_depth_image = Image.fromarray((n_depth_image * 255.0).astype(np.uint8))
-    n_depth_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_d.png')
+    # rgb_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_rgb.png')
+    # instance_segmentation_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_mask.png')
+    # n_depth_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_d.png')
 
     return len(np.unique(instance_segmentation_image)) -1,      \
            bbox,    \
@@ -160,7 +160,8 @@ def capture_img(mode, camera, camera_intrinsics, num):
 
 
 ## --------------------------   1. Spawn Objects   -------------------------- ##
-objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
+# objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
+objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
 
 for l in range(3):
     size_z = (random.random()*0.09+0.03)*2
@@ -189,7 +190,7 @@ elif mode == 'd' or mode == 'depth':
     camera_intrinsics = depth_camera.get_intrinsics_matrix()
 
 ## find object and reach it
-r, theta = 5, 90
+r, theta = 5, 30
 
 x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
 print('[', r, ']', round(x,1), round(y,1))

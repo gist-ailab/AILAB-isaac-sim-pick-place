@@ -22,11 +22,13 @@ from omni.isaac.core.objects import DynamicCuboid
 from omni.isaac.sensor import Camera
 from omni.isaac.core.prims.xform_prim import XFormPrim
 import omni.kit.commands
+from omni.isaac.core.utils.rotations import euler_angles_to_quat
 
+from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
 from correct_radial_distortion import depth_image_from_distance_image
 from ggcnn.inferece_ggcnn import inference_ggcnn
-from detection.inference_detection import inference_detection
+# from detection.inference_detection import inference_detection
 
 import carb
 import sys
@@ -102,12 +104,13 @@ depth_camera = Camera(
 #########
 objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
 for l in range(3):
-    size_z = (random.random()*0.09+0.03)*2
-    size = size_z
-    pos_y = (random.random()*1.2+0.8)
-    # pos_x = (random.random()*1.2-0.4)
+    # size_z = (random.random()*0.09+0.03)*2
+    # size = size_z
+    # pos_y = random.random()*1.2+0.8
+    # pos_x = random.random()*1.2-0.4
     # pos_z = size_z
-    position=np.array([0.4, 0.33, 0.1 + size_z/2])
+    # position = np.random.randint(-1200, 1200, size=3) / 1000
+    position = np.array([0.5+(l*0.1), 0, 0.1])
     a = random.randint(0, len(objects)-1)
     create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=position, scale=[0.2,0.2,0.2])
 
@@ -134,42 +137,47 @@ depth_camera.add_bounding_box_2d_tight_to_frame()
 
 stage = get_current_stage()
 for l in range(3):
-    cube_prim = stage.DefinePrim("/World/object"+str(l))
-    add_update_semantics(prim=cube_prim, semantic_label="object"+str(l))
+    object_prim = stage.DefinePrim("/World/object"+str(l))
+    add_update_semantics(prim=object_prim, semantic_label="object"+str(l))
 
 my_world.reset()
 my_controller = PickPlaceController(
     name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
 )
+my_controller2 = ReachTargetController(
+    name="reach_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
+)
 articulation_controller = my_ur5e.get_articulation_controller()
 
-i = 0
-while simulation_app.is_running():
-    my_world.step(render=True)
-    if my_world.is_playing():
-        if my_world.current_time_step_index == 0:
-            my_world.reset()
-            my_controller.reset()
-        # elif my_world.current_time_step_index == 200:
-        if my_controller._event == 0:
-            if my_controller._t >= 0.99:
-            # if my_world.current_time_step_index > 110:
-                my_controller.pause()
-                # print(my_controller._t)
-                # print(my_world.current_time_step_index)
+r, theta, z = 5, 0, 0.5
+found_cube = False
+print('reach-target')
+for theta in range(0, 360, 45):
+    x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
+    print('[', r, ']', round(x,1), round(y,1))
+    while simulation_app.is_running():
+        my_world.step(render=True)
+        if my_world.is_playing():
+            observations = my_world.get_observations()
+            actions = my_controller2.forward(
+                # picking_position=cube.get_local_pose()[0],
+                picking_position=np.array([x, y, z]),
+                current_joint_positions=my_ur5e.get_joint_positions(),
+                end_effector_offset=np.array([0, 0, 0.25]),
+                theta=theta
+            )
+            if my_controller2.is_done():
+                print('done reaching target')
+                
                 rgb_image = depth_camera.get_rgba()[:, :, :3]
                 depth_image = depth_camera.get_current_frame()["distance_to_camera"]
                 instance_segmentation_image = depth_camera.get_current_frame()["instance_segmentation"]["data"]
-                # loose_bbox = depth_camera.get_current_frame()["bounding_box_2d_loose"]
                 tight_bbox = depth_camera.get_current_frame()["bounding_box_2d_tight"]
                 depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
                 n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
                                 
                 imgplot = plt.imshow(rgb_image)
                 plt.show()
-                rgb_image = Image.fromarray(rgb_image)
-                rgb_image.save('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb.png')
-                exit()
                 inssegplot = plt.imshow(instance_segmentation_image)
                 plt.show()
                 ndepthplot = plt.imshow(n_depth_image)
@@ -180,27 +188,43 @@ while simulation_app.is_running():
                 for i in range(len(bbox_info)):
                     id = bbox_info[i]
                     bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
-                print(tight_bbox["data"])
                 
-                angle, length, width, center = inference_ggcnn(n_depth_image, bboxes["obj"+str(0)])
+                if bboxes:
+                    found_cube = True
+                angle, length, width, center = inference_ggcnn(rgb_image, n_depth_image, bboxes["obj"+str(1)])
                 center = np.array(center)
-                depth = depth_image[center[0]][center[1]]
+                depth = n_depth_image[center[1]][center[0]]
                 
                 center = np.expand_dims(center, axis=0)
                 world_center = depth_camera.get_world_points_from_image_coords(center, depth)
-                
-                my_controller.resume()
+                print(world_center)
+                print(center)
+                print(angle)
+                break
+            articulation_controller.apply_action(actions)
+        if args.test is True:
+            break
+        if found_cube:
+            print('found cube')
+    if found_cube:
+        print('found cube')
+        print('bbox', bbox_info)
+        break
 
-        # elif my_world.current_time_step_index > 210:
-        
-        observations = my_world.get_observations()
+print('pick-and-place')
+while simulation_app.is_running():
+    my_world.step(render=True)
+    if my_world.is_playing():
+        if my_world.current_time_step_index == 0:
+            my_world.reset()
+            my_controller.reset()
         actions = my_controller.forward(
-            picking_position=np.array([0.4, 0.4, 0]),
-            # picking_position=np.array([world_center[0], world_center[1], length/100]),
+            # picking_position=np.array([0.4, 0.4, 0]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
-            # end_effector_orientation = np.array([0, 0, angle]),
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
         if my_controller.is_done():
             print("done picking and placing")
