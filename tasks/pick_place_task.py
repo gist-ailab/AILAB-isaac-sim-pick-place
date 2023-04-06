@@ -41,37 +41,51 @@ class UR5ePickPlace(tasks.PickPlace):
     def __init__(
         self,
         name: str = "ur5e_pick_place",
-        imported_list: Optional[list] = None,    # import mesh file such as stl, obj, etc.
-        object_position: Optional[np.ndarray] = None,
+        objects_list: Optional[list] = None,    # import mesh file such as stl, obj, etc.
+        objects_position: Optional[np.ndarray] = None,
         target_position: Optional[np.ndarray] = None,
         offset: Optional[np.ndarray] = np.array([0, 0, 0.15]),
     ) -> None:
         tasks.PickPlace.__init__(self, name=name, )
-        if object_position is None:
-            pos_x = random.uniform(0.3, 0.6)
-            pos_y = random.uniform(0.3, 0.6)
-            pos_z = 0.1
-            self.object_position = np.array([pos_x, pos_y, pos_z])
+        if objects_position is None:
+            for i in range(len(objects_list)):
+                if i == 0:
+                    pos_x = random.uniform(0.3, 0.6)
+                    pos_y = random.uniform(0.3, 0.6)
+                    pos_z = 0.1
+                    self.objects_position = np.array([pos_x, pos_y, pos_z])
+                elif i == 1:
+                    pos_x = random.uniform(-0.3, -0.6)
+                    pos_y = random.uniform(0.3, 0.6)
+                    pos_z = 0.1
+                    self.objects_position = np.concatenate((self.objects_position, np.array([pos_x, pos_y, pos_z])),
+                                                          axis=0)
+                elif i == 2:
+                    pos_x = random.uniform(-0.3, -0.6)
+                    pos_y = random.uniform(-0.3, -0.6)
+                    pos_z = 0.1
+                    self.objects_position = np.concatenate((self.objects_position, np.array([pos_x, pos_y, pos_z])),
+                                                          axis=0)
         else:
-            self.object_position = object_position
+            self.objects_position = objects_position
 
-        self.imported_objects = imported_list
+        self.imported_objects = objects_list
         self.imported_objects_prim_path = "/World/object"
         
         # 아래 3개 변수는 개수가 많아진다면 list나 dict로 해야 함.
-        self.position = None
-        self.orientation = None
-        self.task_object_name = None
+        self.objects_position_list = []
+        self.objects_orientation_list = []
+        self.objects_name_list = []
 
         if self.imported_objects is None:
             cube_prim_path = "/World/Cube"
             cube_name = "cube"
             size_scale = 0.03
-            self.object_position[2] = self.object_position[2] + size_scale/2
+            self.objects_position[0][2] = self.objects_position[0][2] + size_scale/2
             self._object = DynamicCuboid(
                 prim_path = cube_prim_path,
                 name = cube_name,
-                position = self.object_position,
+                position = self.objects_position[0],
                 scale = np.array([size_scale, size_scale, size_scale]),
                 color = np.array([0, 0, 1]),
                 size = 1.0,
@@ -80,7 +94,7 @@ class UR5ePickPlace(tasks.PickPlace):
             self._objects = self._object
         else:
             size_scale = 0.2
-            self._objects = imported_list
+            self._objects = objects_list
             ''' 위 부분은 for문을 통해 여러개의 object를 추가할 수도 있음 '''
 
         self._offset = offset
@@ -106,6 +120,10 @@ class UR5ePickPlace(tasks.PickPlace):
         if self.imported_objects is None:
             self._task_object = scene.add(self._objects)
         else:
+            for i in range(len(self.imported_objects)):
+                self.set_usd_objects(object_number = i,
+                                     object_position = self.objects_position[i])
+            '''         
             # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
             define_prim(self.imported_objects_prim_path)
             define_prim(self.imported_objects_prim_path+"/geometry_prim")
@@ -134,7 +152,7 @@ class UR5ePickPlace(tasks.PickPlace):
                     dynamic_friction = 10,
                     restitution = None
                 )        
-            )
+            )'''
 
         self._robot = self.set_robot()
         scene.add(self._robot)
@@ -163,10 +181,41 @@ class UR5ePickPlace(tasks.PickPlace):
         ur5e_robot_name = find_unique_string_name(
             initial_name="my_ur5e", is_unique_fn=lambda x: not self.scene.object_exists(x)
         )
-        
         return UR5eHandeye(prim_path = ur5e_prim_path,
                            name = ur5e_robot_name,
                            usd_path = ur5e_usd_path)
+
+
+    def set_usd_objects(self, object_number: int, object_position: np.ndarray) -> None:
+        # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
+        define_prim(self.imported_objects_prim_path + f"_{object_number}")
+        define_prim(self.imported_objects_prim_path + f"/geometry_prim_{object_number}")
+
+        self._task_object = add_reference_to_stage(usd_path = self._objects[object_number],
+                                                   prim_path = self.imported_objects_prim_path + f"_{object_number}")
+        rigid_prim = RigidPrim(prim_path = self.imported_objects_prim_path + f"_{object_number}",
+                               position = object_position,
+                               orientation = np.array([1, 0, 0, 0]),
+                               name = "rigid_prim",
+                               scale = np.array([0.2] * 3),
+                               mass = 0.01)
+        rigid_prim.enable_rigid_body_physics()
+
+        geometry_prim = GeometryPrim(prim_path = self.imported_objects_prim_path + f"/geometry_prim_{object_number}",
+                                     name = "geometry_prim",
+                                     position = object_position,
+                                     orientation = np.array([1, 0, 0, 0]),
+                                     scale = np.array([0.2] * 3),
+                                     collision = True,
+                                    )
+        geometry_prim.apply_physics_material(
+            PhysicsMaterial(
+                prim_path = self.imported_objects_prim_path + f"/physics_material_{object_number}",
+                static_friction = 10,
+                dynamic_friction = 10,
+                restitution = None
+            )        
+        )
 
     
     def get_params(self) -> dict:
@@ -175,23 +224,28 @@ class UR5ePickPlace(tasks.PickPlace):
             self.position, self.orientation = self._task_object.get_local_pose()
             self.task_object_name = self._task_object.name
         else:
-            stage = omni.usd.get_context().get_stage()
-            prim = stage.GetPrimAtPath(self.imported_objects_prim_path)
-            matrix = omni.usd.get_world_transform_matrix(prim)
-            translate = matrix.ExtractTranslation()
-            rotation = matrix.ExtractRotationQuat()
-            self.position = np.array([translate[0], translate[1], translate[2]+0.03],
-                                     dtype=np.float32)
-            self.orientation = np.array([rotation.imaginary[0],
-                                         rotation.imaginary[1],
-                                         rotation.imaginary[2],
-                                         rotation.real],
+            for i in range(len(self.imported_objects)):
+                stage = omni.usd.get_context().get_stage()
+                prim = stage.GetPrimAtPath(self.imported_objects_prim_path + f"_{i}")
+                matrix = omni.usd.get_world_transform_matrix(prim)
+                translate = matrix.ExtractTranslation()
+                rotation = matrix.ExtractRotationQuat()
+                self.position = np.array([translate[0], translate[1], translate[2]+0.03],
                                          dtype=np.float32)
-            self.task_object_name = prim.GetName()
+                self.objects_position_list.append(self.position)
+                self.orientation = np.array([rotation.imaginary[0],
+                                             rotation.imaginary[1],
+                                             rotation.imaginary[2],
+                                             rotation.real],
+                                            dtype=np.float32)
+                self.objects_orientation_list.append(self.orientation)
+                self.task_object_name = prim.GetName()
+                self.objects_name_list.append(self.task_object_name)
 
-        params_representation["task_object_position"] = {"value": self.position, "modifiable": True}
-        params_representation["task_object_orientation"] = {"value": self.orientation, "modifiable": True}
-        params_representation["task_object_name"] = {"value": self.task_object_name, "modifiable": False}
+                params_representation[f"task_object_position_{i}"] = {"value": self.position, "modifiable": True}
+                params_representation[f"task_object_orientation_{i}"] = {"value": self.orientation, "modifiable": True}
+                params_representation[f"task_object_name_{i}"] = {"value": self.task_object_name, "modifiable": False}
+        
         params_representation["target_position"] = {"value": self.target_position, "modifiable": True}
         params_representation["robot_name"] = {"value": self._robot.name, "modifiable": False}
         return params_representation
@@ -205,16 +259,27 @@ class UR5ePickPlace(tasks.PickPlace):
         """
         joints_state = self._robot.get_joints_state()
         end_effector_position, _ = self._robot.end_effector.get_local_pose()
-        return {
-            self.task_object_name: {
-                "position": self.position,
-                "orientation": self.orientation,
-                "target_position": self.target_position,
-            },
-            self._robot.name: {
-                "joint_positions": joints_state.positions,
-                "end_effector_position": end_effector_position,
-            },
-        }
+
+        observation_dict = dict()
+        if self.imported_objects is None:
+            observation_dict = {
+                                self.task_object_name: {"position": self.position,
+                                                        "orientation": self.orientation,
+                                                        "target_position": self.target_position,
+                                                        },
+                                self._robot.name: {"joint_positions": joints_state.positions,
+                                                   "end_effector_position": end_effector_position,
+                                                   },
+                                }
+        else:
+            for i in range(len(self.imported_objects)):
+                observation_dict[self.objects_name_list[i]] = {"position": self.objects_position_list[i],
+                                                          "orientation": self.objects_orientation_list[i],
+                                                          "target_position": self.target_position,
+                                                          }
+            observation_dict[self._robot.name] = {"joint_positions": joints_state.positions,
+                                                  "end_effector_position": end_effector_position,
+                                                  }
+        return observation_dict
     
 

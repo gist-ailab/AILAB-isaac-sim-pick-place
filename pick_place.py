@@ -22,21 +22,23 @@ import glob, os, random
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
 objects_list = glob.glob(objects_path)
-objects_list = objects_list[random.randrange(1, 79)]
+objects_list = random.sample(objects_list, 3)
+# objects_list = objects_list[random.randrange(1, 79)]
 # objects_list = objects_list[14]
 # objects_list = objects_list[41]
-objects_list = objects_list[2]
+# objects_list = objects_list[2]
 
-object_position = np.array([0.3, 0.3, 0.1])
-object_position = None
+objects_position = np.array([[0.3, 0.3, 0.1],
+                             [-0.3, 0.3, 0.1],
+                             [-0.3, -0.3, 0.1]])
 
 offset = np.array([0, 0, 0.1])
 target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
 target_orientation = np.array([0, 0, 0, 1])
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = UR5ePickPlace(imported_list = objects_list,
-                        object_position = object_position,
+my_task = UR5ePickPlace(objects_list = objects_list,
+                        objects_position = objects_position,
                         offset=offset)  # releasing offset at the target position
 my_world.add_task(my_task)
 my_world.reset()
@@ -60,8 +62,8 @@ while simulation_app.is_running():
             my_controller.reset()
         observations = my_world.get_observations()
         actions = my_controller.forward(
-            picking_position=observations[task_params["task_object_name"]["value"]]["position"],
-            placing_position=observations[task_params["task_object_name"]["value"]]["target_position"],
+            picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
+            placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
             current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
             end_effector_offset=np.array([0.125, 0.095, 0.04]),
             # end_effector_offset=np.array([0, 0, 0.04]),
