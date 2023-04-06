@@ -9,7 +9,15 @@
 
 ### 2. Conda Enviroment Setup
  - Create env create
+    ```
+    conda env create -f environment.yml
+    conda activate isaac-sim
+    ```
+
  - Install requirment pakages
+    ```
+    pip install -r requirements.txt
+    ```
 
 ### 3. YCB object  Dataset Download
  - You can get ycb dataset in MAT
