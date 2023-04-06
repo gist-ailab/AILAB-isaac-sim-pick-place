@@ -110,7 +110,7 @@ for l in range(3):
     # pos_x = random.random()*1.2-0.4
     # pos_z = size_z
     # position = np.random.randint(-1200, 1200, size=3) / 1000
-    position = np.array([0.5+(l*0.1), 0, 0.1])
+    position = np.array([-0.4-(l*0.2), 0, 0.1])
     a = random.randint(0, len(objects)-1)
     create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=position, scale=[0.2,0.2,0.2])
 
@@ -142,15 +142,15 @@ for l in range(3):
 
 my_world.reset()
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
+    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
 )
 my_controller2 = ReachTargetController(
-    name="reach_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
+    name="reach_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
 )
 articulation_controller = my_ur5e.get_articulation_controller()
 
-r, theta, z = 5, 0, 0.5
-found_cube = False
+r, theta, z = 4, 0, 0.3
+found_obj = False
 print('reach-target')
 for theta in range(0, 360, 45):
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
@@ -167,57 +167,103 @@ for theta in range(0, 360, 45):
                 theta=theta
             )
             if my_controller2.is_done():
-                print('done reaching target')
-                
                 rgb_image = depth_camera.get_rgba()[:, :, :3]
                 depth_image = depth_camera.get_current_frame()["distance_to_camera"]
                 instance_segmentation_image = depth_camera.get_current_frame()["instance_segmentation"]["data"]
                 tight_bbox = depth_camera.get_current_frame()["bounding_box_2d_tight"]
-                depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
-                n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
-                                
-                imgplot = plt.imshow(rgb_image)
-                plt.show()
-                inssegplot = plt.imshow(instance_segmentation_image)
-                plt.show()
-                ndepthplot = plt.imshow(n_depth_image)
-                plt.show()
                 
-                bbox_info = tight_bbox["info"]["bboxIds"]                
-                bboxes = {}
-                for i in range(len(bbox_info)):
-                    id = bbox_info[i]
-                    bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
-                
-                if bboxes:
-                    found_cube = True
-                angle, length, width, center = inference_ggcnn(rgb_image, n_depth_image, bboxes["obj"+str(1)])
-                center = np.array(center)
-                depth = n_depth_image[center[1]][center[0]]
-                
-                center = np.expand_dims(center, axis=0)
-                world_center = depth_camera.get_world_points_from_image_coords(center, depth)
-                print(world_center)
-                print(center)
-                print(angle)
+                if {'class': 'object1'} in tight_bbox["info"]["idToLabels"].values():
+                    depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
+                    n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
+                                    
+                    imgplot = plt.imshow(rgb_image)
+                    plt.show()
+                    inssegplot = plt.imshow(instance_segmentation_image)
+                    plt.show()
+                    ndepthplot = plt.imshow(n_depth_image)
+                    plt.show()
+                    
+                    bbox_info = tight_bbox["info"]["bboxIds"]
+                    bboxes = {}
+                    for i in range(len(bbox_info)):
+                        id = bbox_info[i]
+                        bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
+                    
+                    bbox = bboxes["obj"+str(1)]
+                    center = [int((bbox[1]+bbox[3])/2), int((bbox[2]+bbox[4])/2)]
+                    depth = depth_image[center[0]][center[1]]
+                    center = np.expand_dims(center, axis=0)
+                    world_center = depth_camera.get_world_points_from_image_coords(center, depth)
+                    
+                    # angle, length, width, center = inference_ggcnn(rgb_image, n_depth_image, bboxes["obj"+str(1)])
+                    # center = np.array(center)
+                    # depth = n_depth_image[center[1]][center[0]]
+                    
+                    # center = np.expand_dims(center, axis=0)
+                    # world_center = depth_camera.get_world_points_from_image_coords(center, depth)
+                    # print(world_center)
+                    # print(center)
+                    # print(angle)
+                    # angle = np.arctan(world_center[0][1]/world_center[0][0])
+                    angle = theta * 2 * np.pi / 360
+                    found_obj = True
+                    
+                my_controller2.reset()
                 break
             articulation_controller.apply_action(actions)
-        if args.test is True:
-            break
-        if found_cube:
-            print('found cube')
-    if found_cube:
-        print('found cube')
-        print('bbox', bbox_info)
+    if found_obj:
+        print('found obj')
         break
 
 print('pick-and-place')
+change_world_center = False
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
+        if my_controller._event == 0:
+            if my_controller._t >= 0.99:
+            # if my_world.current_time_step_index > 110:
+                if not change_world_center:
+                    my_controller.pause()
+                    # print(my_controller._t)
+                    # print(my_world.current_time_step_index)
+                    rgb_image = depth_camera.get_rgba()[:, :, :3]
+                    depth_image = depth_camera.get_current_frame()["distance_to_camera"]
+                    instance_segmentation_image = depth_camera.get_current_frame()["instance_segmentation"]["data"]
+                    # loose_bbox = depth_camera.get_current_frame()["bounding_box_2d_loose"]
+                    tight_bbox = depth_camera.get_current_frame()["bounding_box_2d_tight"]
+                    depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
+                    n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
+
+                    imgplot = plt.imshow(rgb_image)
+                    plt.show()
+                    inssegplot = plt.imshow(instance_segmentation_image)
+                    plt.show()
+                    ndepthplot = plt.imshow(n_depth_image)
+                    plt.show()
+
+                    bbox_info = tight_bbox["info"]["bboxIds"]                
+                    bboxes = {}
+                    for i in range(len(bbox_info)):
+                        id = bbox_info[i]
+                        bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
+                    print(tight_bbox["data"])
+                    
+                    ggcnn_angle, length, width, center = inference_ggcnn(rgb_image, n_depth_image, bboxes["obj"+str(1)])
+                    center = np.array(center)
+                    depth = n_depth_image[center[1]][center[0]]
+                    
+                    center = np.expand_dims(center, axis=0)
+                    world_center = depth_camera.get_world_points_from_image_coords(center, depth)
+                    angle = angle + ggcnn_angle
+                    
+                    change_world_center = True
+                    
+                    my_controller.resume()
+                
         actions = my_controller.forward(
             # picking_position=np.array([0.4, 0.4, 0]),
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
