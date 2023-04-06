@@ -72,7 +72,6 @@ class UR5ePickPlace(tasks.PickPlace):
         self.imported_objects = objects_list
         self.imported_objects_prim_path = "/World/object"
         
-        # 아래 3개 변수는 개수가 많아진다면 list나 dict로 해야 함.
         self.objects_position_list = []
         self.objects_orientation_list = []
         self.objects_name_list = []
@@ -105,7 +104,6 @@ class UR5ePickPlace(tasks.PickPlace):
         return
 
 
-
     def set_up_scene(self, scene: Scene) -> None:
         """[summary]
         YCB objects are added to the scene. If the ycb objects are not found in the scene, 
@@ -123,36 +121,6 @@ class UR5ePickPlace(tasks.PickPlace):
             for i in range(len(self.imported_objects)):
                 self.set_usd_objects(object_number = i,
                                      object_position = self.objects_position[i])
-            '''         
-            # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
-            define_prim(self.imported_objects_prim_path)
-            define_prim(self.imported_objects_prim_path+"/geometry_prim")
-
-            self._task_object = add_reference_to_stage(usd_path = self._objects,
-                                                       prim_path = self.imported_objects_prim_path)
-            rigid_prim = RigidPrim(prim_path = self.imported_objects_prim_path,
-                       position = self.object_position,
-                       orientation = np.array([1, 0, 0, 0]),
-                       name = "rigid_prim",
-                       scale = np.array([0.2] * 3),
-                       mass = 0.01)
-            rigid_prim.enable_rigid_body_physics()
-
-            geometry_prim = GeometryPrim(prim_path = self.imported_objects_prim_path + "/geometry_prim",
-                                         name = "geometry_prim",
-                                         position = self.object_position,
-                                         orientation = np.array([1, 0, 0, 0]),
-                                         scale = np.array([0.2] * 3),
-                                         collision = True,
-                                        )
-            geometry_prim.apply_physics_material(
-                PhysicsMaterial(
-                    prim_path = self.imported_objects_prim_path + "/physics_material",
-                    static_friction = 10,
-                    dynamic_friction = 10,
-                    restitution = None
-                )        
-            )'''
 
         self._robot = self.set_robot()
         scene.add(self._robot)
