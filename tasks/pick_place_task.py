@@ -14,8 +14,10 @@ from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.objects import DynamicCuboid
 from omni.isaac.core.utils.prims import is_prim_path_valid
 from omni.isaac.core.utils.string import find_unique_string_name
-from omni.isaac.core.utils.prims import create_prim, get_prim_path
+from omni.isaac.core.utils.prims import create_prim, get_prim_path, define_prim
 from omni.isaac.core.utils.stage import get_stage_units
+from omni.isaac.core.materials import PhysicsMaterial
+from omni.isaac.core.prims import RigidPrim, GeometryPrim
 from robots.ur5e_handeye import UR5eHandeye
 import os, random
 import numpy as np
@@ -40,13 +42,19 @@ class UR5ePickPlace(tasks.PickPlace):
         self,
         name: str = "ur5e_pick_place",
         imported_list: Optional[list] = None,    # import mesh file such as stl, obj, etc.
+        object_position: Optional[np.ndarray] = None,
         target_position: Optional[np.ndarray] = None,
-        offest: Optional[np.ndarray] = np.array([0, 0, 0.15]),
+        offset: Optional[np.ndarray] = np.array([0, 0, 0.15]),
     ) -> None:
         tasks.PickPlace.__init__(self, name=name, )
-        self.pos_x = (random.random()*1.2-0.4)/4
-        self.pos_y = (random.random()*1.2+0.8)/4
-        self.pos_z = 0.1
+        if object_position is None:
+            pos_x = random.uniform(0.3, 0.6)
+            pos_y = random.uniform(0.3, 0.6)
+            pos_z = 0.1
+            self.object_position = np.array([pos_x, pos_y, pos_z])
+        else:
+            self.object_position = object_position
+
         self.imported_objects = imported_list
         self.imported_objects_prim_path = "/World/object"
         
@@ -59,10 +67,11 @@ class UR5ePickPlace(tasks.PickPlace):
             cube_prim_path = "/World/Cube"
             cube_name = "cube"
             size_scale = 0.03
+            self.object_position[2] = self.object_position[2] + size_scale/2
             self._object = DynamicCuboid(
                 prim_path = cube_prim_path,
                 name = cube_name,
-                position = np.array([0.4, 0.33, 0.1 + size_scale/2]),
+                position = self.object_position,
                 scale = np.array([size_scale, size_scale, size_scale]),
                 color = np.array([0, 0, 1]),
                 size = 1.0,
@@ -70,22 +79,15 @@ class UR5ePickPlace(tasks.PickPlace):
             )
             self._objects = self._object
         else:
-            imported_object = create_prim(
-                                          usd_path=imported_list[random.randint(0, len(imported_list)-1)],
-                                        #   usd_path=imported_list[0],
-                                          prim_path=self.imported_objects_prim_path,
-                                          position=[self.pos_x, self.pos_y, self.pos_z],
-                                          scale=[0.2,0.2,0.2])
-            # self._objects = imported_object
-            self._objects = imported_object
-            ''' 위 부분은 for문을 통해 여러개의 object를 추가할 수 있도록 수정해야함 '''
+            size_scale = 0.2
+            self._objects = imported_list
+            ''' 위 부분은 for문을 통해 여러개의 object를 추가할 수도 있음 '''
 
-        self._target_position = target_position
-        self._offset = offest
-        if self._target_position is None:
-            self._target_position = np.array([0.4, -0.33, 0])
-            self._target_position[2] = 0.05 # considering the length of the gripper tip
-        self._target_position = self._target_position + self._offset
+        self._offset = offset
+        if target_position is None:
+            self.target_position = np.array([0.4, -0.33, 0])
+            self.target_position[2] = 0.05 # considering the length of the gripper tip
+        self.target_position = self.target_position + self._offset
         return
 
 
@@ -103,6 +105,36 @@ class UR5ePickPlace(tasks.PickPlace):
 
         if self.imported_objects is None:
             self._task_object = scene.add(self._objects)
+        else:
+            # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
+            define_prim(self.imported_objects_prim_path)
+            define_prim(self.imported_objects_prim_path+"/geometry_prim")
+
+            self._task_object = add_reference_to_stage(usd_path = self._objects,
+                                                       prim_path = self.imported_objects_prim_path)
+            rigid_prim = RigidPrim(prim_path = self.imported_objects_prim_path,
+                       position = self.object_position,
+                       orientation = np.array([1, 0, 0, 0]),
+                       name = "rigid_prim",
+                       scale = np.array([0.2] * 3),
+                       mass = 0.01)
+            rigid_prim.enable_rigid_body_physics()
+
+            geometry_prim = GeometryPrim(prim_path = self.imported_objects_prim_path + "/geometry_prim",
+                                         name = "geometry_prim",
+                                         position = self.object_position,
+                                         orientation = np.array([1, 0, 0, 0]),
+                                         scale = np.array([0.2] * 3),
+                                         collision = True,
+                                        )
+            geometry_prim.apply_physics_material(
+                PhysicsMaterial(
+                    prim_path = self.imported_objects_prim_path + "/physics_material",
+                    static_friction = 10,
+                    dynamic_friction = 10,
+                    restitution = None
+                )        
+            )
 
         self._robot = self.set_robot()
         scene.add(self._robot)
@@ -117,8 +149,9 @@ class UR5ePickPlace(tasks.PickPlace):
         Returns:
             UR5e: [description]
         """
-        working_dir = os.path.dirname(os.path.realpath(__file__))
-        ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
+        working_dir = os.path.dirname(os.path.realpath(__file__))   # same directory with this code
+        # ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
+        ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper_v2.usd")
         if os.path.isfile(ur5e_usd_path):
             pass
         else:
@@ -147,7 +180,7 @@ class UR5ePickPlace(tasks.PickPlace):
             matrix = omni.usd.get_world_transform_matrix(prim)
             translate = matrix.ExtractTranslation()
             rotation = matrix.ExtractRotationQuat()
-            self.position = np.array([translate[0], translate[1], translate[2]],
+            self.position = np.array([translate[0], translate[1], translate[2]+0.03],
                                      dtype=np.float32)
             self.orientation = np.array([rotation.imaginary[0],
                                          rotation.imaginary[1],
@@ -159,7 +192,7 @@ class UR5ePickPlace(tasks.PickPlace):
         params_representation["task_object_position"] = {"value": self.position, "modifiable": True}
         params_representation["task_object_orientation"] = {"value": self.orientation, "modifiable": True}
         params_representation["task_object_name"] = {"value": self.task_object_name, "modifiable": False}
-        params_representation["target_position"] = {"value": self._target_position, "modifiable": True}
+        params_representation["target_position"] = {"value": self.target_position, "modifiable": True}
         params_representation["robot_name"] = {"value": self._robot.name, "modifiable": False}
         return params_representation
 
@@ -176,7 +209,7 @@ class UR5ePickPlace(tasks.PickPlace):
             self.task_object_name: {
                 "position": self.position,
                 "orientation": self.orientation,
-                "target_position": self._target_position,
+                "target_position": self.target_position,
             },
             self._robot.name: {
                 "joint_positions": joints_state.positions,

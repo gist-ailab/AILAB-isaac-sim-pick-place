@@ -36,6 +36,7 @@ class PickPlaceController(manipulators_controllers.PickPlaceController):
         if events_dt is None:
             # events_dt = [0.01, 0.0035, 0.01, 1.0, 0.008, 0.005, 0.005, 1, 0.01, 0.08]
             events_dt = [0.008, 0.005, 1, 0.05, 0.05, 0.05, 0.0025, 1, 0.008, 0.08]
+            events_dt = [0.008, 0.01, 1, 0.08, 0.1, 0.05, 0.005, 1, 0.01, 0.1]
         manipulators_controllers.PickPlaceController.__init__(
             self,
             name=name,

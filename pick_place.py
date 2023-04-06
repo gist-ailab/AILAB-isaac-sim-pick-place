@@ -16,17 +16,28 @@ from omni.isaac.core import World
 from omni.isaac.core.utils.prims import create_prim, delete_prim
 from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
 import numpy as np
-import glob, os
+import glob, os, random
 
 
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
 objects_list = glob.glob(objects_path)
-# imported_object = create_prim(usd_path=objects_list[5], prim_path="/World/object", position=[pos_x,pos_y,pos_z], scale=[0.3,0.3,0.3])
+objects_list = objects_list[random.randrange(1, 79)]
+# objects_list = objects_list[14]
+# objects_list = objects_list[41]
+objects_list = objects_list[2]
 
+object_position = np.array([0.3, 0.3, 0.1])
+object_position = None
+
+offset = np.array([0, 0, 0.1])
+target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
+target_orientation = np.array([0, 0, 0, 1])
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = UR5ePickPlace(imported_list = objects_list)
+my_task = UR5ePickPlace(imported_list = objects_list,
+                        object_position = object_position,
+                        offset=offset)  # releasing offset at the target position
 my_world.add_task(my_task)
 my_world.reset()
 task_params = my_task.get_params()
@@ -52,7 +63,8 @@ while simulation_app.is_running():
             picking_position=observations[task_params["task_object_name"]["value"]]["position"],
             placing_position=observations[task_params["task_object_name"]["value"]]["target_position"],
             current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            end_effector_offset=np.array([0, 0, 0.12]),
+            end_effector_offset=np.array([0.125, 0.095, 0.04]),
+            # end_effector_offset=np.array([0, 0, 0.04]),
         )
         if my_controller.is_done():
             print("done picking and placing")
