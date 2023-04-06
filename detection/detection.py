@@ -84,7 +84,7 @@ model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights="DEFAULT")
 
 # replace the classifier with a new one, that has
 # num_classes which is user-defined
-num_classes = 3  # 1 class (person) + background
+num_classes = 90  # 1 class (person) + background
 # get number of input features for the classifier
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 # replace the pre-trained head with a new one
@@ -120,7 +120,7 @@ roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0'],
 
 # put the pieces together inside a FasterRCNN model
 model = FasterRCNN(backbone,
-                   num_classes=3,
+                   num_classes=90,
                    rpn_anchor_generator=anchor_generator,
                    box_roi_pool=roi_pooler)
 
@@ -172,7 +172,7 @@ def main():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     # our dataset has two classes only - background and person
-    num_classes = 3
+    num_classes = 90
     # use our dataset and defined transformations
     dataset = PennFudanDataset('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/data', get_transform(train=True))
     dataset_test = PennFudanDataset('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/data', get_transform(train=False))

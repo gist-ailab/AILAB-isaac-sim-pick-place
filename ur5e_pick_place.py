@@ -26,6 +26,7 @@ import omni.kit.commands
 from pick_place_controller import PickPlaceController
 from correct_radial_distortion import depth_image_from_distance_image
 from ggcnn.inferece_ggcnn import inference_ggcnn
+from detection.inference_detection import inference_detection
 
 import carb
 import sys
@@ -164,12 +165,15 @@ while simulation_app.is_running():
                 depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
                 n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
                                 
-                # imgplot = plt.imshow(rgb_image)
-                # plt.show()
-                # inssegplot = plt.imshow(instance_segmentation_image)
-                # plt.show()
-                # ndepthplot = plt.imshow(n_depth_image)
-                # plt.show()
+                imgplot = plt.imshow(rgb_image)
+                plt.show()
+                rgb_image = Image.fromarray(rgb_image)
+                rgb_image.save('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/rgb.png')
+                exit()
+                inssegplot = plt.imshow(instance_segmentation_image)
+                plt.show()
+                ndepthplot = plt.imshow(n_depth_image)
+                plt.show()
                 
                 bbox_info = tight_bbox["info"]["bboxIds"]                
                 bboxes = {}
@@ -184,12 +188,6 @@ while simulation_app.is_running():
                 
                 center = np.expand_dims(center, axis=0)
                 world_center = depth_camera.get_world_points_from_image_coords(center, depth)
-                # print(center)
-                # print(length)
-                # print(width)
-                # print(n_center)
-                print(angle)
-                exit()
                 
                 my_controller.resume()
 
@@ -197,12 +195,12 @@ while simulation_app.is_running():
         
         observations = my_world.get_observations()
         actions = my_controller.forward(
-            picking_position=np.array([0, 0, 0]),
+            picking_position=np.array([0.4, 0.4, 0]),
             # picking_position=np.array([world_center[0], world_center[1], length/100]),
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
-            end_effector_orientation = None,
+            # end_effector_orientation = np.array([0, 0, angle]),
         )
         if my_controller.is_done():
             print("done picking and placing")
