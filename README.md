@@ -30,5 +30,6 @@
 
 - Run Pick and Place
     ```
-    python isaac-sim-pick-place/preprocess/ur5e_pick_place.py
+    ## change directories of usd files, and ggcnn pth file ##
+    python isaac-sim-pick-place/ur5e_pick_place.py
     ```

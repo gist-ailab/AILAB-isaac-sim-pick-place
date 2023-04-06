@@ -19,8 +19,10 @@ import numpy as np
 import glob, os, random
 
 
-working_dir = os.path.dirname(os.path.realpath(__file__))
-objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
+# working_dir = os.path.dirname(os.path.realpath(__file__))
+# objects_path = os.path.join(working_dir, "ycb_usd/ycb/*.usd")
+
+objects_path = "/ailab_mat/dataset/ycb_usd/ycb/*/*.usd"
 objects_list = glob.glob(objects_path)
 objects_list = random.sample(objects_list, 3)
 # get three objects randomly

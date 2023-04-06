@@ -13,7 +13,7 @@ def inference_ggcnn(rgb, depth, bbox):
     cropped_depth = depth[cy-crop_range: cy+crop_range, cx-crop_range: cx+crop_range]
     cropped_rgb = rgb[cy-crop_range: cy+crop_range, cx-crop_range: cx+crop_range]
     # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth.png', depth*255)
-    cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/cropped_depth.png', cropped_depth*255)
+    # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/cropped_depth.png', cropped_depth*255)
     # cropped_depth = np.transpose(cropped_depth, (2, 0, 1))
     # cropped_depth = cropped_depth[0]
     cropped_depth = np.clip((cropped_depth - cropped_depth.mean()), -1, 1)
@@ -21,8 +21,8 @@ def inference_ggcnn(rgb, depth, bbox):
     
     ## GGCNN Network
     net = GGCNN()
-    net.load_state_dict(torch.load("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
-    # net.load_state_dict(torch.load("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
+    # net.load_state_dict(torch.load("/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
+    net.load_state_dict(torch.load("/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"))
     net.cuda()
     
     with torch.no_grad():

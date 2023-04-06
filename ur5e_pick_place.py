@@ -49,7 +49,8 @@ my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
 # ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
-ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
+# ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -102,7 +103,8 @@ depth_camera = Camera(
 #######
 #Add ycb object
 #########
-objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
+# objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
+objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
 for l in range(3):
     # size_z = (random.random()*0.09+0.03)*2
     # size = size_z
