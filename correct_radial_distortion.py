@@ -35,23 +35,23 @@ def depth_image_from_distance_image(distance, intrinsics):
 
 
 
+if __name__ == '__main__':
+    depth_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_3_45_d.png"
+    new_depth_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_3_45_newd.png"
+    depth = cv2.imread(depth_path, cv2.IMREAD_ANYDEPTH)
+    # cv2.resize(depth, (1920, 1080))
+    print(type(depth))
+    print(depth.size)   # 1920*1080*3       6220800 # 1920*1080*1       2073600
+    print(depth.shape)  # (1080, 1920)
+    # intrinsics = [[940.50757, 0.0, 960.0], [0.0, 529.0355, 540.0], [0.0, 0.0, 1.0]]         # depth camera intrinsics
+    intrinsics = [[1398.3395, 0.0, 960.0], [0.0, 786.56598, 540.0], [0.0, 0.0, 1.0]]        # rgb camera intrinsics
 
-depth_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_3_45_d.png"
-new_depth_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/rgbcam_3_45_newd.png"
-depth = cv2.imread(depth_path, cv2.IMREAD_ANYDEPTH)
-# cv2.resize(depth, (1920, 1080))
-print(type(depth))
-print(depth.size)   # 1920*1080*3       6220800 # 1920*1080*1       2073600
-print(depth.shape)  # (1080, 1920)
-# intrinsics = [[940.50757, 0.0, 960.0], [0.0, 529.0355, 540.0], [0.0, 0.0, 1.0]]         # depth camera intrinsics
-intrinsics = [[1398.3395, 0.0, 960.0], [0.0, 786.56598, 540.0], [0.0, 0.0, 1.0]]        # rgb camera intrinsics
 
 
+    new_depth = np.uint16(depth_image_from_distance_image(depth, intrinsics))
+    plt.imshow(depth)
+    plt.show()
 
-new_depth = np.uint16(depth_image_from_distance_image(depth, intrinsics))
-plt.imshow(depth)
-plt.show()
-
-plt.imshow(new_depth)
-plt.show()
-cv2.imwrite(new_depth_path, new_depth*255)
+    plt.imshow(new_depth)
+    plt.show()
+    cv2.imwrite(new_depth_path, new_depth*255)
