@@ -12,11 +12,7 @@
 ### 3. YCB object  Dataset Download
  - You can get ycb dataset in MAT
     ```
-    /ailab_mat/dataset/YCB
-    ```
- - Preprocessing from obj file to urdf file
-    ```
-    python isaac-sim-pick-place/preprocess/preprocess_ycb.py
+    /ailab_mat/dataset/ycb_usd
     ```
 
 
