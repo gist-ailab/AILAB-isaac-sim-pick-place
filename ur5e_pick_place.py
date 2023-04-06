@@ -117,13 +117,13 @@ stage = get_current_stage()
 my_world.reset()
 
 # rgb_camera.initialize()
-depth_camera.initialize()
 # rgb_camera.add_distance_to_camera_to_frame()
 # rgb_camera.add_instance_segmentation_to_frame()
 # rgb_camera.add_instance_id_segmentation_to_frame()
 # rgb_camera.add_semantic_segmentation_to_frame()
 # rgb_camera.add_bounding_box_2d_loose_to_frame()
 # rgb_camera.add_bounding_box_2d_tight_to_frame()
+depth_camera.initialize()
 depth_camera.add_distance_to_camera_to_frame()
 depth_camera.add_instance_segmentation_to_frame()
 depth_camera.add_instance_id_segmentation_to_frame()
@@ -164,12 +164,12 @@ while simulation_app.is_running():
                 depth_camera_intrinsics = depth_camera.get_intrinsics_matrix()
                 n_depth_image = depth_image_from_distance_image(depth_image, depth_camera_intrinsics)
                                 
-                imgplot = plt.imshow(rgb_image)
-                plt.show()
-                inssegplot = plt.imshow(instance_segmentation_image)
-                plt.show()
-                ndepthplot = plt.imshow(n_depth_image)
-                plt.show()
+                # imgplot = plt.imshow(rgb_image)
+                # plt.show()
+                # inssegplot = plt.imshow(instance_segmentation_image)
+                # plt.show()
+                # ndepthplot = plt.imshow(n_depth_image)
+                # plt.show()
                 
                 bbox_info = tight_bbox["info"]["bboxIds"]                
                 bboxes = {}
@@ -178,29 +178,25 @@ while simulation_app.is_running():
                     bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
                 
                 angle, length, width, center = inference_ggcnn(n_depth_image, bboxes["obj"+str(0)])
-                print(angle)
-                print(length)
-                print(width)
-                print(center)
-                exit()
+                center = np.array(center)
+                depth = depth_image[center[0]][center[1]]
                 
-                # rgb_image = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB)
-                # instance_segmentation_image = np.array(instance_segmentation_image, dtype=type(depth_image[0][0]))
-                # cv2.imwrite('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/rgb_image_3.png', rgb_image)
-                # # depth_image = depth_image.astype(np.uint8)
-                # # cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth_image_3.png', depth_image*255)
-                # depth_image = Image.fromarray((depth_image * 255.0).astype(np.uint8))
-                # depth_image.save('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/depth_image_3.png')
-                # cv2.imwrite('/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/mask_3.png', instance_segmentation_image)
-                
-                # print(cube.get_local_pose()[0])
+                center = np.expand_dims(center, axis=0)
+                world_center = depth_camera.get_world_points_from_image_coords(center, depth)
+                # print(center)
+                # print(length)
+                # print(width)
+                # print(n_center)
+                # exit()
                 
                 my_controller.resume()
+
         # elif my_world.current_time_step_index > 210:
+        
         observations = my_world.get_observations()
         actions = my_controller.forward(
             # picking_position=np.array([pos_x,pos_y, 0.00]),
-            picking_position=np.array([position[0], position[1], 0]),
+            picking_position=np.array([world_center[0], world_center[1], length/100]),
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
