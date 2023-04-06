@@ -30,16 +30,6 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
 
         - Phase 0: Move end_effector above the cube center at the 'end_effector_initial_height'.
 
-        - Phase 1: Lower end_effector down to encircle the target cube
-        - Phase 2: Wait for Robot's inertia to settle.
-        - Phase 3: close grip.
-        - Phase 4: Move end_effector up again, keeping the grip tight (lifting the block).
-        - Phase 5: Smoothly move the end_effector toward the goal xy, keeping the height constant.
-        - Phase 6: Move end_effector vertically toward goal height at the 'end_effector_initial_height'.
-        - Phase 7: loosen the grip.
-        - Phase 8: Move end_effector vertically up again at the 'end_effector_initial_height'
-        - Phase 9: Move end_effector towards the old xy position.
-
         Args:
             name (str): Name id of the controller
             cspace_controller (BaseController): a cartesian space controller that returns an ArticulationAction type
@@ -88,16 +78,17 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
     def forward(
         self,
         picking_position: np.ndarray,
-        placing_position: np.ndarray,
         current_joint_positions: np.ndarray,
         end_effector_offset: typing.Optional[np.ndarray] = None,
         end_effector_orientation: typing.Optional[np.ndarray] = None,
+        theta: np.int8 = None,
     ) -> ArticulationAction:
         """Runs the controller one step.
 
         Args:
             picking_position (np.ndarray): The object's position to be picked in local frame.
-            current_joint_positions (np.ndarray): Current joint positions of the robot.
+            placing_position (np.ndarray):  The object's position to be placed in local frame.
+            current_joint_positions (np.ndarray): Current joint positions of the robot. 12
             end_effector_offset (typing.Optional[np.ndarray], optional): offset of the end effector target. Defaults to None.
             end_effector_orientation (typing.Optional[np.ndarray], optional): end effector orientation while picking and placing. Defaults to None.
 
@@ -117,7 +108,7 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
         self._h0 = picking_position[2]
 
         interpolated_xy = self._get_interpolated_xy(
-            placing_position[0], placing_position[1], self._current_target_x, self._current_target_y
+            0, 0, self._current_target_x, self._current_target_y
         )
         position_target = np.array(
             [
@@ -127,7 +118,8 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
             ]
         )
         if end_effector_orientation is None:
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, 0]))
+            # end_effector_orientation = euler_angles_to_quat(np.array([0, theta * np.pi / 360, 0]))
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
 
         target_joint_positions = self._cspace_controller.forward(
             target_end_effector_position=position_target, target_end_effector_orientation=end_effector_orientation

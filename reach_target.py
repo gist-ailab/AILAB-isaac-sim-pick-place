@@ -80,16 +80,13 @@ depth_camera = Camera(
 
 print('rgb camera intrinsic\n', rgb_camera.get_intrinsics_matrix())
 print('depth camera intrinsic\n', depth_camera.get_intrinsics_matrix())
-
-## --------------------- add cube --------------------- ##
 size_scale = 0.03
 size_scale_z = 0.03
 cube = my_world.scene.add(
     DynamicCuboid(
         name="cube",
         # position=np.array([5, 5, 0.1 + size_scale/2]),
-        position=np.array([0.4, 0.4, 0.1 + size_scale/2]),
-        # position=np.array([0.5, 0, 0.1 + size_scale/2]),
+        position=np.array([0.3, 0.33, 0.1 + size_scale/2]),
         prim_path="/World/Cube",
         scale=np.array([size_scale, size_scale, size_scale]),
         size=1.0,
@@ -145,14 +142,14 @@ def capture_img(mode, camera, camera_intrinsics, num):
     np.subtract(instance_segmentation_image, 1, out=instance_segmentation_image, where=instance_segmentation_image!=0)
     
     ## post process depth image
-    n_depth_image = depth_image_from_distance_image(depth_image*255, camera_intrinsics)
+    n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
 
     ## save image
     rgb_image = Image.fromarray((rgb_image).astype(np.uint8))
     rgb_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_rgb.png')
     instance_segmentation_image = Image.fromarray((instance_segmentation_image*255).astype(np.uint8))
     instance_segmentation_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_mask.png')
-    n_depth_image = Image.fromarray((n_depth_image).astype(np.uint8))
+    n_depth_image = Image.fromarray((n_depth_image * 255.0).astype(np.uint8))
     n_depth_image.save(f'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/data/{mode}cam_{num}_d.png')
 
     return len(np.unique(instance_segmentation_image)) -1,      \
@@ -180,7 +177,7 @@ for l in range(3):
 ## --------------------------   2. Find a target   -------------------------- ##
 
 found_cube = False
-z = 0.5
+z = 0.4
 qw, qx, qy, qz = 0, 0, 0, 0.25-size_scale_z/2  # 0.707, 0, 0, 0.707
 mode = 'rgb'
 
@@ -192,87 +189,32 @@ elif mode == 'd' or mode == 'depth':
     camera_intrinsics = depth_camera.get_intrinsics_matrix()
 
 ## find object and reach it
-r = 5
-for theta in range (0, 360, 45):
-    x, y = r/10 * np.cos(theta), r/10 * np.sin(theta)
-    print('[', r, ']', round(x,1), round(y,1))
-    while simulation_app.is_running():
-        my_world.step(render=True)
-        if my_world.is_playing():
-            observations = my_world.get_observations()
-            actions = my_controller2.forward(
-                # picking_position=cube.get_local_pose()[0],
-                picking_position=np.array([x, y, z]),
-                placing_position=np.array([0.4, -0.33, 0.02]),
-                current_joint_positions=my_ur5e.get_joint_positions(),
-                end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
-                theta=theta,
-            )
-            if my_controller2.is_done():
-                print('done reaching target')
-                found_cube, bbox, rgb, depth, mask = capture_img(mode, camera, camera_intrinsics, str(r) + '_' + str(theta))
-                my_controller2.reset()
-                break
-            articulation_controller.apply_action(actions)
-        if args.test is True:
+r, theta = 5, 90
+
+x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
+print('[', r, ']', round(x,1), round(y,1))
+while simulation_app.is_running():
+    my_world.step(render=True)
+    if my_world.is_playing():
+        observations = my_world.get_observations()
+        actions = my_controller2.forward(
+            # picking_position=cube.get_local_pose()[0],
+            picking_position=np.array([x, y, z]),
+            current_joint_positions=my_ur5e.get_joint_positions(),
+            end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
+            theta=theta,
+        )
+        if my_controller2.is_done():
+            print('done reaching target')
+            found_cube, bbox, rgb, depth, mask = capture_img(mode, camera, camera_intrinsics, str(r) + '_' + str(theta))
+            my_controller2.reset()
             break
-    if found_cube:
-        print('found cube')
-        print('bbox', bbox)
+        articulation_controller.apply_action(actions)
+    if args.test is True:
         break
-
-## --------------------------   3. Inference GGCNN   -------------------------- ##
-tight_bbox = depth_camera.get_current_frame()["bounding_box_2d_tight"]
-bbox_info = tight_bbox["info"]["bboxIds"]
-bboxes = {}
-for i in range(len(bbox_info)):
-    id = bbox_info[i]
-    bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
-
-print('-----------------------------------------------------')
-plt.imshow(depth)
-plt.show()
-print('depth shape', depth.shape)
-print(depth[0].shape)
-print(list(bbox['data'][0])[1:-1])
-
-
-angle, length, width, center = inference_ggcnn(depth, list(bbox['data'][0])[1:-1], 100)   # rgb, depth, mask, bbox, crop_range
-# grasps = inference_ggcnn(rgb, depth, mask, list(bbox['data'][0])[1:-1], 100)   # rgb, depth, mask, bbox, crop_range
-print(angle, length, width, center)
-
-## --------------------------   4. Pick and Place   -------------------------- ##
-
-# print('#########')
-# print('#########')
-# print('#########')
-# x, y = float((780-300+317)/1080), float((714-300+42)/1920)
-# z = 0.235
-# print(x, y, z)
-# print(cube.get_local_pose()[0])
-# while simulation_app.is_running():
-#     print('pick and place')
-#     my_world.step(render=True)
-#     if my_world.is_playing():
-#         observations = my_world.get_observations()
-#         actions = my_controller.forward(
-#             picking_position=cube.get_local_pose()[0],
-#             # picking_position=np.array([x, y, z]),
-#             placing_position=np.array([0.4, -0.33, 0.02]),
-#             current_joint_positions=my_ur5e.get_joint_positions(),
-#             end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
-#         )
-#         found_cube, bbox, rgb, depth, mask = capture_img(mode, camera, camera_intrinsics, str(r) + '_' + str(theta))
-
-#         if my_controller.is_done():
-#             print('done reaching target')
-#             found_cube, bbox, rgb, depth, mask = capture_img(mode, camera, camera_intrinsics, str(r) + '_' + str(theta))
-#             print('bbox', bbox)
-#             my_controller.reset()
-#             break
-#         articulation_controller.apply_action(actions)
-
-
+if found_cube:
+    print('found cube')
+    print('bbox', bbox)
 
 
 simulation_app.close()
