@@ -8,10 +8,12 @@ from ggcnn.utils.dataset_processing import evaluation, grasp
 
 def inference_ggcnn(depth, bbox):
     cy, cx = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-    crop_range = 300
+    crop_range = 150
     cx = 1080-crop_range
     
     cropped_depth = depth[cx-crop_range: cx+crop_range, cy-crop_range: cy+crop_range]
+    print(cx, cy)
+    print(cropped_depth.shape)
     # cropped_depth = np.transpose(cropped_depth, (2, 0, 1))
     # cropped_depth = cropped_depth[0]
     cropped_depth = np.clip((cropped_depth - cropped_depth.mean()), -1, 1)
@@ -34,7 +36,7 @@ def inference_ggcnn(depth, bbox):
         width = grasps[0].width
         center = grasps[0].center
         
-    center = [cx + center[0] - crop_range, cy + center[1] - 300]
+    center = [cx + center[0] - crop_range, cy + center[1] - crop_range]
     
     return angle, length, width, center
         

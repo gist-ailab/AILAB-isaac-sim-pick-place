@@ -187,7 +187,8 @@ while simulation_app.is_running():
                 # print(length)
                 # print(width)
                 # print(n_center)
-                # exit()
+                print(angle)
+                exit()
                 
                 my_controller.resume()
 
@@ -195,11 +196,12 @@ while simulation_app.is_running():
         
         observations = my_world.get_observations()
         actions = my_controller.forward(
-            # picking_position=np.array([pos_x,pos_y, 0.00]),
-            picking_position=np.array([world_center[0], world_center[1], length/100]),
+            picking_position=np.array([0, 0, 0]),
+            # picking_position=np.array([world_center[0], world_center[1], length/100]),
             placing_position=np.array([0.4, -0.33, 0.02]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_orientation = None,
         )
         if my_controller.is_done():
             print("done picking and placing")
