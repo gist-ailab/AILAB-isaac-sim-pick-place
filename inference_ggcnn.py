@@ -23,7 +23,6 @@ def inference_ggcnn(rgb, depth, mask, bbox, crop_range=200):
 
     cy, cx = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
     # crop_range = 300
-    cx = 1080-crop_range
     print(f'center  x={cx}, y={cy}')
 
     print(cx-crop_range, cx+crop_range, cy-crop_range, cy+crop_range)
