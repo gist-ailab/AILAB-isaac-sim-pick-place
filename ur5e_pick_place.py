@@ -176,6 +176,7 @@ while simulation_app.is_running():
                 for i in range(len(bbox_info)):
                     id = bbox_info[i]
                     bboxes["obj"+str(id)] = tight_bbox["data"][int(id)]
+                print(tight_bbox["data"])
                 
                 angle, length, width, center = inference_ggcnn(n_depth_image, bboxes["obj"+str(0)])
                 center = np.array(center)

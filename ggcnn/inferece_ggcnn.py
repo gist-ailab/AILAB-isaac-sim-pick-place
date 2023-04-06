@@ -7,13 +7,12 @@ from ggcnn.models.common import post_process_output
 from ggcnn.utils.dataset_processing import evaluation, grasp
 
 def inference_ggcnn(depth, bbox):
-    cy, cx = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
+    cy, cx = int((bbox[1]+bbox[3])/2), int((bbox[2]+bbox[4])/2)
     crop_range = 150
     cx = 1080-crop_range
     
+    cv2.imwrite('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/data/depth.png', depth*255)
     cropped_depth = depth[cx-crop_range: cx+crop_range, cy-crop_range: cy+crop_range]
-    print(cx, cy)
-    print(cropped_depth.shape)
     # cropped_depth = np.transpose(cropped_depth, (2, 0, 1))
     # cropped_depth = cropped_depth[0]
     cropped_depth = np.clip((cropped_depth - cropped_depth.mean()), -1, 1)
