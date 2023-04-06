@@ -19,18 +19,17 @@ from omni.isaac.core.utils.semantics import add_update_semantics
 from pick_place_controller import PickPlaceController
 from reach_target_controller import ReachTargetController
 from omni.isaac.core.objects import DynamicCuboid
-from omni.isaac.sensor import Camera
-import carb
-import sys
+# from omni.isaac.sensor import Camera
+from camera import Camera
 import numpy as np
 import argparse
 import os
 
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import cv2
-from inference_ggcnn import inference_ggcnn
 from PIL import Image
+from inference_ggcnn import inference_ggcnn
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--test", default=False, action="store_true", help="Run in test mode")
@@ -39,8 +38,8 @@ args, unknown = parser.parse_known_args()
 my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
-ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
-# ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
+# ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -67,21 +66,24 @@ rgb_camera = Camera(
     frequency=20,
     resolution=(1920, 1080),
 )
+print(rgb_camera.get_local_pose())
+
 depth_camera = Camera(
     prim_path="/World/UR5e/realsense/Depth",
     frequency=20,
     resolution=(1920, 1080),
 )
+print(depth_camera.get_local_pose())
 
-print('rgb camera intrinsic\n', rgb_camera.get_intrinsics_matrix())
-print('depth camera intrinsic\n', depth_camera.get_intrinsics_matrix())
 size_scale = 0.03
 size_scale_z = 0.03
 cube = my_world.scene.add(
     DynamicCuboid(
         name="cube",
-        # position=np.array([5, 5, 0.1 + size_scale/2]),
-        position=np.array([0.3, 0.33, 0.1 + size_scale/2]),
+        position=np.array([0.9, 0.9, 0.1 + size_scale/2]),
+        # position=np.array([0.33, -0.1, 0.1 + size_scale/2]),
+        # position=np.array([0.1, -0.33, 0.1 + size_scale/2]),
+        # position=np.array([-0.1, 0.33, 0.1 + size_scale/2]),
         prim_path="/World/Cube",
         scale=np.array([size_scale, size_scale, size_scale]),
         size=1.0,
@@ -153,43 +155,119 @@ def capture_img(mode, rgb_camera, depth_camera, num):
            cv2.cvtColor(np.array(instance_segmentation_image), cv2.COLOR_RGB2BGR)
 
 
-
 found_cube = False
-z = 0.4
-qw, qx, qy, qz = 0, 0, 0, 0.25-size_scale_z/2  # 0.707, 0, 0, 0.707
-mode = 'rgb'
+z = 0.3
+qw, qx, qy, qz = 0, 0, 0, 0.25-size_scale_z/2
+mode = 'rgb'  # rgb or d
+
+if mode == 'rgb':
+    print('rgb camera intrinsic\n', rgb_camera.get_intrinsics_matrix())
+elif mode == 'd':
+    print('depth camera intrinsic\n', depth_camera.get_intrinsics_matrix())
 
 ## find object and reach it
-# for r in range(3, 10, 2):
-r = 5
-for theta in range (0, 360, 45):
-    x, y = r/10 * np.cos(theta), r/10 * np.sin(theta)
-    print('[', r, ']', round(x,1), round(y,1))
-    while simulation_app.is_running():
-        my_world.step(render=True)
-        if my_world.is_playing():
-            observations = my_world.get_observations()
-            actions = my_controller2.forward(
-                # picking_position=cube.get_local_pose()[0],
-                picking_position=np.array([x, y, z]),
-                placing_position=np.array([0.4, -0.33, 0.02]),
-                current_joint_positions=my_ur5e.get_joint_positions(),
-                end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
-                theta=theta,
-            )
-            if my_controller2.is_done():
-                print('done reaching target')
-                found_cube, bbox, rgb, depth, mask = capture_img(mode, rgb_camera, depth_camera, str(r) + '_' + str(theta))
-                my_controller2.reset()
+for r in range(3, 10, 2):
+    for theta in range (0, 360, 45):
+        x, y = r/10 * np.cos(theta), r/10 * np.sin(theta)
+        print('[', r, ']', round(x,1), round(y,1))
+        while simulation_app.is_running():
+            my_world.step(render=True)
+            if my_world.is_playing():
+                observations = my_world.get_observations()
+                actions = my_controller2.forward(
+                    # picking_position=cube.get_local_pose()[0],
+                    picking_position=np.array([x, y, z]),
+                    placing_position=np.array([0.4, -0.33, 0.02]),
+                    current_joint_positions=my_ur5e.get_joint_positions(),
+                    end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
+                )
+                if my_controller2.is_done():
+                    print('done reaching target')
+                    found_cube, bbox, rgb, depth, mask = capture_img(mode, rgb_camera, depth_camera, str(r) + '_' + str(theta))
+                    my_controller2.reset()
+                    break
+                articulation_controller.apply_action(actions)
+            if args.test is True:
                 break
-            articulation_controller.apply_action(actions)
-        if args.test is True:
+        if found_cube:
+            print('found cube')
+            print('bbox', bbox)
+            while simulation_app.is_running():
+                # 1920 x 1080
+                print('ur5e', my_ur5e.get_local_pose()[1])
+                if 400 < bbox['data'][0][1] < 1520 and 400 < bbox['data'][0][2] < 680:
+                    print('bbox is in the center')
+                    break
+                elif bbox['data'][0][1] <= 400:
+                    print('bbox is on the right')
+                    qx += 0.05
+                    found_cube = False
+                elif bbox['data'][0][1] >= 1520:
+                    print('bbox is on the left')
+                    qx -= 0.05
+                    found_cube = False
+                elif bbox['data'][0][2] <= 400:
+                    print('bbox is on the top')
+                    qy += 0.05
+                    found_cube = False
+                elif bbox['data'][0][2] >= 680:
+                    print('bbox is on the bottom')
+                    qy -= 0.05
+                    found_cube = False
+            
+                my_world.step(render=True)
+                if my_world.is_playing():
+                    observations = my_world.get_observations()
+                    actions = my_controller2.forward(
+                        picking_position=cube.get_local_pose()[0],
+                        # picking_position=np.array([x, y, z]),
+                        placing_position=np.array([0.4, -0.33, 0.02]),
+                        current_joint_positions=my_ur5e.get_joint_positions(),
+                        end_effector_offset=np.array([qw, qx, qy, qz]),
+                    )
+                    my_controller.pause()
+                    found_cube, bbox, rgb, depth, mask = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
+                    my_controller.resume()
+
+                    if my_controller2.is_done():
+                        print('done reaching target')
+                        my_controller.pause()
+                        found_cube, bbox, rgb, depth, mask = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
+                        my_controller.resume()
+                        print('bbox', bbox)
+                        my_controller2.reset()
+                        break
+                    articulation_controller.apply_action(actions)
             break
     if found_cube:
-        print('found cube')
-        print('bbox', bbox)
         break
 
+# ## add GGCNN
+# print(rgb.shape, depth.shape, mask.shape)
+# # print(bbox['data'], type(bbox['data']))
+# # print(bbox['data'][0], type(bbox['data']))
+# # print(list(bbox['data'][0]), type(bbox['data']))
+# # print(list(bbox['data'][0])[1:-1], type(bbox['data']))
+# grasps = inference_ggcnn(rgb, depth, mask, list(bbox['data'][0])[1:-1], 200)   # rgb, depth, mask, bbox, crop_range
+# print(grasps)
+print('## cube ##')
+bbox = list(bbox['data'][0])[1:-1]
+cy, cx = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
+print('cube center', cx, cy)
+print('depth shape', depth.shape)
+print('cube GT pose', cube.get_local_pose()[0], cube.get_local_pose()[1])
+
+print('## camera ##')
+if mode == 'rgb':
+    print('rgb cam', rgb_camera.get_local_pose()[0])
+elif mode == 'd':
+    print('d cam', depth_camera.get_local_pose()[0])
+
+print('## ur5e ##')
+print('ur5e', my_ur5e.get_local_pose()[0])
+print('gripper', gripper.get_local_pose()[0])
+print('gripper', my_ur5e.gripper.get_local_pose()[0])
+print('gripper', my_ur5e.gripper.get_local_pose()[1])
 
 # print('#########')
 # print('#########')
@@ -210,11 +288,11 @@ for theta in range (0, 360, 45):
 #             current_joint_positions=my_ur5e.get_joint_positions(),
 #             end_effector_offset=np.array([0, 0, 0.25-size_scale_z/2]),
 #         )
-#         found_cube, bbox, rgb, depth, mask = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
+#         found_cube, bbox = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
 
 #         if my_controller.is_done():
 #             print('done reaching target')
-#             found_cube, bbox, rgb, depth, mask = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
+#             found_cube, bbox = capture_img('rgb', rgb_camera, depth_camera, str(r) + '_' + str(theta))
 #             print('bbox', bbox)
 #             my_controller.reset()
 #             break
@@ -222,7 +300,5 @@ for theta in range (0, 360, 45):
 
 
 
-grasps = inference_ggcnn(rgb, depth, mask, list(bbox['data'][0])[1:-1], 200)   # rgb, depth, mask, bbox, crop_range
-print(grasps)
 
 simulation_app.close()

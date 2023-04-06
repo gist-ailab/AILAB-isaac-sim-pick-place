@@ -92,12 +92,14 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
         current_joint_positions: np.ndarray,
         end_effector_offset: typing.Optional[np.ndarray] = None,
         end_effector_orientation: typing.Optional[np.ndarray] = None,
+        theta: np.int8 = None,
     ) -> ArticulationAction:
         """Runs the controller one step.
 
         Args:
             picking_position (np.ndarray): The object's position to be picked in local frame.
-            current_joint_positions (np.ndarray): Current joint positions of the robot.
+            placing_position (np.ndarray):  The object's position to be placed in local frame.
+            current_joint_positions (np.ndarray): Current joint positions of the robot. 12
             end_effector_offset (typing.Optional[np.ndarray], optional): offset of the end effector target. Defaults to None.
             end_effector_orientation (typing.Optional[np.ndarray], optional): end effector orientation while picking and placing. Defaults to None.
 
@@ -127,7 +129,8 @@ class ReachTargetController(manipulators_controllers.PickPlaceController):
             ]
         )
         if end_effector_orientation is None:
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, 0]))
+            # end_effector_orientation = euler_angles_to_quat(np.array([0, theta * np.pi / 360, 0]))
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
 
         target_joint_positions = self._cspace_controller.forward(
             target_end_effector_position=position_target, target_end_effector_orientation=end_effector_orientation
