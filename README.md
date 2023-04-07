@@ -4,7 +4,9 @@
 
 ### 1. Download Isaac Sim
  - Dependency check
-    - Ubuntu 20.04
+    - Ubuntu
+      - Recommanded: 20.04 / 22.04
+      - Tested on: 20.04
     - NVIDIA Driver version
       - Recommanded: 525.60.11
       - Minimum: 510.73.05
