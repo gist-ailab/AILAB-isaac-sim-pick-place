@@ -3,6 +3,13 @@
 ## Environment Setup
 
 ### 1. Download Isaac Sim
+ - Dependency check
+    - Ubuntu 20.04
+    - NVIDIA Driver version
+      - Recommanded: 525.60.11
+      - Minimum: 510.73.05
+      - Tested on: 510.108.03 / 
+
  - [Download Omniverse](https://developer.nvidia.com/isaac-sim)
  - [Workstation Setup](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_basic.html)
  - [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
@@ -12,6 +19,11 @@
     ```
     conda env create -f environment.yml
     conda activate isaac-sim
+    ```
+
+ - Setup environment variables so that Isaac Sim python packages are located correctly
+    ```
+    source setup_conda_env.sh
     ```
 
  - Install requirment pakages
