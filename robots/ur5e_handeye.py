@@ -60,8 +60,9 @@ class UR5eHandeye(Robot):
                 usd_path = assets_root_path + "/Isaac/Robots/UniversalRobots/ur5e/ur5e.usd"
                 add_reference_to_stage(usd_path=usd_path, prim_path=prim_path)
             if self._end_effector_prim_name is None:
+                self._end_effector_prim_path = prim_path + "/flange"
                 # self._end_effector_prim_path = prim_path + "/robotiq_arg2f_base_link"
-                self._end_effector_prim_path = prim_path + "/right_inner_finger_pad"
+                # self._end_effector_prim_path = prim_path + "/right_inner_finger_pad"
 
             else:
                 self._end_effector_prim_path = prim_path + "/" + end_effector_prim_name
