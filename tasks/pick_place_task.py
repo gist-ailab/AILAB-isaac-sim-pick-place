@@ -47,24 +47,24 @@ class UR5ePickPlace(tasks.PickPlace):
         offset: Optional[np.ndarray] = np.array([0, 0, 0.15]),
     ) -> None:
         tasks.PickPlace.__init__(self, name=name, )
-        if objects_position is None:
+        if (objects_position is None) and (objects_list is not None):
             for i in range(len(objects_list)):
                 if i == 0:
                     pos_x = random.uniform(0.3, 0.6)
                     pos_y = random.uniform(0.3, 0.6)
                     pos_z = 0.1
-                    self.objects_position = np.array([pos_x, pos_y, pos_z])
+                    self.objects_position = np.array([[pos_x, pos_y, pos_z]])
                 elif i == 1:
                     pos_x = random.uniform(-0.3, -0.6)
                     pos_y = random.uniform(0.3, 0.6)
                     pos_z = 0.1
-                    self.objects_position = np.concatenate((self.objects_position, np.array([pos_x, pos_y, pos_z])),
+                    self.objects_position = np.concatenate((self.objects_position, np.array([[pos_x, pos_y, pos_z]])),
                                                           axis=0)
                 elif i == 2:
                     pos_x = random.uniform(-0.3, -0.6)
                     pos_y = random.uniform(-0.3, -0.6)
                     pos_z = 0.1
-                    self.objects_position = np.concatenate((self.objects_position, np.array([pos_x, pos_y, pos_z])),
+                    self.objects_position = np.concatenate((self.objects_position, np.array([[pos_x, pos_y, pos_z]])),
                                                           axis=0)
         else:
             self.objects_position = objects_position
@@ -79,22 +79,25 @@ class UR5ePickPlace(tasks.PickPlace):
         if self.imported_objects is None:
             cube_prim_path = "/World/Cube"
             cube_name = "cube"
-            size_scale = 0.03
-            self.objects_position[0][2] = self.objects_position[0][2] + size_scale/2
+            if objects_position is None:
+                pos_x = random.uniform(0.3, 0.6)
+                pos_y = random.uniform(0.3, 0.6)
+                pos_z = 0.1
+                self.objects_position = np.array([[pos_x, pos_y, pos_z]])
+                self.objects_position[0][2] = self.objects_position[0][2] + 0.01
+
             self._object = DynamicCuboid(
                 prim_path = cube_prim_path,
                 name = cube_name,
                 position = self.objects_position[0],
-                scale = np.array([size_scale, size_scale, size_scale]),
                 color = np.array([0, 0, 1]),
-                size = 1.0,
+                size = 0.04,
                 mass = 0.01,
             )
             self._objects = self._object
         else:
-            size_scale = 0.2
+            # size_scale = 0.2
             self._objects = objects_list
-            ''' 위 부분은 for문을 통해 여러개의 object를 추가할 수도 있음 '''
 
         self._offset = offset
         if target_position is None:
@@ -115,7 +118,7 @@ class UR5ePickPlace(tasks.PickPlace):
         self._scene = scene
         scene.add_default_ground_plane()
 
-        if self.imported_objects is None:
+        if self.imported_objects is None:   # add only cube
             self._task_object = scene.add(self._objects)
         else:
             for i in range(len(self.imported_objects)):
@@ -191,6 +194,10 @@ class UR5ePickPlace(tasks.PickPlace):
         if self.imported_objects is None:
             self.position, self.orientation = self._task_object.get_local_pose()
             self.task_object_name = self._task_object.name
+            params_representation[f"task_object_position_0"] = {"value": self.position, "modifiable": True}
+            params_representation[f"task_object_orientation_0"] = {"value": self.orientation, "modifiable": True}
+            params_representation[f"task_object_name_0"] = {"value": self.task_object_name, "modifiable": False}
+
         else:
             for i in range(len(self.imported_objects)):
                 stage = omni.usd.get_context().get_stage()
