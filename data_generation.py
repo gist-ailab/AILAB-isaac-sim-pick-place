@@ -4,31 +4,16 @@ simulation_app = SimulationApp({"headless": False})
 
 from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
-from omni.isaac.core.objects import DynamicCuboid
-from omni.isaac.core.objects import DynamicCylinder
-from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.stage import get_current_stage
-from omni.isaac.core.utils.stage import get_stage_units
-from omni.isaac.core.utils.string import find_unique_string_name
 from omni.isaac.core.utils.stage import add_reference_to_stage
-from omni.isaac.core.utils.stage import create_new_stage
-from omni.isaac.core.robots import Robot
-from omni.isaac.universal_robots import UR10
 from omni.isaac.manipulators import SingleManipulator
 from omni.isaac.manipulators.grippers import ParallelGripper
-from omni.isaac.core.utils.prims import is_prim_path_valid
 from omni.isaac.sensor import Camera
-from omni.isaac.core.prims import XFormPrim
 from omni.isaac.core.utils.prims import create_prim, delete_prim
-from ur5 import UR5
-import omni.isaac.core.utils.numpy.rotations as rot_utils
-from omni.syntheticdata import SyntheticData
-import omni.replicator.core as rep
+from omni.isaac.core.utils.semantics import add_update_semantics
 from pick_place_controller import PickPlaceController
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-import PIL
 from PIL import Image as im
 import torchvision.transforms as T
 import os
@@ -41,16 +26,22 @@ import glob
 #########
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--gripper-name",
+    "--robot_path",
     type=str,
-    default="Cobotta_Pro_900",
-    help="Key to use to access RMPflow config files for a specific robot.",
+    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/ur5e_handeye_gripper_v2.usd",
+    help="robot usd path.",
 )
 parser.add_argument(
-    "--usd-path",
+    "--data_path",
     type=str,
-    default="/Isaac/Robots/Denso/cobotta_pro_900.usd",
-    help="Path to supported robot on Nucleus Server",
+    default="/home/ailab/Workspace/minhwan/ycb",
+    help="data usd directory",
+)
+parser.add_argument(
+    "--save_path",
+    type=str,
+    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/test_img",
+    help="img save path directory",
 )
 
 args = parser.parse_args()
@@ -65,12 +56,14 @@ scene = Scene()
 scene.add_default_ground_plane()
 
 
-ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
+ur5e_usd_path = args.robot_path
+
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
     raise Exception(f"{ur5e_usd_path} not found")
 
+# robot add
 add_reference_to_stage(usd_path=ur5e_usd_path, prim_path="/World/UR5")
 gripper = ParallelGripper(
     end_effector_prim_path="/World/UR5/right_inner_finger_pad",
@@ -84,7 +77,7 @@ my_ur5e = my_world.scene.add(
         prim_path="/World/UR5", name="my_ur5e", end_effector_prim_name="right_inner_finger_pad", gripper=gripper
     )
 )
-
+# camera initialize
 hand_camera = Camera(
     prim_path="/World/UR5/realsense/RGB",
     frequency=20,
@@ -110,46 +103,62 @@ my_world.reset()
 
 transform = T.ToPILImage()
 
-objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
+# objects ycd_file list
+objects = glob.glob(args.data_path+"/*/*.usd")
 
 while simulation_app.is_running():
     my_world.step(render=True)
-    if i % 150 == 1:
-        for l in range(3):
-            size_z = (random.random()*0.09+0.03)*2
-            size = size_z
-            pos_y = (random.random()*1.2+0.8)
-            pos_x = (random.random()*1.2-0.4)
-            pos_z = size_z
+    # random 1 ~ 3 data generation in camera boundary
+    if i % 15 == 1:
+        obj_num = random.randint(1,3)
+        for l in range(obj_num):
+            pos_y = (random.random()*0.6-0.17)
+            pos_x = (random.random()*0.3+0.33)
+            pos_z = 0.00
             a = random.randint(0, len(objects)-1)
-            print(a)
-            create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=[pos_x,pos_y,pos_z], scale=[0.3,0.3,0.3])
-            # pr = XFormPrim(prim_path ="/World/object"+str(l), position=[pos_x,pos_y,pos_z])
-        
+            object_prim = create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=[pos_x,pos_y,pos_z], scale=[0.2,0.2,0.2])
+            # update semantic information with label 0 is unlabel 1 is background label go for 2 ~
+            add_update_semantics(prim=object_prim, semantic_label=str(l*100+a+2))
         my_world.reset()
         
-    if i % 150 == 149:
+    if i % 15 == 12:
+        
         hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
         hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
         hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
+        hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
         focus_distance = hand_camera.get_focus_distance()
         horizontal_aperture = hand_camera.get_horizontal_aperture()
         
         print(hand_camera.get_current_frame()["instance_segmentation"])
-        print(np.unique(hand_instance_segmentation_image))
+        
         
         hand_imgplot = transform(hand_rgb_image)
-        hand_imgplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/img/img"+str(int(i/150))+".png")
        
-        hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
-        hand_inssegplot.save("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/cylinder/mask/mask"+str(int(i/150))+".png")
+        # class가 2,3,4로 순서대로 나타나는게 아니라 (2,3) (3,4) 등으로 나타날 때도 있음 해당 예외 처리를 위해 다음과 같은 dict 생성 
+        class_list = {}
+        for kl in range(2,5):
+            if str(kl) in hand_instance_segmentation_dict.keys():
+                class_list[kl]=int(hand_instance_segmentation_dict[str(kl)]['class'])
 
-        delete_prim('/World/object0')
-        delete_prim('/World/object1')
-        delete_prim('/World/object2')
+        # hand_instance_segmentation_image의 경우 class(2,3,4)로 라벨이 되어있음. 이를 label로 바꿔줌
+        for c in class_list.keys():
+            np.place(hand_instance_segmentation_image, hand_instance_segmentation_image==c, class_list[c])
+        print(np.unique(hand_instance_segmentation_image))
+        # png형태로 저장
+        hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
+        if i < 1065:
+            hand_imgplot.save(args.save_path+"/train/img/img"+str(int(i/15))+".png")
+            hand_inssegplot.save(args.save_path+"/train/mask/mask"+str(int(i/15))+".png")
+        else:
+            hand_imgplot.save(args.save_path+"/val/img/img"+str(int(i/15))+".png")
+            hand_inssegplot.save(args.save_path+"/val/mask/mask"+str(int(i/15))+".png")
+            
+        for l in range(obj_num):
+            delete_prim("/World/object"+str(l))
         my_world.reset()
         
-    if i == 15000:
+    if i == 1500:
         simulation_app.close()
 
     i += 1
