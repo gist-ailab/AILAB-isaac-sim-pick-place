@@ -57,7 +57,9 @@ gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
 from pathlib import Path
 CURRENT_FILE = Path(__file__).parent
-total_objects_list = glob.glob(f"{CURRENT_FILE}/ycb_usd/*/*/*.usd")
+total_objects_list = glob.glob(f"{CURRENT_FILE}/ycb_usd/*/*/*.usd")     # : !!
+current_num_total_objects = len(total_objects_list)
+assert current_num_total_objects!=0, f"!!>> place YCB objects in folder! now : {current_num_total_objects}"
 
 # working_dir = os.path.dirname(os.path.realpath(__file__))
 
