@@ -1,0 +1,6 @@
+object2urdf==0.12
+opencv-python==4.7.0.68
+Pillow==9.3.0
+scikit-image==0.19.3
+scikit-learn==1.0.2
+scipy==1.7.1

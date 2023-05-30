@@ -5,38 +5,22 @@ simulation_app = SimulationApp({"headless": False})
 from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.utils.stage import get_current_stage
-from omni.isaac.core.utils.stage import add_reference_to_stage
-from omni.isaac.manipulators import SingleManipulator
-from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.sensor import Camera
-from omni.isaac.core.utils.prims import create_prim, delete_prim
+from omni.isaac.core.utils.prims import delete_prim
 from omni.isaac.core.utils.semantics import add_update_semantics
-from pick_place_controller import PickPlaceController
+from omni.isaac.core.objects import DynamicCuboid
 import numpy as np
 import argparse
 from PIL import Image as im
 import torchvision.transforms as T
-import os
 import random
-import glob
 
 
 ##########
 #Read robot name and path#
 #########
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--robot_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/ur5e_handeye_gripper_v2.usd",
-    help="robot usd path.",
-)
-parser.add_argument(
-    "--data_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/ycb",
-    help="data usd directory",
-)
+
 parser.add_argument(
     "--save_path",
     type=str,
@@ -56,42 +40,25 @@ scene = Scene()
 scene.add_default_ground_plane()
 
 
-ur5e_usd_path = args.robot_path
-
-if os.path.isfile(ur5e_usd_path):
-    pass
-else:
-    raise Exception(f"{ur5e_usd_path} not found")
-
-# robot add
-add_reference_to_stage(usd_path=ur5e_usd_path, prim_path="/World/UR5")
-gripper = ParallelGripper(
-    end_effector_prim_path="/World/UR5/right_inner_finger_pad",
-    joint_prim_names=["left_outer_knuckle_joint", "right_outer_knuckle_joint"],
-    joint_opened_positions=np.array([0.0, 0.0]),
-    joint_closed_positions=np.array([np.pi*2/9, -np.pi*2/9]),
-    action_deltas=np.array([-np.pi*2/9, np.pi*2/9]),
-)
-my_ur5e = my_world.scene.add(
-    SingleManipulator(
-        prim_path="/World/UR5", name="my_ur5e", end_effector_prim_name="right_inner_finger_pad", gripper=gripper
-    )
-)
 # camera initialize
 hand_camera = Camera(
-    prim_path="/World/UR5/realsense/RGB",
+    prim_path="/World/RGB",
     frequency=20,
     resolution=(1920, 1080),
+    position=[0.48176, 0.13541, 0.71],
+    orientation=[0.5,-0.5,0.5,0.5]
+    # orientation=[1,0,0,0]
 )
 
+hand_camera.set_focal_length(1.93)
+hand_camera.set_focus_distance(4)
+
+hand_camera.set_horizontal_aperture(2.65)
+hand_camera.set_vertical_aperture(1.48)
+
+hand_camera.set_clipping_range(0.01, 10000)
 my_world.reset()
 hand_camera.initialize()
-
-my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
-)
-articulation_controller = my_ur5e.get_articulation_controller()
-
 
 i = 0
 hand_camera.add_distance_to_camera_to_frame()
@@ -103,26 +70,23 @@ my_world.reset()
 
 transform = T.ToPILImage()
 
-# objects ycd_file list
-objects = glob.glob(args.data_path+"/*/*.usd")
-
 while simulation_app.is_running():
     my_world.step(render=True)
     # random 1 ~ 3 data generation in camera boundary
     if i % 15 == 1:
         obj_num = random.randint(1,3)
         for l in range(obj_num):
-            pos_y = (random.random()*0.6-0.17)
-            pos_x = (random.random()*0.3+0.33)
-            pos_z = 0.00
-            a = random.randint(0, len(objects)-1)
-            object_prim = create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=[pos_x,pos_y,pos_z], scale=[0.2,0.2,0.2])
+            pos_x = (random.random()*0.92+0.02)
+            pos_y = (random.random()*0.52-0.12)
+            pos_z = 0.02
+            cube = DynamicCuboid("/World/object"+str(l),position=[pos_x,pos_y,pos_z/2], scale=[0.02,0.02,0.02])
+            object_prim=stage.DefinePrim("/World/object"+str(l))
             # update semantic information with label 0 is unlabel 1 is background label go for 2 ~
-            add_update_semantics(prim=object_prim, semantic_label=str(l*100+a+2))
-        my_world.reset()
+            
+            add_update_semantics(prim=object_prim, semantic_label=str(l+2))
+    my_world.reset()
         
     if i % 15 == 12:
-        
         hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
         hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
         hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
@@ -131,7 +95,6 @@ while simulation_app.is_running():
         horizontal_aperture = hand_camera.get_horizontal_aperture()
         
         print(hand_camera.get_current_frame()["instance_segmentation"])
-        
         
         hand_imgplot = transform(hand_rgb_image)
        

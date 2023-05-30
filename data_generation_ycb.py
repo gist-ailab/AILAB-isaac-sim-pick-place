@@ -6,12 +6,10 @@ from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.stage import add_reference_to_stage
-from omni.isaac.manipulators import SingleManipulator
-from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.sensor import Camera
 from omni.isaac.core.utils.prims import create_prim, delete_prim
 from omni.isaac.core.utils.semantics import add_update_semantics
-from pick_place_controller import PickPlaceController
+
 import numpy as np
 import argparse
 from PIL import Image as im
@@ -65,18 +63,7 @@ else:
 
 # robot add
 add_reference_to_stage(usd_path=ur5e_usd_path, prim_path="/World/UR5")
-gripper = ParallelGripper(
-    end_effector_prim_path="/World/UR5/right_inner_finger_pad",
-    joint_prim_names=["left_outer_knuckle_joint", "right_outer_knuckle_joint"],
-    joint_opened_positions=np.array([0.0, 0.0]),
-    joint_closed_positions=np.array([np.pi*2/9, -np.pi*2/9]),
-    action_deltas=np.array([-np.pi*2/9, np.pi*2/9]),
-)
-my_ur5e = my_world.scene.add(
-    SingleManipulator(
-        prim_path="/World/UR5", name="my_ur5e", end_effector_prim_name="right_inner_finger_pad", gripper=gripper
-    )
-)
+
 # camera initialize
 hand_camera = Camera(
     prim_path="/World/UR5/realsense/RGB",
@@ -86,12 +73,6 @@ hand_camera = Camera(
 
 my_world.reset()
 hand_camera.initialize()
-
-my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.5
-)
-articulation_controller = my_ur5e.get_articulation_controller()
-
 
 i = 0
 hand_camera.add_distance_to_camera_to_frame()
@@ -109,7 +90,7 @@ objects = glob.glob(args.data_path+"/*/*.usd")
 while simulation_app.is_running():
     my_world.step(render=True)
     # random 1 ~ 3 data generation in camera boundary
-    if i % 15 == 1:
+    if i % 150 == 10:
         obj_num = random.randint(1,3)
         for l in range(obj_num):
             pos_y = (random.random()*0.6-0.17)
@@ -121,7 +102,7 @@ while simulation_app.is_running():
             add_update_semantics(prim=object_prim, semantic_label=str(l*100+a+2))
         my_world.reset()
         
-    if i % 15 == 12:
+    if i % 150 == 120:
         
         hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
         hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
@@ -147,7 +128,7 @@ while simulation_app.is_running():
         print(np.unique(hand_instance_segmentation_image))
         # png형태로 저장
         hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
-        if i < 1065:
+        if i < 10650:
             hand_imgplot.save(args.save_path+"/train/img/img"+str(int(i/15))+".png")
             hand_inssegplot.save(args.save_path+"/train/mask/mask"+str(int(i/15))+".png")
         else:
@@ -158,7 +139,7 @@ while simulation_app.is_running():
             delete_prim("/World/object"+str(l))
         my_world.reset()
         
-    if i == 1500:
+    if i == 15000:
         simulation_app.close()
 
     i += 1
