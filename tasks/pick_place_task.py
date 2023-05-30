@@ -140,7 +140,7 @@ class UR5ePickPlace(tasks.PickPlace):
         """
         working_dir = os.path.dirname(os.path.realpath(__file__))   # same directory with this code
         # ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
-        ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper_v2.usd")
+        ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         if os.path.isfile(ur5e_usd_path):
             pass
         else:
