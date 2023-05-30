@@ -18,16 +18,8 @@ from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_c
 import numpy as np
 import glob, os, random
 
-<<<<<<< HEAD
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
-=======
-
-# working_dir = os.path.dirname(os.path.realpath(__file__))
-# objects_path = os.path.join(working_dir, "ycb_usd/ycb/*.usd")
-
-objects_path = "/ailab_mat/dataset/ycb_usd/ycb/*/*.usd"
->>>>>>> 85ccad6d2a82e3d44b91bb91f25750c2417aa5eb
 objects_list = glob.glob(objects_path)
 objects_list = random.sample(objects_list, 3)
 # get three objects randomly
