@@ -57,7 +57,7 @@ def build_prototype_urdf(root):
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <geometry>
-                    <mesh filename="_prototype.obj" scale="10 10 10" />
+                    <mesh filename="_prototype.obj" scale="1 1 1" />
                 </geometry>
                 <material name="texture">
                     <color rgba="1.0 1.0 1.0 1.0"/>
@@ -65,7 +65,7 @@ def build_prototype_urdf(root):
             </visual>
             <collision>
                 <geometry>
-                    <mesh filename="_prototype.obj" scale="10 10 10" />
+                    <mesh filename="_prototype.obj" scale="1 1 1" />
                 </geometry>
             </collision>
             <inertial>
@@ -86,6 +86,6 @@ def obj2urdf(root):
 
 if __name__ == "__main__":
     data_root = "/home/nam/workspace/YCB"
-    save_root = "/home/nam/workspace/preprocessed_ycb"
+    save_root = "/home/nam/workspace/preprocessed_ycb_1"
 
     preprocess_ycb(data_root=data_root, save_root=save_root)

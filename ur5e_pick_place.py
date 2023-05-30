@@ -50,7 +50,7 @@ my_world.scene.add_default_ground_plane()
 
 # ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
 # ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
-ur5e_usd_path = "/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
+ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/tasks/ur5e_handeye_gripper_v2.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -103,8 +103,8 @@ depth_camera = Camera(
 #######
 #Add ycb object
 #########
-# objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
-objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
+objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
+# objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
 for l in range(3):
     # size_z = (random.random()*0.09+0.03)*2
     # size = size_z
@@ -112,7 +112,7 @@ for l in range(3):
     # pos_x = random.random()*1.2-0.4
     # pos_z = size_z
     # position = np.random.randint(-1200, 1200, size=3) / 1000
-    position = np.array([-0.4-(l*0.2), 0, 0.1])
+    position = np.array([0.4+(l*0.2), 0, 0.1])
     a = random.randint(0, len(objects)-1)
     create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=position, scale=[0.2,0.2,0.2])
 
