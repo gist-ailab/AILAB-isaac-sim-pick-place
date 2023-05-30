@@ -18,7 +18,6 @@ from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_c
 import numpy as np
 import glob, os, random
 
-
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(working_dir, "ycb_usd/*/*.usd")
 objects_list = glob.glob(objects_path)
@@ -28,7 +27,10 @@ objects_list = random.sample(objects_list, 3)
 objects_position = np.array([[0.3, 0.3, 0.1],
                              [-0.3, 0.3, 0.1],
                              [-0.3, -0.3, 0.1]])
-offset = np.array([0, 0, 0.1])
+# objects_position = np.array([
+#                              [0.4, 0.33, 0.1]
+#                              ])
+offset = np.array([0, 0, 0.1])  # releasing offset at the target position
 target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
 target_orientation = np.array([0, 0, 0, 1])
 
@@ -36,6 +38,8 @@ my_world = World(stage_units_in_meters=1.0)
 my_task = UR5ePickPlace(objects_list = objects_list,
                         objects_position = objects_position,
                         offset=offset)  # releasing offset at the target position
+# my_task = UR5ePickPlace(objects_position = objects_position)
+# my_task = UR5ePickPlace()
 my_world.add_task(my_task)
 my_world.reset()
 task_params = my_task.get_params()
@@ -61,9 +65,14 @@ while simulation_app.is_running():
             picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
             placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
             current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            end_effector_offset=np.array([0.125, 0.095, 0.04]),
+            end_effector_offset=np.array([0.125, 0.095, 0.03]), #TODO: change this to the correct offset ratio
             # end_effector_offset=np.array([0, 0, 0.04]),
         )
+        # print('---------------------------------------------------------')
+        # print(f'EE position: {observations["my_ur5e"]["end_effector_position"][:2]}')
+        # print(f'cube position: {observations["cube"]["position"][:2]}')
+        # print(f'picking position: {observations[task_params["task_object_name_0"]["value"]]["position"][:2]}')
+        # print('---------------------------------------------------------\n\n')
         if my_controller.is_done():
             print("done picking and placing")
         articulation_controller.apply_action(actions)
