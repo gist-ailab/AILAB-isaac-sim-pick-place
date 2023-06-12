@@ -30,7 +30,7 @@ from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
 
-class AILabExtension(AILabExtension):
+class AILabExtensions(AILabExtension):
     def __init__(self):
         super().__init__()
 
@@ -48,7 +48,7 @@ class AILabExtension(AILabExtension):
         )
         return
 
-gui_test = AILabExtension()
+gui_test = AILabExtensions()
 gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
 
@@ -69,9 +69,9 @@ objects_list = random.sample(total_objects_list, 3)
 
 
 #
-objects_position = np.array([[0.3, 0.3, 0.1],
-                             [-0.3, 0.3, 0.1],
-                             [-0.3, -0.3, 0.1]])
+objects_position = np.array([[ 0.3,  0.3, 0.1],
+                             [ 0.3,  0.0, 0.1],
+                             [ 0.4,  0.5, 0.1]])
 offset = np.array([0, 0, 0.1])
 target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
 target_orientation = np.array([0, 0, 0, 1])
@@ -113,15 +113,23 @@ while simulation_app.is_running():
         
         if gui_test.use_custom_updated:
             observations = my_world.get_observations()
+            
+            #TODO: check gui_test.current_target is exist
+
             actions = my_controller.forward(
-                picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
-                placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
+                picking_position=observations[task_params[gui_test.current_target]["value"]]["position"],
+                placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
                 current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
                 end_effector_offset=np.array([0.125, 0.095, 0.04]),
                 # end_effector_offset=np.array([0, 0, 0.04]),
             )
             if my_controller.is_done():
-                print("done picking and placing")
+                print("\n done picking and placing \n")
+                print("resetting sim \n")
+                my_world.reset()
+                my_controller.reset()
+                gui_test.use_custom_updated = False
+                gui_test.current_target = None
             articulation_controller.apply_action(actions)
         else:
             observations = my_world.get_observations()

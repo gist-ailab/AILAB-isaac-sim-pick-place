@@ -25,8 +25,6 @@ class AILabExtension(omni.ext.IExt):
         super().__init__()
         self._ext_id= 'omni.isaac.examples-1.5.1'
         self.use_custom_updated = False
-
-        self.current_target = None
         pass
 
     def on_startup(self, ext_id: str='omni.isaac.examples-1.5.1'):
@@ -151,118 +149,118 @@ class AILabExtension(omni.ext.IExt):
                         )
                 with self._controls_frame:
                     # = ++
-                    # if use_custom_update:
-                    with ui.VStack(style=get_style(), spacing=5, height=0):
-                        dict = {
-                            "label": "Check Objects",
-                            "type": "button",
-                            "text": "Check",
-                            "tooltip": "Check object to pick",
-                            "on_clicked_fn": self._on_check,
-                        }
-                        self._buttons["Check Objects"] = btn_builder(**dict)
-                        self._buttons["Check Objects"].enabled = True
+                    if use_custom_update:
+                        with ui.VStack(style=get_style(), spacing=5, height=0):
+                            dict = {
+                                "label": "Check Objects",
+                                "type": "button",
+                                "text": "Check",
+                                "tooltip": "Check object to pick",
+                                "on_clicked_fn": self._on_check,
+                            }
+                            self._buttons["Check Objects"] = btn_builder(**dict)
+                            self._buttons["Check Objects"].enabled = True
 
-                        dict = {
-                            "label": "Reset",
-                            "type": "button",
-                            "text": "Reset",
-                            "tooltip": "Reset robot and environment",
-                            "on_clicked_fn": self._on_reset,
-                        }
-                        self._buttons["Reset"] = btn_builder(**dict)
-                        self._buttons["Reset"].enabled = False
-                        
-                        dict = {
-                            "label": "Object No.0",
-                            "type": "button",
-                            "text": "000_unkown",
-                            "tooltip": "Pick object and move",
-                            "on_clicked_fn": self._on_button_00,
-                        }
-                        self._buttons["Object No.0"] = btn_builder(**dict)
-                        self._buttons["Object No.0"].enabled = False
-
-                        dict = {
-                            "label": "Object No.1",
-                            "type": "button",
-                            "text": "001_unkown",
-                            "tooltip": "Pick object and move",
-                            "on_clicked_fn": self._on_button_01,
-                        }
-                        self._buttons["Object No.1"] = btn_builder(**dict)
-                        self._buttons["Object No.1"].enabled = False
-
-                        dict = {
-                            "label": "Object No.2",
-                            "type": "button",
-                            "text": "002_unkown",
-                            "tooltip": "Pick object and move",
-                            "on_clicked_fn": self._on_button_02,
-                        }
-                        self._buttons["Object No.2"] = btn_builder(**dict)
-                        self._buttons["Object No.2"].enabled = False
-                    # # else:   
-                    #     with ui.VStack(style=get_style(), spacing=5, height=0):
-                    #         dict = {
-                    #             "label": "Check Objects",
-                    #             "type": "button",
-                    #             "text": "Check",
-                    #             "tooltip": "Check object to pick",
-                    #             "on_clicked_fn": self._on_check,
-                    #         }
-                    #         self._buttons["Check Objects"] = btn_builder(**dict)
-                    #         self._buttons["Check Objects"].enabled = True
-
-                    #         # dict = {
-                    #         #     "label": "Pick Object",
-                    #         #     "type": "button",
-                    #         #     "text": "Pick",
-                    #         #     "tooltip": "Pick object and move",
-                    #         #     "on_clicked_fn": self._on_load_world,
-                    #         # }
-                    #         # self._buttons["Pick Object"] = btn_builder(**dict)
-                    #         # self._buttons["Pick Object"].enabled = False
-
-                    #         dict = {
-                    #             "label": "Reset",
-                    #             "type": "button",
-                    #             "text": "Reset",
-                    #             "tooltip": "Reset robot and environment",
-                    #             "on_clicked_fn": self._on_reset,
-                    #         }
-                    #         self._buttons["Reset"] = btn_builder(**dict)
-                    #         self._buttons["Reset"].enabled = False
+                            dict = {
+                                "label": "Reset",
+                                "type": "button",
+                                "text": "Reset",
+                                "tooltip": "Reset robot and environment",
+                                "on_clicked_fn": self._on_reset,
+                            }
+                            self._buttons["Reset"] = btn_builder(**dict)
+                            self._buttons["Reset"].enabled = True
                             
-                    #         dict = {
-                    #             "label": "Object No.0",
-                    #             "type": "button",
-                    #             "text": "000_unkown",
-                    #             "tooltip": "Pick object and move",
-                    #             "on_clicked_fn": self._on_selected_button,
-                    #         }
-                    #         self._buttons["Object No.0"] = btn_builder(**dict)
-                    #         self._buttons["Object No.0"].enabled = False
+                            dict = {
+                                "label": "Object No.0",
+                                "type": "button",
+                                "text": "000_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.0"] = btn_builder(**dict)
+                            self._buttons["Object No.0"].enabled = True
 
-                    #         dict = {
-                    #             "label": "Object No.1",
-                    #             "type": "button",
-                    #             "text": "001_unkown",
-                    #             "tooltip": "Pick object and move",
-                    #             "on_clicked_fn": self._on_selected_button,
-                    #         }
-                    #         self._buttons["Object No.1"] = btn_builder(**dict)
-                    #         self._buttons["Object No.1"].enabled = False
+                            dict = {
+                                "label": "Object No.1",
+                                "type": "button",
+                                "text": "001_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.1"] = btn_builder(**dict)
+                            self._buttons["Object No.1"].enabled = True
 
-                    #         dict = {
-                    #             "label": "Object No.2",
-                    #             "type": "button",
-                    #             "text": "002_unkown",
-                    #             "tooltip": "Pick object and move",
-                    #             "on_clicked_fn": self._on_selected_button,
-                    #         }
-                    #         self._buttons["Object No.2"] = btn_builder(**dict)
-                    #         self._buttons["Object No.2"].enabled = False
+                            dict = {
+                                "label": "Object No.2",
+                                "type": "button",
+                                "text": "002_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.2"] = btn_builder(**dict)
+                            self._buttons["Object No.2"].enabled = True
+                    else:   
+                        with ui.VStack(style=get_style(), spacing=5, height=0):
+                            dict = {
+                                "label": "Check Objects",
+                                "type": "button",
+                                "text": "Check",
+                                "tooltip": "Check object to pick",
+                                "on_clicked_fn": self._on_check,
+                            }
+                            self._buttons["Check Objects"] = btn_builder(**dict)
+                            self._buttons["Check Objects"].enabled = True
+
+                            # dict = {
+                            #     "label": "Pick Object",
+                            #     "type": "button",
+                            #     "text": "Pick",
+                            #     "tooltip": "Pick object and move",
+                            #     "on_clicked_fn": self._on_load_world,
+                            # }
+                            # self._buttons["Pick Object"] = btn_builder(**dict)
+                            # self._buttons["Pick Object"].enabled = False
+
+                            dict = {
+                                "label": "Reset",
+                                "type": "button",
+                                "text": "Reset",
+                                "tooltip": "Reset robot and environment",
+                                "on_clicked_fn": self._on_reset,
+                            }
+                            self._buttons["Reset"] = btn_builder(**dict)
+                            self._buttons["Reset"].enabled = False
+                            
+                            dict = {
+                                "label": "Object No.0",
+                                "type": "button",
+                                "text": "000_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.0"] = btn_builder(**dict)
+                            self._buttons["Object No.0"].enabled = False
+
+                            dict = {
+                                "label": "Object No.1",
+                                "type": "button",
+                                "text": "001_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.1"] = btn_builder(**dict)
+                            self._buttons["Object No.1"].enabled = False
+
+                            dict = {
+                                "label": "Object No.2",
+                                "type": "button",
+                                "text": "002_unkown",
+                                "tooltip": "Pick object and move",
+                                "on_clicked_fn": self._on_selected_button,
+                            }
+                            self._buttons["Object No.2"] = btn_builder(**dict)
+                            self._buttons["Object No.2"].enabled = False
         return
 
     def _set_button_tooltip(self, button_name, tool_tip):
@@ -301,7 +299,7 @@ class AILabExtension(omni.ext.IExt):
             self._buttons["Check Objects"].enabled = False
             self.use_custom_updated = False
 
-            # self.post_reset_button_event()
+            self.post_reset_button_event()
 
         asyncio.ensure_future(_on_check())
         return
@@ -319,53 +317,6 @@ class AILabExtension(omni.ext.IExt):
 
         asyncio.ensure_future(_on_selected_button())
         return
-    
-    def _on_button_00(self):
-        async def _on_button_00():
-            # await self._sample.check_async()
-            # await omni.kit.app.get_app().next_update_async()
-            
-            self._enable_all_buttons(False)
-            self._buttons["Check Objects"].enabled = True
-            self.use_custom_updated = True
-            self.current_target = "task_object_name_0"
-            
-            self.post_reset_button_event()
-
-        asyncio.ensure_future(_on_button_00())
-        return
-
-    def _on_button_01(self):
-        async def _on_button_01():
-            # await self._sample.check_async()
-            # await omni.kit.app.get_app().next_update_async()
-            
-            self._enable_all_buttons(False)
-            self._buttons["Check Objects"].enabled = True
-            self.use_custom_updated = True
-            self.current_target = "task_object_name_1"
-            
-            self.post_reset_button_event()
-
-        asyncio.ensure_future(_on_button_01())
-        return
-
-    def _on_button_02(self):
-        async def _on_button_02():
-            # await self._sample.check_async()
-            # await omni.kit.app.get_app().next_update_async()
-            
-            self._enable_all_buttons(False)
-            self._buttons["Check Objects"].enabled = True
-            self.use_custom_updated = True
-            self.current_target = "task_object_name_2"
-            
-            self.post_reset_button_event()
-
-        asyncio.ensure_future(_on_button_02())
-        return
-
-
     # def _on_check(self):
     #     async def _on_check():
     #         await self._sample.check_async()
