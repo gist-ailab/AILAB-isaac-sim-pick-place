@@ -16,7 +16,8 @@ Clone this repository and then build the image:
 ```bash
 docker login nvcr.io
 
-# TOKEN KEY : Njc5dHR0b2QwZTh0dTFtNW5ydXI4Y3JtNm46MGVkM2VjODctZTk1Ni00NmNjLTkxNDEtYTdmMjNlNjllMjNj 
+id : $oauthtoken
+pwd : Njc5dHR0b2QwZTh0dTFtNW5ydXI4Y3JtNm46MGVkM2VjODctZTk1Ni00NmNjLTkxNDEtYTdmMjNlNjllMjNj 
 ```
 
 ```bash
