@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import torch
 from PIL import Image
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from coco.engine import train_one_epoch, evaluate
 import coco.utils as utils
@@ -158,5 +159,7 @@ def main():
         lr_scheduler.step()
         # evaluate on the test dataset
         evaluate(model, data_loader_test, device=device)
-    
-main()
+        
+        
+if __name__ == "__main__":
+    main()

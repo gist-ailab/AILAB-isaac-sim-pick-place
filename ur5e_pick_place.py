@@ -29,6 +29,8 @@ from pick_place_controller import PickPlaceController
 from correct_radial_distortion import depth_image_from_distance_image
 from ggcnn.inferece_ggcnn import inference_ggcnn
 # from detection.inference_detection import inference_detection
+from omni.isaac.examples.ailab_script import AILabExtension
+from omni.isaac.examples.ailab_examples import AILab
 
 import carb
 import sys
@@ -48,9 +50,7 @@ args, unknown = parser.parse_known_args()
 my_world = World(stage_units_in_meters=1.0)
 my_world.scene.add_default_ground_plane()
 
-# ur5e_usd_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/github_my/isaac-sim-pick-place/ur5e_handeye_gripper.usd"
-# ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/ur5e_handeye_gripper.usd"
-ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/tasks/ur5e_handeye_gripper_v2.usd"
+ur5e_usd_path = "/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/tasks/ur5e_handeye_gripper.usd"
 if os.path.isfile(ur5e_usd_path):
     pass
 else:
@@ -103,7 +103,7 @@ depth_camera = Camera(
 #######
 #Add ycb object
 #########
-objects = glob.glob("/home/nam/workspace/ycb_usd/ycb/*/*.usd")
+objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
 # objects = glob.glob("/ailab_mat/dataset/ycb_usd/ycb/*/*.usd")
 for l in range(3):
     # size_z = (random.random()*0.09+0.03)*2

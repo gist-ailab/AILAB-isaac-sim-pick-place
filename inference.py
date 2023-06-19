@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
-import coco.transforms as T
+# import coco.transforms as T
 import glob
 import random
 import argparse
