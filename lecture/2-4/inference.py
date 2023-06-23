@@ -2,11 +2,10 @@ import os
 import numpy as np
 import torch
 from PIL import Image, ImageDraw
+import sys
 
-import torchvision
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
-import coco.transforms as T
+sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
+
 import glob
 import random
 import argparse
@@ -17,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--model_path",
     type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/test_pth",
+    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/pth",
     help="data usd directory",
 )
 parser.add_argument(
@@ -39,7 +38,7 @@ def main():
     num_classes = 90
     model = get_model_instance_segmentation(num_classes)
     model.to(device)
-    model.load_state_dict(torch.load(args.model_path+"/9.pth"))
+    model.load_state_dict(torch.load(args.model_path+"/99.pth"))
     model.eval()
     
     dataset_test = YCBDataset(args.img_path+'val', get_transform(train=False))
@@ -55,11 +54,14 @@ def main():
     # draw bbox
     draw = ImageDraw.Draw(img1)
     objects = glob.glob(args.data_path+"/*/*.usd")
+    print(objects)
     print((prediction[0]['labels']))
-    for i in range(len(list(prediction[0]['boxes'][:3]))):
-        print(prediction[0]['boxes'][i])
-        draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
-        draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
+    print((prediction[0]))
+    for i in range(len(list(prediction[0]['boxes']))):
+        if prediction[0]['scores'][i]>0.9:
+            print(prediction[0]['boxes'][i])
+            draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+            draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
     img1.save("bbox.jpg")
     labels = prediction[0]['labels']
     
@@ -68,4 +70,5 @@ def main():
     # print(objects)
     print("That's it!")
     
-main()
+if __name__ == "__main__":
+    main()
