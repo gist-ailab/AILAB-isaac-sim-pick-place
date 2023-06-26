@@ -1,9 +1,10 @@
+
 import os
 import sys
 import numpy as np
 import torch
 from PIL import Image
-
+sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
 from coco.engine import train_one_epoch, evaluate
 import coco.utils as utils
 import torchvision
@@ -158,5 +159,6 @@ def main():
         lr_scheduler.step()
         # evaluate on the test dataset
         evaluate(model, data_loader_test, device=device)
-    
-main()
+        
+if __name__ == "__main__":
+    main()
