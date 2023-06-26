@@ -1,7 +1,8 @@
+
+#----- import necessary packages -----#
+# initialize simulation app before import other isacc packages, waiting for about 240 seconds when first run
 from omni.isaac.kit import SimulationApp
-
-simulation_app = SimulationApp({"headless": False})
-
+simulation_app = SimulationApp({"headless": False}) 
 from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.utils.stage import get_current_stage
@@ -9,31 +10,78 @@ from omni.isaac.sensor import Camera
 from omni.isaac.core.utils.prims import delete_prim
 from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.objects import DynamicCuboid
+
+import os
 import numpy as np
 import argparse
 from PIL import Image as im
 import torchvision.transforms as T
 import random
 
+#----- Initialize simulation setting -----#
+# initialize simulation world
+sim_step = 0
+my_world = World(stage_units_in_meters=1.0)
 
-##########
-#Read robot name and path#
-#########
-parser = argparse.ArgumentParser()
+# initialize simulation scene
+scene = Scene()
+scene.add_default_ground_plane() # add default ground plane
 
-parser.add_argument(
-    "--save_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/test_img",
-    help="img save path directory",
+# add camera to scene
+my_camera = Camera(
+    prim_path="/World/RGB",
+    frequency=20,
+    resolution=(1920, 1080), # 1920*1080
+    position=[0.48176, 0.13541, 0.71], # attach camera to robot hand
+    orientation=[0.5,-0.5,0.5,0.5] # quaternion 
 )
+my_camera.set_focal_length(1.93)
+my_camera.set_focus_distance(4)
+my_camera.set_horizontal_aperture(2.65)
+my_camera.set_vertical_aperture(1.48)
+my_camera.set_clipping_range(0.01, 10000)
 
-args = parser.parse_args()
+my_world.reset()
+my_world.step(render=True)
+my_camera.initialize()
+my_camera.add_distance_to_camera_to_frame()
+my_camera.add_instance_segmentation_to_frame()
+
+stage = get_current_stage()
+my_world.reset()
+
+#----- Generate data -----#
+ep_num = 0
+max_ep_num = 100
+max_ep_step = 15
+# simulation loop for 1000 steps
+while simulation_app.is_running():
+    my_world.reset()
+    # initialize episode
+    ep_num += 1
+    
+    print("Start Episode: ", ep_num)
+    for ep_step in range(max_ep_step):
 
 
-########
-#World genration
-########
+        # step episode
+        my_world.step(render=True)
+    
+    
+    # close simulation app
+    if ep_num == max_ep_num:
+        simulation_app.close()
+            
+        
+exit()
+
+# Setting save path for generated data
+work_path = os.path.dirname(os.path.abspath(__file__))
+save_path = os.path.join(work_path, "sample_data")
+print("save_path: ", save_path)
+
+
+
 my_world = World(stage_units_in_meters=1.0)
 
 scene = Scene()
@@ -47,7 +95,6 @@ hand_camera = Camera(
     resolution=(1920, 1080),
     position=[0.48176, 0.13541, 0.71],
     orientation=[0.5,-0.5,0.5,0.5]
-    # orientation=[1,0,0,0]
 )
 
 hand_camera.set_focal_length(1.93)
