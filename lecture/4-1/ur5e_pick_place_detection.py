@@ -81,10 +81,6 @@ gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(Path(working_dir).parent, "dataset/ycb/*/*.usd")
 objects = glob.glob(objects_path)
-# for i in range(len(objects)):
-#     if 'driver' in objects[i]:
-#         print(i)
-# exit()
 objects_list = random.sample(objects, 3)
 objects_list[0] = objects[1]
 
@@ -204,20 +200,13 @@ for theta in range(0, 360, 45):
                             draw.multiline_text((list(prediction[0]['boxes'][i])), text = ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                             draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
                         image.show()
-                                        
-                        #########inference ggcnn##############3
-                        camera_intrinsics = camera.get_intrinsics_matrix()
-                        n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
-                                                
-                        ggcnn_angle, length, width, center = inference_ggcnn(
-                            rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
-                        center = np.array(center)
-                        depth = depth_image[center[1]][center[0]]
                         
-                        center = np.expand_dims(center, axis=0)
+                        bbox = prediction[0]['boxes'][index]
+                        cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
+                        depth = depth_image[cx][cy]
+                        center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
-                        angle = theta * 2 * np.pi / 360 + ggcnn_angle
-                        print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
+                        
                         found_obj = True
                                                 
                     my_controller2.reset()
@@ -243,11 +232,10 @@ while simulation_app.is_running():
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
+            # end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
         if my_controller.is_done():
             print("done picking and placing")
         articulation_controller.apply_action(actions)
-
 
 simulation_app.close()
