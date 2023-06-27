@@ -81,12 +81,7 @@ gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(Path(working_dir).parent, "dataset/ycb/*/*.usd")
 objects = glob.glob(objects_path)
-# for i in range(len(objects)):
-#     if 'driver' in objects[i]:
-#         print(i)
-# exit()
 objects_list = random.sample(objects, 3)
-objects_list[0] = objects[1]
 
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([[0.5, 0, 0.1],
@@ -208,7 +203,7 @@ for theta in range(0, 360, 45):
                         #########inference ggcnn##############3
                         camera_intrinsics = camera.get_intrinsics_matrix()
                         n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
-                                                
+                        
                         ggcnn_angle, length, width, center = inference_ggcnn(
                             rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
                         center = np.array(center)
