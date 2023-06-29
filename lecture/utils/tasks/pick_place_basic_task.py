@@ -34,9 +34,8 @@ class UR5ePickPlace(tasks.PickPlace):
 
         Args:
             name (str, optional): [description]. Defaults to "ur5_pick_place".
-            cube_initial_position (Optional[np.ndarray], optional): [description]. Defaults to None.
-            cube_initial_orientation (Optional[np.ndarray], optional): [description]. Defaults to None.
-            target_position (Optional[np.ndarray], optional): [description]. Defaults to None.
+            objects_position (Optional[np.ndarray], optional): [description]. Object's initial_position. Defaults to None.
+            target_position (Optional[np.ndarray], optional): [description]. Releasing position. Defaults to None.
             offset (Optional[np.ndarray], optional): [description]. Defaults to None.
         """
 
@@ -68,8 +67,9 @@ class UR5ePickPlace(tasks.PickPlace):
                                     size = 0.04,
                                     mass = 0.01,
                                     )
-        self._objects = self._object
+        self._object = self._object
 
+        self.target_position = target_position
         self._offset = offset
         if target_position is None:
             self.target_position = np.array([0.4, -0.33, 0])
@@ -88,7 +88,7 @@ class UR5ePickPlace(tasks.PickPlace):
         self._scene = scene
         scene.add_default_ground_plane()
                 
-        self._task_object = scene.add(self._objects)
+        self._task_object = scene.add(self._object)
 
         self._robot = self.set_robot()
         scene.add(self._robot)
