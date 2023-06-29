@@ -7,7 +7,6 @@
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 #
 from omni.isaac.kit import SimulationApp
-
 simulation_app = SimulationApp({"headless": False})
 
 # add necessary directories to sys.path
@@ -20,19 +19,21 @@ sys.path.append(str(directory))
 from utils.tasks.pick_place_basic_task import UR5ePickPlace
 from utils.controllers.pick_place_controller_robotiq import PickPlaceController
 from omni.isaac.core import World
-from omni.isaac.core.utils.prims import create_prim, delete_prim
-from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
+from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
-import glob, random
 
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([0.4, 0.4, 0.1])
-offset = np.array([0, 0, 0.1])  # releasing offset at the target position
-target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the length of the gripper tip
+target_position = np.array([0.4, -0.33, 0.05])  # 0.55 for considering the length of the gripper tip
 target_orientation = np.array([0, 0, 0, 1])
+offset = np.array([0, 0, 0.1])  # releasing offset at the target position
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = UR5ePickPlace(objects_position=objects_position)
+my_task = UR5ePickPlace(
+                        objects_position=objects_position,
+                        target_position=target_position,
+                        offset=offset,
+                        )
 my_world.add_task(my_task)
 my_world.reset()
 
@@ -52,18 +53,15 @@ self.rmp_flow_config = mg.interface_config_loader.load_supported_motion_policy_c
 '''
 
 articulation_controller = my_ur5e.get_articulation_controller()
+my_controller.reset()
 
 viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
-i = 0
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
-        if my_world.current_time_step_index == 0:
-            my_world.reset()
-            my_controller.reset()
         observations = my_world.get_observations()
         actions = my_controller.forward(
             picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
@@ -77,5 +75,6 @@ while simulation_app.is_running():
         # print('---------------------------------------------------------\n\n')
         if my_controller.is_done():
             print("done picking and placing")
+            break
         articulation_controller.apply_action(actions)
 simulation_app.close()
