@@ -14,8 +14,7 @@ simulation_app = SimulationApp({"headless": False})
 from omni.isaac.core import World
 from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
-from omni.isaac.core.utils.rotations import euler_angles_to_quat
-from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
+from omni.kit.viewport.utility import get_active_viewport
 
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
@@ -24,9 +23,7 @@ from pick_place_controller import PickPlaceController
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import get_model_instance_segmentation
-from correct_radial_distortion import depth_image_from_distance_image
-from ggcnn.inferece_ggcnn import inference_ggcnn
+from detection import get_model_instance_segmentation, get_transform
 
 import numpy as np
 import os
@@ -69,7 +66,7 @@ objects = glob.glob(objects_path)
 objects_list = random.sample(objects, 3)
 
 # if you don't declare objects_position, the objects will be placed randomly
-objects_position = np.array([[0.5, 0.2, 0.1],
+objects_position = np.array([[0.5, 0, 0.1],
                              [-0.6, 0.3, 0.1],
                              [-0.6, -0.3, 0.1]])
 offset = np.array([0, 0, 0.1])  # releasing offset at the target position
@@ -184,21 +181,13 @@ for theta in range(0, 360, 45):
                             draw.multiline_text((list(prediction[0]['boxes'][i])), text = ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                             draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
                         image.show()
-                                        
-                        #########inference ggcnn##############3
-                        camera_intrinsics = camera.get_intrinsics_matrix()
-                        n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
                         
-                        ggcnn_angle, length, width, center = inference_ggcnn(
-                            rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
-                        center = np.array(center)
-                        depth = depth_image[center[1]][center[0]]
-                        
-                        center = np.expand_dims(center, axis=0)
+                        bbox = prediction[0]['boxes'][index]
+                        cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
+                        depth = depth_image[cx][cy]
+                        center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
-                        angle = theta * 2 * np.pi / 360 + ggcnn_angle
-                        print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
-                        print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
+                        
                         found_obj = True
                                                 
                     my_controller2.reset()
@@ -224,11 +213,9 @@ while simulation_app.is_running():
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
         if my_controller.is_done():
             print("done picking and placing")
         articulation_controller.apply_action(actions)
-
 
 simulation_app.close()

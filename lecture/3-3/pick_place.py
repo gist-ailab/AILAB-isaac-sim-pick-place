@@ -29,7 +29,8 @@ import glob, random
 working_dir = os.path.dirname(os.path.realpath(__file__))
 objects_path = os.path.join(Path(working_dir).parent, "dataset/ycb/*/*.usd")
 objects_list = glob.glob(objects_path)
-objects_list = random.sample(objects_list, 3)
+# objects_list = random.sample(objects_list, 3)
+objects_list = [objects_list[0], objects_list[1], objects_list[2]]
 
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([[0.3, 0.3, 0.1],
@@ -62,6 +63,9 @@ i = 0
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
+        
+        if my_controller._event == 1:
+            my_controller.pause()
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
