@@ -148,7 +148,7 @@ for theta in range(0, 360, 45):
                 )
                 if my_controller2.is_done():
                     rgb_image = camera.get_rgba()[:, :, :3]
-                    depth_image = camera.get_current_frame()["distance_to_camera"]
+                    distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
                     
@@ -187,12 +187,12 @@ for theta in range(0, 360, 45):
                                         
                         #########inference ggcnn##############3
                         camera_intrinsics = camera.get_intrinsics_matrix()
-                        n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
+                        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         
                         ggcnn_angle, length, width, center = inference_ggcnn(
-                            rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
+                            rgb=rgb_image, depth=depth_image, bbox=prediction[0]['boxes'][index])
                         center = np.array(center)
-                        depth = depth_image[center[1]][center[0]]
+                        depth = distance_image[center[1]][center[0]]
                         
                         center = np.expand_dims(center, axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)

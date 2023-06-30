@@ -145,7 +145,7 @@ for theta in range(0, 360, 45):
                 )
                 if my_controller2.is_done():
                     rgb_image = camera.get_rgba()[:, :, :3]
-                    depth_image = camera.get_current_frame()["distance_to_camera"]
+                    distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
                     
@@ -184,7 +184,7 @@ for theta in range(0, 360, 45):
                         
                         bbox = prediction[0]['boxes'][index]
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        depth = depth_image[cx][cy]
+                        depth = distance_image[cx][cy]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
                         
