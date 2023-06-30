@@ -1,17 +1,26 @@
+# ---- ---- ---- ----
+# GIST-AILAB, 2023 summer school
+# Day1. 
+# 2-4.0 Object Detection Loop
+# ---- ---- ---- ----
+
 
 import os
 import sys
-import numpy as np
+import argparse
+
 import torch
-from PIL import Image
-sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
-from coco.engine import train_one_epoch, evaluate
-import coco.utils as utils
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+
+from coco.engine import train_one_epoch, evaluate
+import coco.utils as utils
 import coco.transforms as T
-import argparse
+
+import numpy as np
+from PIL import Image
+sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
 
 
 parser = argparse.ArgumentParser()
@@ -31,6 +40,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+
 class YCBDataset(torch.utils.data.Dataset):
     def __init__(self, root, transforms):
         self.root = root
@@ -38,6 +48,9 @@ class YCBDataset(torch.utils.data.Dataset):
         self.imgs = list(sorted(os.listdir(os.path.join(root, "img"))))
         self.masks = list(sorted(os.listdir(os.path.join(root, "mask"))))
 
+    def __len__(self):
+        return len(self.imgs)
+    
     def __getitem__(self, idx):
         img_path = os.path.join(self.root, "img", self.imgs[idx])
         mask_path = os.path.join(self.root, "mask", self.masks[idx])
@@ -81,10 +94,8 @@ class YCBDataset(torch.utils.data.Dataset):
             img, target = self.transforms(img, target)
 
         return img, target
-    
-    def __len__(self):
-        return len(self.imgs)
- 
+
+
 def get_model_instance_segmentation(num_classes):
     # load an instance segmentation model pre-trained on COCO
     model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
@@ -103,6 +114,7 @@ def get_model_instance_segmentation(num_classes):
                                                        num_classes)
 
     return model
+
 
 def get_transform(train):
     transforms = []
@@ -159,6 +171,7 @@ def main():
         lr_scheduler.step()
         # evaluate on the test dataset
         evaluate(model, data_loader_test, device=device)
-        
+
+
 if __name__ == "__main__":
     main()

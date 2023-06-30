@@ -1,16 +1,21 @@
-import os
-import numpy as np
-import torch
-from PIL import Image, ImageDraw
+# ---- ---- ---- ----
+# GIST-AILAB, 2023 summer school
+# Day1. 
+# 2-4.0 Object Detection Inference
+# ---- ---- ---- ----
+
+
 import sys
-
-sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
-
+sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")  
+#TODO : change dir
 import glob
 import random
 import argparse
 
+import torch
+from PIL import Image, ImageDraw
 from detection import YCBDataset, get_model_instance_segmentation, get_transform
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -32,6 +37,7 @@ parser.add_argument(
     help="data usd directory",
 )
 args = parser.parse_args()
+
 
 def main():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -69,6 +75,7 @@ def main():
         print(objects[i-2].split("/")[-2])
     # print(objects)
     print("That's it!")
-    
+
+
 if __name__ == "__main__":
     main()
