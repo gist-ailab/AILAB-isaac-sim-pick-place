@@ -1,7 +1,7 @@
 # ---- ---- ---- ----
 # GIST-AILAB, 2023 summer school
 # Day1. 
-# 1-3.0 Basic simulation
+# 1-3.0 Basic Training Loop
 # ---- ---- ---- ----
 
 
