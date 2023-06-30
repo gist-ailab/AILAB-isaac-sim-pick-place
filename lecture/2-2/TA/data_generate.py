@@ -37,8 +37,8 @@ my_camera = Camera(
     prim_path="/World/RGB",
     frequency=20,
     resolution=(1920, 1080),
-    position=[0.48176, 0.13541, 0.71], # attach to robot hand       #
-    orientation=[0.5,-0.5,0.5,0.5] # quaternion                     #
+    position=[0.48176, 0.13541, 0.71], # attach to robot hand
+    orientation=[0.5,-0.5,0.5,0.5] # quaternion
 )
 my_camera.set_focal_length(1.93)
 my_camera.set_focus_distance(4)
@@ -46,35 +46,30 @@ my_camera.set_horizontal_aperture(2.65)
 my_camera.set_vertical_aperture(1.48)
 my_camera.set_clipping_range(0.01, 10000)
 
-my_world.reset()
-my_world.step(render=True)
+my_world.reset()                                                    #
+my_world.step(render=True)                                          #
 my_camera.initialize()
-my_camera.add_distance_to_camera_to_frame()
-my_camera.add_instance_segmentation_to_frame()
+my_camera.add_distance_to_camera_to_frame()                         #
+my_camera.add_instance_segmentation_to_frame()                      #
 
 
-stage = get_current_stage()
-my_world.reset()
+stage = get_current_stage()                                         #
+my_world.reset()                                                    #
 
-#----- Generate data -----#
+
+max_ep_step = 15
 ep_num = 0
 max_ep_num = 100
-max_ep_step = 15
-# simulation loop for 1000 steps
+
 while simulation_app.is_running():
-    my_world.reset()
-    # initialize episode
-    ep_num += 1
     
+    ep_num += 1
+    my_world.reset()
     print("Start Episode: ", ep_num)
+    
     for ep_step in range(max_ep_step):
-
-
-        # step episode
         my_world.step(render=True)
     
-    
-    # close simulation app
     if ep_num == max_ep_num:
         simulation_app.close()
             

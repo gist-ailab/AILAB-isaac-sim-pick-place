@@ -19,7 +19,7 @@ class DetectionDataset(Dataset):
         self.coco = COCO(path)
         # self.img_path = img_path
         self.transforms = transforms
-        
+
         self.image_ids = list(self.coco.imgToAnns.keys())
     
     def __len__(self): 
@@ -30,7 +30,6 @@ class DetectionDataset(Dataset):
         file_name = self.coco.loadImgs(image_id)[0]['file_name'] # call file's name by using image_id 
         # file_name = os.path.join(self.img_path, file_name)
         # image = Image.open(file_name).convert('RGB')
-
 
         annot_ids = self.coco.getAnnIds(imgIds=image_id) # call annotation ids by using image_id 
         annots = [x for x in self.coco.loadAnns(annot_ids) if x['image_id'] == image_id] # call annotations by using annotation id 
