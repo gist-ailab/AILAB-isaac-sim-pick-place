@@ -1,11 +1,3 @@
-# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.isaac.core.utils.types import ArticulationAction
 from omni.isaac.core.articulations import Articulation
@@ -34,9 +26,7 @@ class PickPlaceController(manipulators_controllers.PickPlaceController):
         events_dt: Optional[List[float]] = None,
     ) -> None:
         if events_dt is None:
-            # events_dt = [0.01, 0.0035, 0.01, 1.0, 0.008, 0.005, 0.005, 1, 0.01, 0.08]
-            # events_dt = [0.008, 0.005, 1, 0.05, 0.05, 0.05, 0.0025, 1, 0.008, 0.08]
-            events_dt = [0.008, 0.01, 1, 0.08, 0.1, 0.05, 0.005, 1, 0.01, 0.1]
+            events_dt = [0.01, 0.01, 1, 0.01, 0.1, 0.05, 0.005, 1, 0.01, 0.1]
         manipulators_controllers.PickPlaceController.__init__(
             self,
             name=name,
@@ -69,8 +59,11 @@ class PickPlaceController(manipulators_controllers.PickPlaceController):
             ArticulationAction: [description]
         """
         if end_effector_orientation is None:
-            # end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi / 2.0, np.pi]))
-            end_effector_orientation = euler_angles_to_quat(np.array([np.pi, 0, np.pi]))
+           end_effector_orientation = euler_angles_to_quat(np.array([np.pi, 0, np.pi]))
+        
+        if end_effector_offset is None:
+            end_effector_offset = np.array([0, 0, 0.23])
+
 
         return super().forward(
             picking_position,
@@ -79,4 +72,3 @@ class PickPlaceController(manipulators_controllers.PickPlaceController):
             end_effector_offset=end_effector_offset,
             end_effector_orientation=end_effector_orientation,
         )
-
