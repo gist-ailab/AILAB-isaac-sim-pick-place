@@ -12,18 +12,9 @@ from omni.isaac.kit import SimulationApp
 simulation_app = SimulationApp({"headless": False})
 
 from omni.isaac.core import World
-from omni.isaac.manipulators import SingleManipulator
-from omni.isaac.manipulators.grippers import ParallelGripper
-from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
-from omni.isaac.core.utils.prims import create_prim, delete_prim
+from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
-from omni.isaac.core.utils.extensions import get_extension_path_from_name
-from omni.isaac.core.objects import DynamicCuboid
-from omni.isaac.sensor import Camera
-from omni.isaac.core.prims.xform_prim import XFormPrim
-import omni.kit.commands
-from omni.isaac.core.utils.rotations import euler_angles_to_quat
-from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
+from omni.kit.viewport.utility import get_active_viewport
 
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
@@ -32,19 +23,10 @@ from pick_place_controller import PickPlaceController
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import YCBDataset, get_model_instance_segmentation, get_transform
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
-from correct_radial_distortion import depth_image_from_distance_image
-from ggcnn.inferece_ggcnn import inference_ggcnn
+from detection import get_model_instance_segmentation, get_transform
 
-import carb
-import sys
 import numpy as np
-import argparse
 import os
-import matplotlib.pyplot as plt
-import cv2
 from PIL import Image, ImageDraw
 import glob
 import random
@@ -231,7 +213,6 @@ while simulation_app.is_running():
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
-            # end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
         if my_controller.is_done():
             print("done picking and placing")

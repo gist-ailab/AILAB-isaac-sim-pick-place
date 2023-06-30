@@ -69,7 +69,8 @@ class PickPlaceController(manipulators_controllers.PickPlaceController):
             ArticulationAction: [description]
         """
         if end_effector_orientation is None:
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi / 2.0, np.pi]))
+            # end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi / 2.0, np.pi]))
+            end_effector_orientation = euler_angles_to_quat(np.array([np.pi, 0, np.pi]))
 
         return super().forward(
             picking_position,
