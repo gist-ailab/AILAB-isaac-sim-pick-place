@@ -5,7 +5,6 @@
 # ---- ---- ---- ----
 
 
-import torch
 import torch.nn as nn
 
 
@@ -20,13 +19,13 @@ sequential_layer1 = nn.Sequential(
 )
 
 
-class BasicNet(nn.Module):
-    def __init__(self, output_shape=10):
-        super(BasicNet, self).__init__()
-        self.fc = nn.Linear(32*32*3, output_shape)
+class BasicNet(nn.Module):                              #
+    def __init__(self, output_shape=10):                #
+        super(BasicNet, self).__init__()                #
+        self.fc = nn.Linear(32*32*3, output_shape)      #
 
-    def forward(self, x):
-        out = self.fc(x)
+    def forward(self, x):                               #
+        out = self.fc(x)                                #
 
-        return out
+        return out                                      #
 
