@@ -155,11 +155,10 @@ for theta in range(0, 360, 45):
                         prediction = model([image.to(device)])
                     labels = prediction[0]['labels']
                     labels_name = []
-                    ycb_objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
                     for i in range(len(list(prediction[0]['boxes'][:3]))):
-                        print(len(ycb_objects))
+                        print(len(objects))
                         print((prediction[0]['labels'][i]-2))
-                        labels_name.append(ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                        labels_name.append(objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                     print(labels)
                     print(labels_name)
                     print('boxes')
@@ -178,7 +177,7 @@ for theta in range(0, 360, 45):
                         draw = ImageDraw.Draw(image)
                         for i in range(len(list(prediction[0]['boxes'][:3]))):
                             print(prediction[0]['boxes'][i])
-                            draw.multiline_text((list(prediction[0]['boxes'][i])), text = ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                            draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                             draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
                         image.show()
                         
