@@ -12,17 +12,10 @@ from omni.isaac.kit import SimulationApp
 simulation_app = SimulationApp({"headless": False})
 
 from omni.isaac.core import World
-from omni.isaac.manipulators import SingleManipulator
-from omni.isaac.manipulators.grippers import ParallelGripper
-from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
-from omni.isaac.core.utils.prims import create_prim, delete_prim
+from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
-from omni.isaac.core.utils.extensions import get_extension_path_from_name
-from omni.isaac.core.objects import DynamicCuboid
-from omni.isaac.sensor import Camera
-from omni.isaac.core.prims.xform_prim import XFormPrim
-import omni.kit.commands
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
+from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
 
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
@@ -31,19 +24,12 @@ from pick_place_controller import PickPlaceController
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import YCBDataset, get_model_instance_segmentation, get_transform
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+from detection import get_model_instance_segmentation
 from correct_radial_distortion import depth_image_from_distance_image
 # from ggcnn.inferece_ggcnn import inference_ggcnn
 
-import carb
-import sys
 import numpy as np
-import argparse
 import os
-import matplotlib.pyplot as plt
-import cv2
 from PIL import Image, ImageDraw
 import glob
 import random
@@ -83,7 +69,7 @@ objects = glob.glob(objects_path)
 objects_list = random.sample(objects, 3)
 
 # if you don't declare objects_position, the objects will be placed randomly
-objects_position = np.array([[0.6, 0.3, 0.1],
+objects_position = np.array([[0.5, 0.2, 0.1],
                              [-0.6, 0.3, 0.1],
                              [-0.6, -0.3, 0.1]])
 offset = np.array([0, 0, 0.1])  # releasing offset at the target position
@@ -110,10 +96,10 @@ for l in range(3):
 
 my_world.reset()
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.5
+    name="pick_place_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
 )
 my_controller2 = ReachTargetController(
-    name="reach_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.5
+    name="reach_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
 )
 articulation_controller = my_ur5.get_articulation_controller()
 
@@ -134,6 +120,9 @@ transforms = T.Compose(transforms)
 
 ######################################################
 
+viewport = get_active_viewport()
+viewport.set_active_camera('/World/ur5e/realsense/Depth')
+viewport.set_active_camera('/OmniverseKit_Persp')
 
 r, theta, z = 4, 0, 0.3
 found_obj = False
@@ -159,7 +148,7 @@ for theta in range(0, 360, 45):
                 )
                 if my_controller2.is_done():
                     rgb_image = camera.get_rgba()[:, :, :3]
-                    depth_image = camera.get_current_frame()["distance_to_camera"]
+                    distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
                     re_objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
@@ -198,6 +187,7 @@ for theta in range(0, 360, 45):
                         image.show()
                                         
                         #########inference ggcnn##############3
+<<<<<<< HEAD
                         # camera_intrinsics = camera.get_intrinsics_matrix()
                         # n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
                                                 
@@ -211,6 +201,22 @@ for theta in range(0, 360, 45):
                         # angle = theta * 2 * np.pi / 360 + ggcnn_angle
                         # print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         # found_obj = True
+=======
+                        camera_intrinsics = camera.get_intrinsics_matrix()
+                        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
+                        
+                        ggcnn_angle, length, width, center = inference_ggcnn(
+                            rgb=rgb_image, depth=depth_image, bbox=prediction[0]['boxes'][index])
+                        center = np.array(center)
+                        depth = distance_image[center[1]][center[0]]
+                        
+                        center = np.expand_dims(center, axis=0)
+                        world_center = camera.get_world_points_from_image_coords(center, depth)
+                        angle = theta * 2 * np.pi / 360 + ggcnn_angle
+                        print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
+                        print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
+                        found_obj = True
+>>>>>>> 0593d5c6cd52a86d1da9b8811cba142a6bf27668
                                                 
                     my_controller2.reset()
                     break

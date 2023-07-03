@@ -72,57 +72,57 @@ transform = T.ToPILImage()
 
 while simulation_app.is_running():
     my_world.step(render=True)
-    # random 1 ~ 3 data generation in camera boundary
-    if i % 15 == 1:
-        obj_num = random.randint(1,3)
-        for l in range(obj_num):
-            pos_x = (random.random()*0.92+0.02)
-            pos_y = (random.random()*0.52-0.12)
-            pos_z = 0.02
-            cube = DynamicCuboid("/World/object"+str(l),position=[pos_x,pos_y,pos_z/2], scale=[0.02,0.02,0.02])
-            object_prim=stage.DefinePrim("/World/object"+str(l))
-            # update semantic information with label 0 is unlabel 1 is background label go for 2 ~
+    # # random 1 ~ 3 data generation in camera boundary
+    # if i % 15 == 1:
+    #     obj_num = random.randint(1,3)
+    #     for l in range(obj_num):
+    #         pos_x = (random.random()*0.92+0.02)
+    #         pos_y = (random.random()*0.52-0.12)
+    #         pos_z = 0.02
+    #         cube = DynamicCuboid("/World/object"+str(l),position=[pos_x,pos_y,pos_z/2], scale=[0.02,0.02,0.02])
+    #         object_prim=stage.DefinePrim("/World/object"+str(l))
+    #         # update semantic information with label 0 is unlabel 1 is background label go for 2 ~
             
-            add_update_semantics(prim=object_prim, semantic_label=str(l+2))
-    my_world.reset()
+    #         add_update_semantics(prim=object_prim, semantic_label=str(l+2))
+    # my_world.reset()
         
-    if i % 15 == 12:
-        hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
-        hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
-        hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
-        hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
-        focus_distance = hand_camera.get_focus_distance()
-        horizontal_aperture = hand_camera.get_horizontal_aperture()
+    # if i % 15 == 12:
+    #     hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
+    #     hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
+    #     hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
+    #     hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
+    #     focus_distance = hand_camera.get_focus_distance()
+    #     horizontal_aperture = hand_camera.get_horizontal_aperture()
         
-        print(hand_camera.get_current_frame()["instance_segmentation"])
+    #     print(hand_camera.get_current_frame()["instance_segmentation"])
         
-        hand_imgplot = transform(hand_rgb_image)
+    #     hand_imgplot = transform(hand_rgb_image)
        
-        # class가 2,3,4로 순서대로 나타나는게 아니라 (2,3) (3,4) 등으로 나타날 때도 있음 해당 예외 처리를 위해 다음과 같은 dict 생성 
-        class_list = {}
-        for kl in range(2,5):
-            if str(kl) in hand_instance_segmentation_dict.keys():
-                class_list[kl]=int(hand_instance_segmentation_dict[str(kl)]['class'])
+    #     # class가 2,3,4로 순서대로 나타나는게 아니라 (2,3) (3,4) 등으로 나타날 때도 있음 해당 예외 처리를 위해 다음과 같은 dict 생성 
+    #     class_list = {}
+    #     for kl in range(2,5):
+    #         if str(kl) in hand_instance_segmentation_dict.keys():
+    #             class_list[kl]=int(hand_instance_segmentation_dict[str(kl)]['class'])
 
-        # hand_instance_segmentation_image의 경우 class(2,3,4)로 라벨이 되어있음. 이를 label로 바꿔줌
-        for c in class_list.keys():
-            np.place(hand_instance_segmentation_image, hand_instance_segmentation_image==c, class_list[c])
-        print(np.unique(hand_instance_segmentation_image))
-        # png형태로 저장
-        hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
-        if i < 1065:
-            hand_imgplot.save(args.save_path+"/train/img/img"+str(int(i/15))+".png")
-            hand_inssegplot.save(args.save_path+"/train/mask/mask"+str(int(i/15))+".png")
-        else:
-            hand_imgplot.save(args.save_path+"/val/img/img"+str(int(i/15))+".png")
-            hand_inssegplot.save(args.save_path+"/val/mask/mask"+str(int(i/15))+".png")
+    #     # hand_instance_segmentation_image의 경우 class(2,3,4)로 라벨이 되어있음. 이를 label로 바꿔줌
+    #     for c in class_list.keys():
+    #         np.place(hand_instance_segmentation_image, hand_instance_segmentation_image==c, class_list[c])
+    #     print(np.unique(hand_instance_segmentation_image))
+    #     # png형태로 저장
+    #     hand_inssegplot = im.fromarray(hand_instance_segmentation_image)
+    #     if i < 1065:
+    #         hand_imgplot.save(args.save_path+"/train/img/img"+str(int(i/15))+".png")
+    #         hand_inssegplot.save(args.save_path+"/train/mask/mask"+str(int(i/15))+".png")
+    #     else:
+    #         hand_imgplot.save(args.save_path+"/val/img/img"+str(int(i/15))+".png")
+    #         hand_inssegplot.save(args.save_path+"/val/mask/mask"+str(int(i/15))+".png")
             
-        for l in range(obj_num):
-            delete_prim("/World/object"+str(l))
-        my_world.reset()
+    #     for l in range(obj_num):
+    #         delete_prim("/World/object"+str(l))
+    #     my_world.reset()
         
-    if i == 1500:
-        simulation_app.close()
+    # if i == 1500:
+    #     simulation_app.close()
 
-    i += 1
+    # i += 1
     
