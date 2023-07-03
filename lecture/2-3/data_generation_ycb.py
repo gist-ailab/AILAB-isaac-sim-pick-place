@@ -29,7 +29,6 @@ robot_path = os.path.join(lecture_path, 'utils/tasks/ur5e_handeye_gripper.usd')
 data_path = os.path.join(lecture_path, 'dataset/ycb')
 save_path = os.path.join(lecture_path, 'dataset/detect_img')
 
-# exit()
 # get object list
 obj_dirs = [os.path.join(data_path, obj_name) for obj_name in os.listdir(data_path)]
 obj_dirs.sort()
@@ -95,7 +94,6 @@ while simulation_app.is_running():
         usd_file = object_info[random_idx]['usd_file']
         obj_label = object_info[random_idx]['label']
         prim_path = "/World/object"+str(l) # 1st, 2nd, 3rd object
-        print("AAAAAAAAA", prim_path)
         object_prim = create_prim(
             usd_path = usd_file, 
             prim_path = prim_path, 
