@@ -22,11 +22,14 @@ def save_image(image, path):
     image = Image.fromarray(image)
     image.save(path)
 
-# data and save path
-robot_path = os.path.join(lecture_path, '/utils/tasks/ur5e_handeye_gripper.usd')
-data_path = os.path.join(lecture_path, '/dataset/ycb')
-save_path = os.path.join(lecture_path, '/detect_img')
 
+# data and save path
+print(lecture_path)
+robot_path = os.path.join(lecture_path, 'utils/tasks/ur5e_handeye_gripper.usd')
+data_path = os.path.join(lecture_path, 'dataset/ycb')
+save_path = os.path.join(lecture_path, 'dataset/detect_img')
+
+# exit()
 # get object list
 obj_dirs = [os.path.join(data_path, obj_name) for obj_name in os.listdir(data_path)]
 obj_dirs.sort()
@@ -39,6 +42,7 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
         'usd_file': usd_file,
         'label': obj_idx+2, # set object label 2 ~ 
     }
+
 
 #-----1. Initialize simulation app and import packages
 from omni.isaac.kit import SimulationApp
@@ -69,15 +73,15 @@ task_params = my_task.get_params()
 
 my_ur5 = my_world.scene.get_object(task_params["robot_name"]["value"])
 hand_camera = my_task.get_camera()
+# hand_camera.add_distance_to_camera_to_frame()
+# hand_camera.add_instance_segmentation_to_frame()
+
 stage = get_current_stage()
-
-
-#-----3. Add objects
-
 
 #-----4. Simulation loop
 i = 0
 while simulation_app.is_running():
+    
     my_world.step(render=True)
 
     #-----4.1. Randomly select object and add to the scene
@@ -91,18 +95,20 @@ while simulation_app.is_running():
         usd_file = object_info[random_idx]['usd_file']
         obj_label = object_info[random_idx]['label']
         prim_path = "/World/object"+str(l) # 1st, 2nd, 3rd object
+        print("AAAAAAAAA", prim_path)
         object_prim = create_prim(
-            usd_path=usd_file, 
-            prim_path=prim_path, 
-            position=random_position, 
-            scale=[0.2,0.2,0.2])
+            usd_path = usd_file, 
+            prim_path = prim_path, 
+            position = random_position, 
+            scale = [0.2,0.2,0.2])
         # update semantic information
         # label 0   : unlabel 
         # label 1   : background 
         # label 2 ~ : YCB object 
-        add_update_semantics(prim=object_prim, semantic_label=str(l*100+obj_label))
+        add_update_semantics(prim=object_prim, semantic_label=str(obj_label+100*l))
     
-    # about 10 steps to stablize the scene
+    # about 10 steps to stablize the scene after reset
+    my_world.reset()
     for j in range(10):
         my_world.step(render=True)
 
@@ -117,9 +123,9 @@ while simulation_app.is_running():
     #-----4.3. post-processing for instance segmentation
     # class가 2,3,4로 순서대로 나타나는게 아니라 (2,3) (3,4) 등으로 나타날 때도 있음 해당 예외 처리를 위해 다음과 같은 dict 생성 
     class_dict = {}
-    for kl in range(2,5):
-        if str(kl) in hand_instance_segmentation_dict.keys():
-            class_dict[kl]=int(hand_instance_segmentation_dict[str(kl)]['class'])
+    for k in range(2,5):
+        if str(k) in hand_instance_segmentation_dict.keys():
+            class_dict[k]=int(hand_instance_segmentation_dict[str(k)]['class'])
     
     # hand_instance_segmentation_image의 경우 class(2,3,4)로 라벨이 되어있음. 이를 label로 바꿔줌
     for c in class_dict.keys():
@@ -129,11 +135,13 @@ while simulation_app.is_running():
     #-----4.4. save image
     # png형태로 저장
     split = "train" if i < 100000 else "val"
-    img_name = "/{}/img/img{}.png".format(split, i)
-    mask_name = "/{}/mask/mask{}.png".format(split, i)
+    img_name = "{}/img/img{}.png".format(split, i)
+    mask_name = "{}/mask/mask{}.png".format(split, i)
     save_image(hand_rgb_image, os.path.join(save_path, img_name))
     save_image(hand_instance_segmentation_image, os.path.join(save_path, mask_name))
         
-    #-----4.5. delete objects
+    # #-----4.5. delete objects
     for l in range(obj_num):
         delete_prim("/World/object"+str(l))
+    my_world.reset()
+    i += 1
