@@ -29,7 +29,6 @@ robot_path = os.path.join(lecture_path, 'utils/tasks/ur5e_handeye_gripper.usd')
 data_path = os.path.join(lecture_path, 'dataset/ycb')
 save_path = os.path.join(lecture_path, 'dataset/detect_img')
 
-# exit()
 # get object list
 obj_dirs = [os.path.join(data_path, obj_name) for obj_name in os.listdir(data_path)]
 obj_dirs.sort()
@@ -52,7 +51,6 @@ from omni.isaac.core import World
 from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.prims import create_prim, delete_prim
-from omni.isaac.core.utils.semantics import add_update_semantics
 
 my_world = World(stage_units_in_meters=1.0)
 
@@ -114,7 +112,6 @@ while simulation_app.is_running():
 
     #-----4.2. Get camera image
     hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
-    hand_depth_image = hand_camera.get_current_frame()["distance_to_camera"]
     hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
     hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
     
