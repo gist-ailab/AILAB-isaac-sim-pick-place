@@ -93,7 +93,6 @@ while simulation_app.is_running():
         usd_file = object_info[random_idx]['usd_file']
         obj_label = object_info[random_idx]['label']
         prim_path = "/World/object"+str(l) # 1st, 2nd, 3rd object
-        print("AAAAAAAAA", prim_path)
         object_prim = create_prim(
             usd_path = usd_file, 
             prim_path = prim_path, 
