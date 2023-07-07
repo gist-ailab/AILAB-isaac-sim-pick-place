@@ -17,33 +17,26 @@ from omni.isaac.manipulators.grippers.gripper import Gripper
 
 class EndEffectorController(BaseController):
     """ 
-        A simple pick and place state machine for tutorials
+        A simple end-effector position control state machine for tutorials
 
-        Each phase runs for 1 second, which is the internal time of the state machine
+        The phase runs for 1 second, which is the internal time of the state machine
 
         Dt of each phase/ event step is defined
 
         - Phase 0: Move end_effector above the cube center at the 'end_effector_initial_height'.
-        - Phase 1: Lower end_effector down to encircle the target cube
-        - Phase 2: Wait for Robot's inertia to settle.
-        - Phase 3: close grip.
-        - Phase 4: Move end_effector up again, keeping the grip tight (lifting the block).
-        - Phase 5: Smoothly move the end_effector toward the goal xy, keeping the height constant.
-        - Phase 6: Move end_effector vertically toward goal height at the 'end_effector_initial_height'.
-        - Phase 7: loosen the grip.
-        - Phase 8: Move end_effector vertically up again at the 'end_effector_initial_height'
-        - Phase 9: Move end_effector towards the old xy position.
 
         Args:
             name (str): Name id of the controller
             cspace_controller (BaseController): a cartesian space controller that returns an ArticulationAction type
             gripper (Gripper): a gripper controller for open/ close actions.
-            end_effector_initial_height (typing.Optional[float], optional): end effector initial picking height to start from (more info in phases above). If not defined, set to 0.3 meters. Defaults to None.
-            events_dt (typing.Optional[typing.List[float]], optional): Dt of each phase/ event step. 10 phases dt has to be defined. Defaults to None.
+            end_effector_initial_height (typing.Optional[float], optional): end effector initial picking height to start 
+                from (more info in phases above). If not defined, set to 0.3 meters. Defaults to None.
+            events_dt (typing.Optional[typing.List[float]], optional): Dt of each phase/ event step. 1 phase dt has to
+                be defined. Defaults to None.
 
         Raises:
             Exception: events dt need to be list or numpy array
-            Exception: events dt need have length of 10
+            Exception: events dt need have length of 1
         """
 
     def __init__(
@@ -64,14 +57,13 @@ class EndEffectorController(BaseController):
         self._events_dt = events_dt
         if self._events_dt is None:
             self._events_dt = [0.008]
-            # self._events_dt = [0.008, 0.005, 0.1, 0.1, 0.0025, 0.001, 0.0025, 1, 0.008, 0.08]
         else:
             if not isinstance(self._events_dt, np.ndarray) and not isinstance(self._events_dt, list):
                 raise Exception("events dt need to be list or numpy array")
             elif isinstance(self._events_dt, np.ndarray):
                 self._events_dt = self._events_dt.tolist()
-            if len(self._events_dt) > 10:
-                raise Exception("events dt length must be less than 10")
+            if len(self._events_dt) > 1:
+                raise Exception("events dt length must be less than 1")
         self._cspace_controller = cspace_controller
         self._gripper = gripper
         self._pause = False
@@ -95,7 +87,6 @@ class EndEffectorController(BaseController):
 
     def forward(
         self,
-        picking_position: np.ndarray,
         target_position: np.ndarray,
         current_joint_positions: np.ndarray,
         end_effector_offset: typing.Optional[np.ndarray] = None,
@@ -104,8 +95,7 @@ class EndEffectorController(BaseController):
         """Runs the controller one step.
 
         Args:
-            picking_position (np.ndarray): The object's position to be picked in local frame.
-            target_position (np.ndarray):  The object's position to be placed in local frame.
+            target_position (np.ndarray):  The end-effector's position to be placed in local frame.
             current_joint_positions (np.ndarray): Current joint positions of the robot.
             end_effector_offset (typing.Optional[np.ndarray], optional): offset of the end effector target. Defaults to None.
             end_effector_orientation (typing.Optional[np.ndarray], optional): end effector orientation while picking and placing. Defaults to None.
@@ -120,14 +110,13 @@ class EndEffectorController(BaseController):
             target_joint_positions = [None] * current_joint_positions.shape[0]
             return ArticulationAction(joint_positions=target_joint_positions)
             
-        self._current_target_x = picking_position[0]
-        self._current_target_y = picking_position[1]
-        self._h0 = picking_position[2]
+        self._current_target_x = target_position[0]
+        self._current_target_y = target_position[1]
+        target_height = target_position[2]
 
         interpolated_xy = self._get_interpolated_xy(
-            target_position[0], target_position[1], self._current_target_x, self._current_target_y
+            0, 0, self._current_target_x, self._current_target_y
         )
-        target_height = self._get_target_hs(target_position[2])
         position_target = np.array(
             [
                 interpolated_xy[0] + end_effector_offset[0],
@@ -176,11 +165,11 @@ class EndEffectorController(BaseController):
 
         Args:
             end_effector_initial_height (typing.Optional[float], optional): end effector initial picking height to start from. If not defined, set to 0.3 meters. Defaults to None.
-            events_dt (typing.Optional[typing.List[float]], optional):  Dt of each phase/ event step. 10 phases dt has to be defined. Defaults to None.
+            events_dt (typing.Optional[typing.List[float]], optional):  Dt of each phase/ event step. 1 phase dt has to be defined. Defaults to None.
 
         Raises:
             Exception: events dt need to be list or numpy array
-            Exception: events dt need have length of 10
+            Exception: events dt need have length of 1
         """
         BaseController.reset(self)
         self._cspace_controller.reset()
@@ -196,7 +185,7 @@ class EndEffectorController(BaseController):
             elif isinstance(self._events_dt, np.ndarray):
                 self._events_dt = self._events_dt.tolist()
             if len(self._events_dt) > 1:
-                raise Exception("events dt length must be less than 10")
+                raise Exception("events dt length must be less than 1")
         return
 
     def is_done(self) -> bool:

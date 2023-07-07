@@ -43,7 +43,6 @@ class EndEffectorController(ee_controller.EndEffectorController):
 
     def forward(
         self,
-        picking_position: np.ndarray,
         target_position: np.ndarray,
         current_joint_positions: np.ndarray,
         end_effector_offset: Optional[np.ndarray] = None,
@@ -69,7 +68,6 @@ class EndEffectorController(ee_controller.EndEffectorController):
 
 
         return super().forward(
-            picking_position,
             target_position,
             current_joint_positions,
             end_effector_offset=end_effector_offset,

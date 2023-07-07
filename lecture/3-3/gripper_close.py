@@ -16,7 +16,8 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 directory = Path(current_dir).parent
 sys.path.append(str(directory))
 
-from utils.tasks.basic_task import SetUpUR5e
+from utils.tasks.pick_place_basic_task import UR5ePickPlace
+# from utils.controllers.pick_place_controller_robotiq import PickPlaceController
 from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
@@ -29,7 +30,11 @@ target_orientation = np.array([0, 0, 0, 1])
 offset = np.array([0, 0, 0.1])  # releasing offset at the target position
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = SetUpUR5e()
+my_task = UR5ePickPlace(
+                        objects_position=objects_position,
+                        target_position=target_position,
+                        offset=offset,
+                        )
 my_world.add_task(my_task)
 my_world.reset()
 
@@ -55,43 +60,20 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
-while True:
-    code = input('Enter the code:')
-    if code in ["o", "open", "c", "close"]:
-        break
-    else:    
-        print("wrong code")
-print('code : ', code)
 
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
         observations = my_world.get_observations()
-        if code == "o" or code == "open":
-            actions = my_controller.open(
-                current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            )
-        elif code == "c" or code == "close":
-            actions = my_controller.close(
-                current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            )
+        
+        actions = my_controller.close(
+            picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
+            placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
+            current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
+        )
 
-        articulation_controller.apply_action(actions)
         if my_controller.is_done():
-            if code == "o" or code == "open":
-                print("done opening the gripper\n")
-            elif code == "c" or code == "close":
-                print("done closing the gripper\n")
-
-            while True:
-                code = input('Enter the code:')
-                if code in ["o", "open", "c", "close", "q", "quit"]:
-                    break
-                else:    
-                    print("wrong code")
-            print('code : ', code)
-            print()
-            if code == 'q' or code == 'quit':
-                break
-            my_controller.reset()
+            print("done picking and placing")
+            break
+        articulation_controller.apply_action(actions)
 simulation_app.close()

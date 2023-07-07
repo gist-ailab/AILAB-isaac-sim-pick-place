@@ -26,58 +26,26 @@ import numpy as np
 from typing import Optional
 
 
-class UR5ePickPlace(tasks.PickPlace):
+class SetUpUR5e(tasks.BaseTask):
     """[summary]
 
         Args:
             name (str, optional): [description]. Defaults to "ur5_pick_place".
-            objects_position (Optional[np.ndarray], optional): [description]. Object's initial_position. Defaults to None.
-            target_position (Optional[np.ndarray], optional): [description]. Releasing position. Defaults to None.
-            offset (Optional[np.ndarray], optional): [description]. Defaults to None.
         """
 
     def __init__(
         self,
-        name: str = "ur5e_pick_place",
-        objects_position: Optional[np.ndarray] = None,
-        target_position: Optional[np.ndarray] = None,
-        offset: Optional[np.ndarray] = np.array([0, 0, 0.15]),
+        name: str = "set_up_ur5e",
     ) -> None:
-        tasks.PickPlace.__init__(self, name=name, )
+        tasks.BaseTask.__init__(self, name=name, )
 
-        cube_prim_path = "/World/Cube"
-        cube_name = "cube"
-        if objects_position is None:
-            pos_x = random.uniform(0.3, 0.6)
-            pos_y = random.uniform(0.3, 0.6)
-            pos_z = 0.1
-            self.objects_position = np.array([pos_x, pos_y, pos_z])
-            self.objects_position[2] = self.objects_position[2] + 0.01
-        else:
-            self.objects_position = objects_position
 
-        self._object = DynamicCuboid(
-                                    prim_path = cube_prim_path,
-                                    name = cube_name,
-                                    position = self.objects_position,
-                                    color = np.array([0, 0, 1]),
-                                    size = 0.04,
-                                    mass = 0.01,
-                                    )
-        self._object = self._object
-
-        self.target_position = target_position
-        self._offset = offset
-        if target_position is None:
-            self.target_position = np.array([0.4, -0.33, 0])
-            self.target_position[2] = 0.05 # considering the length of the gripper tip
-        self.target_position = self.target_position + self._offset
         return
 
 
     def set_up_scene(self, scene: Scene) -> None:
         """[summary]
-        The cuboid added to the scene.
+        The robot added to the scene.
 
         Args:
             scene (Scene): [description]
@@ -85,8 +53,6 @@ class UR5ePickPlace(tasks.PickPlace):
         self._scene = scene
         scene.add_default_ground_plane()
                 
-        self._task_object = scene.add(self._object)
-
         self._robot = self.set_robot()
         scene.add(self._robot)
 
@@ -121,13 +87,6 @@ class UR5ePickPlace(tasks.PickPlace):
     def get_params(self) -> dict:
         params_representation = dict()
 
-        self.position, self.orientation = self._task_object.get_local_pose()
-        self.task_object_name = self._task_object.name
-        params_representation[f"task_object_position_0"] = {"value": self.position, "modifiable": True}
-        params_representation[f"task_object_orientation_0"] = {"value": self.orientation, "modifiable": True}
-        params_representation[f"task_object_name_0"] = {"value": self.task_object_name, "modifiable": False}
-        
-        params_representation["target_position"] = {"value": self.target_position, "modifiable": True}
         params_representation["robot_name"] = {"value": self._robot.name, "modifiable": False}
         return params_representation
 
@@ -144,10 +103,6 @@ class UR5ePickPlace(tasks.PickPlace):
         observation_dict = dict()
         
         observation_dict = {
-                            self.task_object_name: {"position": self.position,
-                                                    "orientation": self.orientation,
-                                                    "target_position": self.target_position,
-                                                    },
                             self._robot.name: {"joint_positions": joints_state.positions,
                                                 "end_effector_position": end_effector_position,
                                                 },
