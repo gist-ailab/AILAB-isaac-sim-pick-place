@@ -15,11 +15,16 @@ from omni.isaac.sensor import Camera                            #
 from omni.isaac.core.utils.semantics import add_update_semantics
 
 import os                                                       #
+import sys
 from PIL import Image  
 import numpy as np                                      #
 import random
 import torchvision.transforms as T
 import copy
+lecture_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))) # path to lecture
+sys.path.append(lecture_path)
+print(lecture_path)
+from utils.correct_radial_distortion import depth_image_from_distance_image
 
 
 my_world = World(stage_units_in_meters=1.0)
@@ -41,8 +46,8 @@ save_root = os.path.join(os.getcwd(), "sample_data")            #
 print("Save root: ", save_root)                                 #
 os.makedirs(save_root, exist_ok=True)                           #
 
-def save_image(image, path):                                    #
-    image = Image.fromarray(image)                              #
+def save_image(image, path, mode = None):                                    #
+    image = Image.fromarray(image, mode)                              #
     image.save(path)                                            #
 
 
@@ -59,6 +64,7 @@ my_camera.set_horizontal_aperture(2.65)                         #
 my_camera.set_vertical_aperture(1.48)                           #
 my_camera.set_clipping_range(0.01, 10000)                       #
 my_camera.add_instance_segmentation_to_frame()
+my_camera.add_distance_to_camera_to_frame()
 my_camera.initialize()                                          #
 
 ep_num = 0
@@ -72,25 +78,28 @@ while simulation_app.is_running():
     print("Episode: ", ep_num)
 
     rgb_image = my_camera.get_rgba()                        #
+    depth_image = my_camera.get_current_frame()["distance_to_camera"]
     hand_instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
     hand_instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
-    
+
     if ep_num == 30:
         print(my_camera.get_current_frame()["instance_segmentation"])
         save_image(rgb_image, os.path.join(save_root, "semantic_img.png"))  #
+        
+        save_image(depth_image, os.path.join(save_root, "depth_img.png"), mode="I")
         save_image(hand_instance_segmentation_image, os.path.join(save_root, "semantic_mask.png"))  #
-
+        
         origin_img_r = copy.deepcopy(hand_instance_segmentation_image)
         origin_img_g = copy.deepcopy(hand_instance_segmentation_image)
         origin_img_b = copy.deepcopy(hand_instance_segmentation_image)
         
         
         np.place(origin_img_r, origin_img_r==2, 255)
-        np.place(origin_img_g, origin_img_b==3, 255)
+        np.place(origin_img_g, origin_img_g==3, 255)
         np.place(origin_img_b, origin_img_b==4, 255)
         
         np.place(origin_img_r, origin_img_r!=255, 0)
-        np.place(origin_img_g, origin_img_b!=255, 0)
+        np.place(origin_img_g, origin_img_g!=255, 0)
         np.place(origin_img_b, origin_img_b!=255, 0)
         
         origin_img = np.array([origin_img_r,origin_img_g,origin_img_b])
