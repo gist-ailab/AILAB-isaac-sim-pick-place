@@ -1,14 +1,19 @@
-# ---- ---- ---- ----
-# GIST-AILAB, 2023 summer school
-# Day2. 
-# 2-3.2 Data generation with YCB dataset 
-# ---- ---- ---- ----
+# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
+#
+# NVIDIA CORPORATION and its licensors retain all intellectual property
+# and proprietary rights in and to this software, related documentation
+# and any modifications thereto.  Any use, reproduction, disclosure or
+# distribution of this software and related documentation without an express
+# license agreement from NVIDIA CORPORATION is strictly prohibited.
+#
+
 from omni.isaac.kit import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
 from omni.isaac.core import World
-from omni.isaac.core.scenes.scene import Scene
-
+from omni.isaac.manipulators import SingleManipulator
+from omni.isaac.manipulators.grippers import ParallelGripper
 from omni.isaac.core.utils.stage import add_reference_to_stage, get_current_stage
 from omni.isaac.core.utils.prims import create_prim, delete_prim
 from omni.isaac.core.utils.semantics import add_update_semantics
@@ -93,8 +98,6 @@ transform = trans.ToPILImage()
 while simulation_app.is_running():
     my_world.step(render=True)
     # random 1 ~ 3 data generation in camera boundary
-
-    
     if i % 15 == 1:
         obj_num = random.randint(1,3)
         for l in range(obj_num):
@@ -105,8 +108,8 @@ while simulation_app.is_running():
             object_prim = create_prim(usd_path=objects[a], prim_path="/World/object"+str(l), position=[pos_x,pos_y,pos_z], scale=[0.2,0.2,0.2])
             # update semantic information with label 0 is unlabel 1 is background label go for 2 ~
             add_update_semantics(prim=object_prim, semantic_label=str(l*100+a+2))
-       
-    
+        my_world.reset()
+        
     if i % 15== 10:
         
         hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
@@ -133,7 +136,7 @@ while simulation_app.is_running():
         print(np.unique(hand_instance_segmentation_image))
         # png형태로 저장
         hand_inssegplot = Image.fromarray(hand_instance_segmentation_image)
-        if i < 100000:
+        if i < 100:
             hand_imgplot.save(args.save_path+"/train/img/img"+str(int(i/15))+".png")
             hand_inssegplot.save(args.save_path+"/train/mask/mask"+str(int(i/15))+".png")
         else:
@@ -144,7 +147,8 @@ while simulation_app.is_running():
             delete_prim("/World/object"+str(l))
         
         
-    if i == 150000:
+    if i == 150:
         simulation_app.close()
 
     i += 1
+    
