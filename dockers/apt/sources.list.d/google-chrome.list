@@ -1,0 +1,1 @@
+deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.pub] http://dl.google.com/linux/chrome/deb/ stable main
