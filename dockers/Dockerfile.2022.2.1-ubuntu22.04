@@ -52,16 +52,31 @@ ARG ISAACSIM_VERSION=2022.2.1
 # system
 ################################################################################
 
+# Configure environment variables
+ARG CUDA_VERSION="12.2.0"
+# ARG UBUNTU_VERSION="22.04"
+
+
 # https://catalog.ngc.nvidia.com/orgs/nvidia/containers/isaac-sim
 FROM nvcr.io/nvidia/isaac-sim:${ISAACSIM_VERSION} as isaac-sim
 
 # https://catalog.ngc.nvidia.com/orgs/nvidia/containers/cudagl
-FROM nvidia/cudagl:${CUDA_VERSION}-base-${BASE_DIST} as system
+FROM quay.io/ulagbulag/openark-vine-desktop:latest-ubuntu as system
+USER root
 
+# FROM "nvcr.io/nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu${UBUNTU_VERSION}"
 
 # # #############################################################################################################################
-RUN apt-get update -y
-RUN apt-get install -y --no-install-recommends \
+ 
+RUN apt-get update \
+    && wget "http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb" \
+    && dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+    && rm -f libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libatomic1 \
     libegl1 \
     libglu1-mesa \
@@ -75,7 +90,8 @@ RUN apt-get install -y --no-install-recommends \
     openssl \
     libssl1.1 \
     wget \
-    vulkan-utils \
+    vulkan-tools \
+    # vulkan-utils \
 && apt-get -y autoremove \
 && apt-get clean autoclean \
 && rm -rf /var/lib/apt/lists/*
@@ -123,7 +139,7 @@ ENV MIN_DRIVER_VERSION 525.60.11
 
 
 # CONDA INSTALL
-RUN apt-get update -y && apt-get install -y wget && apt-get install -y git && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y wget && apt-get install -y git && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
 
 
 # Copy Isaac Sim files
@@ -162,7 +178,7 @@ RUN apt update \
 RUN apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
         xvfb x11vnc \
-        vim-tiny firefox ttf-ubuntu-font-family ttf-wqy-zenhei  \
+        vim-tiny firefox ttf-wqy-zenhei  \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
@@ -214,10 +230,8 @@ RUN conda init bash \
     && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
 
 
-RUN apt-get update -y
-
 # Install core dependencies
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     pipewire \
     wmctrl \
     xdotool \
@@ -272,6 +286,7 @@ RUN sed -i 's#app/locale/#novnc/app/locale/#' /src/web/dist/static/novnc/app/ui.
 # merge
 ################################################################################
 FROM system
+USER root
 LABEL maintainer="fcwu.tw@gmail.com"
 
 COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
@@ -280,231 +295,249 @@ RUN ln -sf /usr/local/lib/web/frontend/static/websockify /usr/local/lib/web/fron
 	chmod +x /usr/local/lib/web/frontend/static/websockify/run
 
 
-# EXPOSE 80
-# WORKDIR /home
-# # ENV HOME=/home/ubuntu \
-# #     SHELL=/bin/bash
+# # EXPOSE 80
+# # WORKDIR /home
+# # # ENV HOME=/home/ubuntu \
+# # #     SHELL=/bin/bash
 
-# # HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
+# # # HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 
-# CMD ["/bin/bash"]
-# ENTRYPOINT ["/startup.sh"]
+# # CMD ["/bin/bash"]
+# # ENTRYPOINT ["/startup.sh"]
 
 
 
-################################################################################
-# Configure user-specific environment variables
-ARG USER_GID="2000"
-ARG USER_NAME="user"
-ARG USER_SHELL="zsh"
-ARG USER_SUDO="true"
-ARG USER_UID="2000"
+# ################################################################################
+# # Configure user-specific environment variables
+# ARG USER_GID="2000"
+# ARG USER_NAME="user"
+# ARG USER_SHELL="zsh"
+# ARG USER_SUDO="true"
+# ARG USER_UID="2000"
 
-# Be ready for serving
-# FROM "nvcr.io/nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu${UBUNTU_VERSION}"
+# # Be ready for serving
+# # FROM "nvcr.io/nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu${UBUNTU_VERSION}"
 
-# Load user-specific environment variables
-ARG USER_GID
-ARG USER_NAME
-ARG USER_SHELL
-ARG USER_SUDO
-ARG USER_UID
+# # Load user-specific environment variables
+# ARG USER_GID
+# ARG USER_NAME
+# ARG USER_SHELL
+# ARG USER_SUDO
+# ARG USER_UID
 
-# Package Manager Configuration
-ARG DEBIAN_FRONTEND='noninteractive'
+# # Package Manager Configuration
+# ARG DEBIAN_FRONTEND='noninteractive'
 
-# SystemD Configuration
-ENV container docker
-STOPSIGNAL SIGRTMIN+3
+# # SystemD Configuration
+# ENV container docker
+# STOPSIGNAL SIGRTMIN+3
 
-# Client Configuration
-WORKDIR /root/
-ENTRYPOINT [ "/usr/bin/env" ]
-CMD [ "/usr/bin/firefox" ]
+# # Client Configuration
+# WORKDIR /root/
+# ENTRYPOINT [ "/usr/bin/env" ]
+# CMD [ "/usr/bin/firefox" ]
 
-# Volumes Configuration
-## home.user
-VOLUME [ "/home/${USER_NAME}" ]
+# # Volumes Configuration
+# ## home.user
+# VOLUME [ "/home/${USER_NAME}" ]
 
-# Add core repositories
-ADD ./apt/keyrings/* /etc/apt/keyrings/
-ADD ./apt/sources.list.d/*.list /etc/apt/sources.list.d/
-RUN find /etc/apt/keyrings/ -type f -exec sh -c \
-    'cat "{}" | gpg --dearmor --yes -o "/etc/apt/keyrings/$(basename "{}")"' \;
+# # Add core repositories
+# ADD ./apt/keyrings/* /etc/apt/keyrings/
+# ADD ./apt/sources.list.d/*.list /etc/apt/sources.list.d/
+# RUN find /etc/apt/keyrings/ -type f -exec sh -c \
+#     'cat "{}" | gpg --dearmor --yes -o "/etc/apt/keyrings/$(basename "{}")"' \;
 
-# Install core dependencies
-Run add-apt-repository ppa:pipewire-debian/pipewire-upstream
-RUN apt-get update && apt-get install -y \
-    apt-transport-https \
-    curl \
-    gpg \
-    libgles2-mesa-dev \
-    libglfw3-dev \
-    libldacbt-abr2 \
-    libldacbt-enc2 \
-    libspa-0.2-bluetooth \
-    mesa-vulkan-drivers \
-    pipewire \
-    pipewire-audio-client-libraries \
-    pipewire-media-session- \
-    pipewire-pulse \
-    pulseaudio-module-bluetooth- \
-    # wireplumber \
-    wmctrl \
-    x11-utils \
-    xdotool \
-    # Cleanup
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+# # Install core dependencies
+# Run add-apt-repository ppa:pipewire-debian/pipewire-upstream
+# RUN apt-get update && apt-get install -y \
+#     apt-transport-https \
+#     curl \
+#     gpg \
+#     libgles2-mesa-dev \
+#     libglfw3-dev \
+#     libldacbt-abr2 \
+#     libldacbt-enc2 \
+#     libspa-0.2-bluetooth \
+#     mesa-vulkan-drivers \
+#     pipewire \
+#     pipewire-audio-client-libraries \
+#     pipewire-media-session- \
+#     pipewire-pulse \
+#     pulseaudio-module-bluetooth- \
+#     # wireplumber \
+#     wmctrl \
+#     x11-utils \
+#     xdotool \
+#     # Cleanup
+#     && apt-get clean all \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Install locale dependencies
-RUN apt-get update && apt-get install -y \
-    language-pack-ko \
-    # Set default locale
-    && locale-gen --purge en_US.UTF-8 \
-    && echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | tee /etc/default/locale \
-    # Cleanup
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+# # Install locale dependencies
+# RUN apt-get update && apt-get install -y \
+#     language-pack-ko \
+#     # Set default locale
+#     && locale-gen --purge en_US.UTF-8 \
+#     && echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' | tee /etc/default/locale \
+#     # Cleanup
+#     && apt-get clean all \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Install development environment dependencies
-RUN apt-get update && apt-get upgrade && apt-get install -y \
-    crun \
-    fuse-overlayfs \
-    git \
-    kubectl \
-    nano \
-    nvidia-container-toolkit-base \
-    openssh-client \
-    pciutils \
-    # podman-docker \
-    python3 \
-    python3-pip \
-    sudo \
-    "${USER_SHELL}" \
-    vim \
-    wget \
-    zip \
-    # Allow passwordless sudo command
-    && test "x${USER_SUDO}" = "xtrue" \
-    && echo "${USER_NAME} ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/10-wheel \
-    && chmod 440 /etc/sudoers.d/10-wheel \
-    || true \
-    # # Docker (Podman) Configuration
-    # && systemctl enable podman \
-    # && touch /etc/containers/nodocker \
-    # ## chmod containers.conf and adjust storage.conf to enable Fuse storage.
-    # && echo '[storage]' >/etc/containers/storage.conf \
-    # && echo 'driver = "overlay"' >>/etc/containers/storage.conf \
-    # && echo 'runroot = "/run/containers/storage"' >>/etc/containers/storage.conf \
-    # && echo 'graphroot = "/var/lib/containers/storage"' >>/etc/containers/storage.conf \
-    # && echo '[storage.options]' >>/etc/containers/storage.conf \
-    # && echo 'additionalimagestores = [' >>/etc/containers/storage.conf \
-    # && echo '"/var/lib/shared",' >>/etc/containers/storage.conf \
-    # && echo ']' >>/etc/containers/storage.conf \
-    # && echo 'pull_options = {enable_partial_images = "false", use_hard_links = "false", ostree_repos=""}' >>/etc/containers/storage.conf \
-    # && echo '[storage.options.overlay]' >>/etc/containers/storage.conf \
-    # && echo 'mount_program = "/usr/bin/fuse-overlayfs"' >>/etc/containers/storage.conf \
-    # && echo 'mountopt = "nodev,fsync=0"' >>/etc/containers/storage.conf \
-    # && echo '[storage.options.thinpool]' >>/etc/containers/storage.conf \
-    # && mkdir -p \
-    # /var/lib/shared/overlay-images \
-    # /var/lib/shared/overlay-layers \
-    # /var/lib/shared/vfs-images \
-    # /var/lib/shared/vfs-layers \
-    # && touch /var/lib/shared/overlay-images/images.lock \
-    # && touch /var/lib/shared/overlay-layers/layers.lock \
-    # && touch /var/lib/shared/vfs-images/images.lock \
-    # && touch /var/lib/shared/vfs-layers/layers.lock \
-    ## generate a CDI specification that refers to all NVIDIA devices
-    && mkdir -p /etc/cdi/ \
-    && chown -R "${USER_UID}:${USER_GID}" /etc/cdi/ \
-    # Environment Variables Configuration
-    && echo '# local binary path registration' >/etc/profile.d/path-local-bin.sh \
-    && echo 'export PATH=${PATH}:/usr/local/bin' >>/etc/profile.d/path-local-bin.sh \
-    && echo 'export PATH=${PATH}:/opt/bin' >>/etc/profile.d/path-local-bin.sh \
-    && ln -sf /usr/local/bin /opt/bin \
-    && echo '# local library path registration' >/etc/ld.so.conf.d/100-path-local-lib.conf \
-    && echo '/usr/local/lib' >>/etc/ld.so.conf.d/100-path-local-lib.conf \
-    && echo '/usr/local/lib64' >>/etc/ld.so.conf.d/100-path-local-lib.conf \
-    && ldconfig \
-    # Cleanup
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+# # Install development environment dependencies
+# RUN apt-get update && apt-get upgrade && apt-get install -y \
+#     crun \
+#     fuse-overlayfs \
+#     git \
+#     kubectl \
+#     nano \
+#     nvidia-container-toolkit-base \
+#     openssh-client \
+#     pciutils \
+#     # podman-docker \
+#     python3 \
+#     python3-pip \
+#     sudo \
+#     "${USER_SHELL}" \
+#     vim \
+#     wget \
+#     zip \
+#     # Allow passwordless sudo command
+#     && test "x${USER_SUDO}" = "xtrue" \
+#     && echo "${USER_NAME} ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/10-wheel \
+#     && chmod 440 /etc/sudoers.d/10-wheel \
+#     || true \
+#     # # Docker (Podman) Configuration
+#     # && systemctl enable podman \
+#     # && touch /etc/containers/nodocker \
+#     # ## chmod containers.conf and adjust storage.conf to enable Fuse storage.
+#     # && echo '[storage]' >/etc/containers/storage.conf \
+#     # && echo 'driver = "overlay"' >>/etc/containers/storage.conf \
+#     # && echo 'runroot = "/run/containers/storage"' >>/etc/containers/storage.conf \
+#     # && echo 'graphroot = "/var/lib/containers/storage"' >>/etc/containers/storage.conf \
+#     # && echo '[storage.options]' >>/etc/containers/storage.conf \
+#     # && echo 'additionalimagestores = [' >>/etc/containers/storage.conf \
+#     # && echo '"/var/lib/shared",' >>/etc/containers/storage.conf \
+#     # && echo ']' >>/etc/containers/storage.conf \
+#     # && echo 'pull_options = {enable_partial_images = "false", use_hard_links = "false", ostree_repos=""}' >>/etc/containers/storage.conf \
+#     # && echo '[storage.options.overlay]' >>/etc/containers/storage.conf \
+#     # && echo 'mount_program = "/usr/bin/fuse-overlayfs"' >>/etc/containers/storage.conf \
+#     # && echo 'mountopt = "nodev,fsync=0"' >>/etc/containers/storage.conf \
+#     # && echo '[storage.options.thinpool]' >>/etc/containers/storage.conf \
+#     # && mkdir -p \
+#     # /var/lib/shared/overlay-images \
+#     # /var/lib/shared/overlay-layers \
+#     # /var/lib/shared/vfs-images \
+#     # /var/lib/shared/vfs-layers \
+#     # && touch /var/lib/shared/overlay-images/images.lock \
+#     # && touch /var/lib/shared/overlay-layers/layers.lock \
+#     # && touch /var/lib/shared/vfs-images/images.lock \
+#     # && touch /var/lib/shared/vfs-layers/layers.lock \
+#     ## generate a CDI specification that refers to all NVIDIA devices
+#     && mkdir -p /etc/cdi/ \
+#     && chown -R "${USER_UID}:${USER_GID}" /etc/cdi/ \
+#     # Environment Variables Configuration
+#     && echo '# local binary path registration' >/etc/profile.d/path-local-bin.sh \
+#     && echo 'export PATH=${PATH}:/usr/local/bin' >>/etc/profile.d/path-local-bin.sh \
+#     && echo 'export PATH=${PATH}:/opt/bin' >>/etc/profile.d/path-local-bin.sh \
+#     && ln -sf /usr/local/bin /opt/bin \
+#     && echo '# local library path registration' >/etc/ld.so.conf.d/100-path-local-lib.conf \
+#     && echo '/usr/local/lib' >>/etc/ld.so.conf.d/100-path-local-lib.conf \
+#     && echo '/usr/local/lib64' >>/etc/ld.so.conf.d/100-path-local-lib.conf \
+#     && ldconfig \
+#     # Cleanup
+#     && apt-get clean all \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Install desktop environment dependencies
-RUN apt-get update && apt-get install -y \
-    blueman \
-    bluez \
-    code \
-    dbus-x11 \
-    file-roller \
-    gnome-bluetooth \
-    ibus-hangul \
-    network-manager \
-    network-manager-gnome \
-    # picom \
-    plank \
-    sqlite \
-    ssh-askpass \
-    thunar thunar-archive-plugin thunar-volman \
-    tumbler \
-    xdg-dbus-proxy \
-    xfce4-appfinder xfce4-notifyd xfce4-panel xfce4-pulseaudio-plugin \
-    xfce4-session xfce4-settings xfce4-terminal \
-    xfconf xfdesktop4 xfwm4 \
-    # Remove confliected repositories
-    && rm /etc/apt/sources.list.d/microsoft.list \
-    # Cleanup
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+# # Install desktop environment dependencies
+# RUN apt-get update && apt-get install -y \
+#     blueman \
+#     bluez \
+#     code \
+#     dbus-x11 \
+#     file-roller \
+#     gnome-bluetooth \
+#     ibus-hangul \
+#     network-manager \
+#     network-manager-gnome \
+#     # picom \
+#     plank \
+#     sqlite \
+#     ssh-askpass \
+#     thunar thunar-archive-plugin thunar-volman \
+#     tumbler \
+#     xdg-dbus-proxy \
+#     xfce4-appfinder xfce4-notifyd xfce4-panel xfce4-pulseaudio-plugin \
+#     xfce4-session xfce4-settings xfce4-terminal \
+#     xfconf xfdesktop4 xfwm4 \
+#     # Remove confliected repositories
+#     && rm /etc/apt/sources.list.d/microsoft.list \
+#     # Cleanup
+#     && apt-get clean all \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Install internet browsers
-RUN apt-get update && apt-get install -y \
-    firefox \
-    google-chrome-stable \
-    # Cleanup
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+# # Install internet browsers
+# RUN apt-get update && apt-get install -y \
+#     firefox \
+#     google-chrome-stable \
+#     # Cleanup
+#     && apt-get clean all \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Install utilities - Custom
-ARG ADDONS_HOME="/opt/openark/vdi/desktop"
-ADD ./addons "${ADDONS_HOME}"
-RUN chmod -R a+x "${ADDONS_HOME}/bin" \
-    && for file in ${ADDONS_HOME}/share/applications/*.desktop; do true \
-    && ln -s "${file}" "/usr/share/applications/$(basename "${file}")" \
-    ; done \
-    && for file in ${ADDONS_HOME}/share/autostart/*.desktop; do true \
-    && ln -s "${file}" "/etc/xdg/autostart/$(basename "${file}")" \
-    ; done
+# # Install utilities - Custom
+# ARG ADDONS_HOME="/opt/openark/vdi/desktop"
+# ADD ./addons "${ADDONS_HOME}"
+# RUN chmod -R a+x "${ADDONS_HOME}/bin" \
+#     && for file in ${ADDONS_HOME}/share/applications/*.desktop; do true \
+#     && ln -s "${file}" "/usr/share/applications/$(basename "${file}")" \
+#     ; done \
+#     && for file in ${ADDONS_HOME}/share/autostart/*.desktop; do true \
+#     && ln -s "${file}" "/etc/xdg/autostart/$(basename "${file}")" \
+#     ; done
 
-# # Install utilities - Podman
-# ARG PODMAN_REPO="https://raw.githubusercontent.com/containers/libpod/master/contrib/podmanimage/stable"
-# ADD "${PODMAN_REPO}/containers.conf" /etc/containers/containers.conf
-# ADD "${PODMAN_REPO}/podman-containers.conf" /etc/containers/podman-containers.conf
-# ENV _CONTAINERS_USERNS_CONFIGURED=""
-# RUN chmod 644 \
-#     /etc/containers/containers.conf \
-#     /etc/containers/podman-containers.conf
+# # # Install utilities - Podman
+# # ARG PODMAN_REPO="https://raw.githubusercontent.com/containers/libpod/master/contrib/podmanimage/stable"
+# # ADD "${PODMAN_REPO}/containers.conf" /etc/containers/containers.conf
+# # ADD "${PODMAN_REPO}/podman-containers.conf" /etc/containers/podman-containers.conf
+# # ENV _CONTAINERS_USERNS_CONFIGURED=""
+# # RUN chmod 644 \
+# #     /etc/containers/containers.conf \
+# #     /etc/containers/podman-containers.conf
 
-# Add firefox preferences
-ADD ./browser/firefox/autoconfig.js /usr/lib64/firefox/defaults/pref/
-ADD ./browser/firefox/firefox.cfg /usr/lib64/firefox/
+# # Add firefox preferences
+# ADD ./browser/firefox/autoconfig.js /usr/lib64/firefox/defaults/pref/
+# ADD ./browser/firefox/firefox.cfg /usr/lib64/firefox/
 
-# Add read-only shared directory
-RUN mkdir -p /opt/public/ \
-    && chown -R "${USER_UID}:${USER_GID}" /opt/public/
+# # Add read-only shared directory
+# RUN mkdir -p /opt/public/ \
+#     && chown -R "${USER_UID}:${USER_GID}" /opt/public/
 
-# Add scripts
-ADD ./scripts /opt/scripts/
-RUN chmod 0555 /opt/scripts/*
+# # Add scripts
+# ADD ./scripts /opt/scripts/
+# RUN chmod 0555 /opt/scripts/*
 
-# Add a user
-# RUN ldconfig \
-#     && groupadd -g "${USER_GID}" -o "${USER_NAME}" \
-#     && useradd -u "${USER_UID}" -g "${USER_GID}" -G "audio,cdrom,input,pulse,render,video" \
-#     -s "/bin/${USER_SHELL}" -m -o "${USER_NAME}" \
-#     && echo -e "${USER_UID}:2001:63535" > /etc/subuid \
-#     && echo -e "${USER_GID}:2001:63535" > /etc/subgid
-# USER "${USER_NAME}"
-# WORKDIR "/home/${USER_NAME}"
+# # Add a user
+# # RUN ldconfig \e
+# #     && groupadd -g "${USER_GID}" -o "${USER_NAME}" \
+# #     && useradd -u "${USER_UID}" -g "${USER_GID}" -G "audio,cdrom,input,pulse,render,video" \
+# #     -s "/bin/${USER_SHELL}" -m -o "${USER_NAME}" \
+# #     && echo -e "${USER_UID}:2001:63535" > /etc/subuid \
+# #     && echo -e "${USER_GID}:2001:63535" > /etc/subgid
+# # USER "${USER_NAME}"
+# # WORKDIR "/home/${USER_NAME}"
+
+RUN mkdir -p /isaac-sim/kit/cache/Kit
+RUN mkdir -p /root/.cache/ov
+RUN mkdir -p /root/.cache/pip
+RUN mkdir -p /root/.cache/nvidia/GLCache
+RUN mkdir -p /root/.nv/ComputeCache
+RUN mkdir -p /root/.nvidia-omniverse/logs
+RUN mkdir -p /root/.local/share/ov/data
+RUN mkdir -p /root/Documents
+RUN mkdir -p /root/.Xauthority
+
+
+RUN ln -sf /usr/lib64/libcuda.so.1 /usr/lib64/libcuda.so
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
+CMD [ /isaac-sim/isaac-sim.sh --allow-root ]
+
+RUN echo 'alias code="code --no-sandbox --user-data-dir=/root"' >> /etc/profile.d/aliases
+RUN echo 'alias chrome="google-chrome --no-sandbox"' >> /etc/profile.d/aliases
