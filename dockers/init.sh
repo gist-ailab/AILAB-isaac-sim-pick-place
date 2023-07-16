@@ -1,10 +1,7 @@
 # Docker Pull Container
-```bash
 docker pull --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
-```
 
 # Run container
-```bash
 podman run -dit --entrypoint bash --name isaac-sim --device nvidia.com/gpu=all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -e DISPLAY \
@@ -18,22 +15,14 @@ podman run -dit --entrypoint bash --name isaac-sim --device nvidia.com/gpu=all -
 -v ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw \
 -v ~/docker/isaac-sim/documents:/root/Documents:rw \
 registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
-```
-
-
-# Git Clone Lecture Files
-```bash
-cd /home/user/Desktop
-git clone https://github.com/gist-ailab/AILAB-isaac-sim-pick-place.git --recurse-submodules --remote-submodules
-```
 
 
 # Alias for Docker Terminal Execution
 alias sim="docker exec -it isaac-sim bash"
 
 
+# Git Clone Lecture Files
+cd /home/user/Desktop
+rm -rf AILAB-isaac-sim-pick-place
+git clone https://github.com/gist-ailab/AILAB-isaac-sim-pick-place.git --recurse-submodules --remote-submodules
 
-# VSCODE 설정
-- dev container 확장 설치
-- docker container attach
-- open project folder
