@@ -18,6 +18,7 @@ docker build --pull -t \
   --file Dockerfile.2022.2.1-ubuntu22.04 .
 ```
 
+
 ```
 docker push --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v2
 ```
@@ -40,7 +41,7 @@ registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
 ```
 
 
-docker run --name isaac-sim -it --entrypoint bash --gpus all -e "ACCEPT_EULA=Y" --rm --network=host \
+docker run --name isaac-sim -it --gpus all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -e DISPLAY \
 -v /home/user/Desktop:/home/workspace \

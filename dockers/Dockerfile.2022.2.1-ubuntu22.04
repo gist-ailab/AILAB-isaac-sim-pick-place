@@ -128,10 +128,9 @@ COPY --from=isaac-sim /etc/vulkan/icd.d/nvidia_icd.json /etc/vulkan/icd.d/nvidia
 COPY --from=isaac-sim /etc/vulkan/icd.d/nvidia_icd.json /etc/vulkan/implicit_layer.d/nvidia_layers.json
 
 WORKDIR /isaac-sim
+RUN ln -s exts/omni.isaac.examples/omni/isaac/examples extension_examples
 
-
-# # Default entrypoint to launch headless with streaming
-# ENTRYPOINT /isaac-sim/runheadless.native.sh 
+# Default entrypoint to launch headless with streaming
 WORKDIR /home
 RUN git clone https://github.com/gist-ailab/AILAB-isaac-sim-pick-place.git --recurse-submodules --remote-submodules
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -143,10 +142,8 @@ RUN conda init bash \
     && . ~/.bashrc \
     && conda env create -f /isaac-sim/environment.yml \
     && conda activate isaac-sim && pip install -r /home/AILAB-isaac-sim-pick-place/requirements.txt \
+    && ln -sf /usr/lib64/libcuda.so.1 /usr/local/nvidia/lib64/libcuda.so \
     && echo "conda activate isaac-sim" >> ~/.bashrc \
-    && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc \
-    && echo "ln -s exts/omni.isaac.examples/omni/isaac/examples /isaac-sim/extension_examples" >> ~/.bashrc \
-    && echo "ln -sf /usr/lib64/libcuda.so.1 /usr/lib64/libcuda.so" >> ~/.bashrc \
-    && echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64" >> ~/.bashrc
+    && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
 
 ENTRYPOINT [ "/bin/bash" ]
