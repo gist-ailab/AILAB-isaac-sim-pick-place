@@ -1,6 +1,12 @@
 # Docker Pull Container
 docker pull --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
 
+
+# Alias for Docker Terminal Execution
+echo 'alias sim="docker exec -it isaac-sim bash"' >> ~/.zshrc
+source ~/.zshrc
+
+
 # Run container
 podman run -dit --entrypoint bash --name isaac-sim --device nvidia.com/gpu=all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
@@ -17,12 +23,7 @@ podman run -dit --entrypoint bash --name isaac-sim --device nvidia.com/gpu=all -
 registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
 
 
-# Alias for Docker Terminal Execution
-alias sim="docker exec -it isaac-sim bash"
-
-
 # Git Clone Lecture Files
 cd /home/user/Desktop
 rm -rf AILAB-isaac-sim-pick-place
 git clone https://github.com/gist-ailab/AILAB-isaac-sim-pick-place.git --recurse-submodules --remote-submodules
-
