@@ -27,3 +27,7 @@ registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
 cd /home/user/Desktop
 rm -rf AILAB-isaac-sim-pick-place
 git clone https://github.com/gist-ailab/AILAB-isaac-sim-pick-place.git --recurse-submodules --remote-submodules
+
+
+# Run Examples
+sim /isaac-sim/isaac-sim.sh --allow-root
