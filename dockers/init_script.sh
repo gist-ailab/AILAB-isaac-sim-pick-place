@@ -6,7 +6,6 @@ docker pull --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:20
 echo 'alias sim="docker exec -it isaac-sim bash"' >> ~/.zshrc
 source ~/.zshrc
 
-
 # Run container
 podman run -dit --entrypoint bash --name isaac-sim --device nvidia.com/gpu=all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
