@@ -138,12 +138,15 @@ ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 RUN mkdir /root/.conda && bash Miniconda3-latest-Linux-x86_64.sh -b
 
+
 RUN conda init bash \
     && . ~/.bashrc \
     && conda env create -f /isaac-sim/environment.yml \
     && conda activate isaac-sim && pip install -r /home/AILAB-isaac-sim-pick-place/requirements.txt \
-    && ln -sf /usr/lib64/libcuda.so.1 /usr/local/nvidia/lib64/libcuda.so \
     && echo "conda activate isaac-sim" >> ~/.bashrc \
     && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
+
+RUN mkdir -p /usr/local/nvidia/lib64
+RUN ln -sf /usr/lib64/libcuda.so.1 /usr/local/nvidia/lib64/libcuda.so
 
 ENTRYPOINT [ "/bin/bash" ]
