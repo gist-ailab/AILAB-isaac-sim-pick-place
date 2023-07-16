@@ -147,7 +147,7 @@ RUN conda init bash \
     && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
 
 # Add symlink
-RUN ln -s exts/omni.isaac.examples/omni/isaac/examples extension_examples
+RUN ln -s exts/omni.isaac.examples/omni/isaac/examples /isaac-sim/extension_examples
 
 # libcuda
 RUN ln -sf /usr/lib64/libcuda.so.1 /usr/lib64/libcuda.so
