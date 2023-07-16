@@ -180,14 +180,18 @@ RUN mkdir -p /root/Documents
 RUN mkdir -p /root/.Xauthority
 
 
-COPY ~/docker/isaac-sim/cache/kit /isaac-sim/kit/cache/Kit
-COPY ~/docker/isaac-sim/cache/ov /root/.cache/ov
-COPY ~/docker/isaac-sim/cache/pip /root/.cache/pip
-COPY ~/docker/isaac-sim/cache/glcache /root/.cache/nvidia/GLCache
-COPY ~/docker/isaac-sim/cache/computecache /root/.nv/ComputeCache
-COPY ~/docker/isaac-sim/logs /root/.nvidia-omniverse/logs
-COPY ~/docker/isaac-sim/data /root/.local/share/ov/data
-COPY ~/docker/isaac-sim/documents /root/Documents
+COPY imp_file/kit /isaac-sim/kit/cache/Kit
+COPY imp_file/ov /root/.cache/ov
+COPY imp_file/pip /root/.cache/pip
+COPY imp_file/glcache /root/.cache/nvidia/GLCache
+COPY imp_file/computecache /root/.nv/ComputeCache
+COPY imp_file/logs /root/.nvidia-omniverse/logs
+COPY imp_file/data /root/.local/share/ov/data
+COPY imp_file/documents /root/Documents
+
+
+ENV ACCEPT_EULA=Y
+
 
 # RUN echo 'alias code="code --no-sandbox --user-data-dir=/root"' >> /etc/profile.d/aliases
 # RUN echo 'alias chrome="google-chrome --no-sandbox"' >> /etc/profile.d/aliases

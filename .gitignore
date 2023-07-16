@@ -10,3 +10,5 @@ ycb_usd/*
 
 # files
 *.pyc
+
+imp_file/

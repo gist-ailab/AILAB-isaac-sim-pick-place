@@ -38,6 +38,22 @@ podman run --name isaac-sim --entrypoint bash -it --device nvidia.com/gpu=all -e
 registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v2
 ```
 
+
+
+
+
+```
+docker run --name isaac-sim2 --entrypoint bash -it --gpus all --rm --network=host \
+-e DISPLAY \
+registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v2
+```
+
+
+
+
+
+
+
 # In a docker container (will be deprecated)
 ```
 alias code="code --no-sandbox --user-data-dir=/root"
