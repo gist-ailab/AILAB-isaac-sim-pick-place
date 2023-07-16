@@ -19,12 +19,12 @@ docker build --pull -t \
 ```
 
 ```
-docker push --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04
+docker push --tls-verify=false registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v2
 ```
 
 # Run container
 ```
-podman run --name isaac-sim --entrypoint bash -it --device [nvidia.com/gpu=all](http://nvidia.com/gpu=all) -e "ACCEPT_EULA=Y" --rm --network=host \
+podman run --name isaac-sim --entrypoint bash -it --device nvidia.com/gpu=all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -e DISPLAY \
 -v ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/Kit:rw \
@@ -35,10 +35,12 @@ podman run --name isaac-sim --entrypoint bash -it --device [nvidia.com/gpu=all](
 -v ~/docker/isaac-sim/logs:/root/.nvidia-omniverse/logs:rw \
 -v ~/docker/isaac-sim/data:/root/.local/share/ov/data:rw \
 -v ~/docker/isaac-sim/documents:/root/Documents:rw \
-registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04
+registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v2
 ```
 
-# In a docker container (deprecated)
+# In a docker container (will be deprecated)
+alias code="code --no-sandbox --user-data-dir=/root"
+alias chrome="google-chrome --no-sandbox"
+
 ln -sf /usr/lib64/libcuda.so.1 /usr/lib64/libcuda.so
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64
-/isaac-sim/isaac-sim.sh --allow-root
