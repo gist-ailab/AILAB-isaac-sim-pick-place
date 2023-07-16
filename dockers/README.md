@@ -40,7 +40,7 @@ registry.ark.svc.ops.openark/library/isaac-sim:2022.2.1-ubuntu22.04_v3
 ```
 
 
-podman run --name isaac-sim --entrypoint bash -it --device nvidia.com/gpu=all -e "ACCEPT_EULA=Y" --rm --network=host \
+docker run --name isaac-sim -it --entrypoint bash --gpus all -e "ACCEPT_EULA=Y" --rm --network=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
 -e DISPLAY \
 -v /home/user/Desktop:/home/workspace \

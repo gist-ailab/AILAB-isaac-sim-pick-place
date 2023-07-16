@@ -144,7 +144,9 @@ RUN conda init bash \
     && conda env create -f /isaac-sim/environment.yml \
     && conda activate isaac-sim && pip install -r /home/AILAB-isaac-sim-pick-place/requirements.txt \
     && echo "conda activate isaac-sim" >> ~/.bashrc \
-    && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
+    && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc \
+    && echo "ln -s exts/omni.isaac.examples/omni/isaac/examples /isaac-sim/extension_examples" >> ~/.bashrc \
+    && echo "ln -sf /usr/lib64/libcuda.so.1 /usr/lib64/libcuda.so" >> ~/.bashrc \
+    && echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64" >> ~/.bashrc
 
-COPY init.sh /home/
-ENTRYPOINT [ "/home/init.sh" ]
+ENTRYPOINT [ "/bin/bash" ]
