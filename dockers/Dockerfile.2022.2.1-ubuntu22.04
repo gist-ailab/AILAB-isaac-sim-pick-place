@@ -141,7 +141,9 @@ RUN mkdir /root/.conda && bash Miniconda3-latest-Linux-x86_64.sh -b
 RUN conda init bash \
     && . ~/.bashrc \
     && conda env create -f /isaac-sim/environment.yml \
-    && conda activate isaac-sim && pip install -r /isaac-sim/AILAB-isaac-sim-pick-place/requirements.txt  && pip install -r ipykernel \
+    && conda activate isaac-sim && pip install -r /isaac-sim/AILAB-isaac-sim-pick-place/requirements.txt  \
+    && /root/miniconda3/envs/isaac-sim/bin/python -m pip install jupyter \
+    && /root/miniconda3/envs/isaac-sim/bin/python -m pip install ipykernel \
     && echo "conda activate isaac-sim" >> ~/.bashrc \
     && echo ". /isaac-sim/setup_conda_env.sh" >> ~/.bashrc
 
