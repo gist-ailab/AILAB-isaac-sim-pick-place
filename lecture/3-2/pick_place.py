@@ -42,15 +42,6 @@ my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
 my_controller = PickPlaceController(
     name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e
     )
-'''
-check that you modified the rmp_flow_config in the PickPlaceController -> RMPFlowController
-from "UR10", "RMPflowSuction" to "UR5e", "RMPflow"
-
-self.rmp_flow_config = mg.interface_config_loader.load_supported_motion_policy_config(
-    # "UR10", "RMPflowSuction"
-    "UR5e", "RMPflow"
-)
-'''
 
 articulation_controller = my_ur5e.get_articulation_controller()
 my_controller.reset()
