@@ -150,6 +150,7 @@ RUN conda init bash \
 RUN mkdir -p /usr/local/nvidia/lib64
 RUN ln -sf /usr/lib64/libcuda.so.1 /usr/local/nvidia/lib64/libcuda.so
 
-WORKDIR /home/user/
+COPY settings.json /root/.vscode-server/data/Machine/settings.json
+WORKDIR /home/user/Desktop
 
 # ENTRYPOINT [ "/bin/bash" ]
