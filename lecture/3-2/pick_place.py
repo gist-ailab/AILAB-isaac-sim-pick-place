@@ -67,6 +67,8 @@ while simulation_app.is_running():
             picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
             placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
             current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
+            end_effector_offset=np.array([0, 0, 0.18])
+
         )
         # print('---------------------------------------------------------')
         # print(f'EE position: {observations["my_ur5e"]["end_effector_position"][:2]}')
