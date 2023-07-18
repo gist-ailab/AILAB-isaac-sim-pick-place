@@ -21,6 +21,8 @@ from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
 
 # from detection.inference_detection import inference_detection
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
