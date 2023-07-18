@@ -1,11 +1,4 @@
-# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
+
 
 from omni.isaac.kit import SimulationApp
 
@@ -19,11 +12,12 @@ from omni.kit.viewport.utility import get_active_viewport
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
 
-# from detection.inference_detection import inference_detection
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import get_model_instance_segmentation, get_transform
+from detection import get_model_instance_segmentation
 
 import numpy as np
 import os
@@ -164,11 +158,11 @@ for theta in range(0, 360, 45):
                     print('boxes')
                     print(prediction[0]['boxes'])
                     
-                    # target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
-                    # print(target)
-                    # if target in labels_name:
-                    target = labels_name[0]
+                    # target = labels_name[0]
+                    target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
+                    
                     if target in labels_name:
+                        found_obj = True
                         index = labels_name.index(target)
                         print(index)
                     
@@ -187,25 +181,23 @@ for theta in range(0, 360, 45):
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
                         
-                        found_obj = True
                                                 
                     my_controller2.reset()
                     break
                 articulation_controller.apply_action(actions)
+                
     if found_obj:
         print('found object')
         break
 
 print('pick-and-place')
-change_world_center = False
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
-        
-        
+            
         observations = my_world.get_observations()              
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),

@@ -68,6 +68,6 @@ while simulation_app.is_running():
     print("Episode: ", ep_num)
 
     rgb_image = my_camera.get_rgba()                        #
-    if ep_num == 30:
+    if ep_num == max_ep_num:
         save_image(rgb_image, os.path.join(save_root, "rgb{}.png".format(ep_num)))  #
         simulation_app.close()
