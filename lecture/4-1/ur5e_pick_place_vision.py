@@ -209,27 +209,27 @@ for theta in range(0, 360, 45):
         print('found object')
         break
 
-# print('pick-and-place')
-# change_world_center = False
-# while simulation_app.is_running():
-#     my_world.step(render=True)
-#     if my_world.is_playing():
-#         if my_world.current_time_step_index == 0:
-#             my_world.reset()
-#             my_controller.reset()
+print('pick-and-place')
+change_world_center = False
+while simulation_app.is_running():
+    my_world.step(render=True)
+    if my_world.is_playing():
+        if my_world.current_time_step_index == 0:
+            my_world.reset()
+            my_controller.reset()
         
         
-#         observations = my_world.get_observations()              
-#         actions = my_controller.forward(
-#             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
-#             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
-#             current_joint_positions=my_ur5.get_joint_positions(),
-#             end_effector_offset=np.array([0, 0, 0.25]),
-#             end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
-#         )
-#         if my_controller.is_done():
-#             print("done picking and placing")
-#         articulation_controller.apply_action(actions)
+        observations = my_world.get_observations()              
+        actions = my_controller.forward(
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+            placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
+            current_joint_positions=my_ur5.get_joint_positions(),
+            end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
+        )
+        if my_controller.is_done():
+            print("done picking and placing")
+        articulation_controller.apply_action(actions)
 
 
 simulation_app.close()
