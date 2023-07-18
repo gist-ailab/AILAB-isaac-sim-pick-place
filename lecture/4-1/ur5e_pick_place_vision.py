@@ -165,10 +165,10 @@ for theta in range(0, 360, 45):
                         print((prediction[0]['labels'][i]-2))
                         labels_name.append(re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                     
-                    # target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
-                    # print(target)
-                    # if target in labels_name:
-                    target = labels_name[0]
+                    
+                    # target = labels_name[0]
+                    target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
+                    print(target)
                     
                     if target in labels_name:
                         index = labels_name.index(target)
