@@ -1,11 +1,3 @@
-# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
 
 from omni.isaac.kit import SimulationApp
 
@@ -15,14 +7,12 @@ from omni.isaac.core import World
 from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
-from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
+from omni.kit.viewport.utility import get_active_viewport
 
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
 from inference_ggcnn import inference_ggcnn
 
-
-# from detection.inference_detection import inference_detection
 import sys
 sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
@@ -153,7 +143,6 @@ for theta in range(0, 360, 45):
                     distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
-                    # re_objects = glob.glob("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture/dataset/ycb/*/*.usd")
                     image = Image.fromarray(rgb_image)
                     image, _ = transforms(image=image, target=None)
                     with torch.no_grad():
@@ -167,7 +156,6 @@ for theta in range(0, 360, 45):
                     
                     # target = labels_name[0]
                     target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
-                    print(target)
                     
                     if target in labels_name:
                         index = labels_name.index(target)

@@ -1,11 +1,4 @@
-# Copyright (c) 2022, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
+
 
 from omni.isaac.kit import SimulationApp
 
@@ -19,13 +12,12 @@ from omni.kit.viewport.utility import get_active_viewport
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
 
-# from detection.inference_detection import inference_detection
 import sys
 sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import get_model_instance_segmentation, get_transform
+from detection import get_model_instance_segmentation
 
 import numpy as np
 import os
@@ -168,7 +160,6 @@ for theta in range(0, 360, 45):
                     
                     # target = labels_name[0]
                     target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
-                    print(target)
                     
                     if target in labels_name:
                         found_obj = True
