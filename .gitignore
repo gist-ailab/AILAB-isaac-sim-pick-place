@@ -10,5 +10,5 @@ ycb_usd/*
 
 # files
 *.pyc
-
+dataset/*
 imp_file/

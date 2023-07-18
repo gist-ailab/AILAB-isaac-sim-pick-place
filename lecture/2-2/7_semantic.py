@@ -24,7 +24,7 @@ import copy
 lecture_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))) # path to lecture
 sys.path.append(lecture_path)
 print(lecture_path)
-from utils.correct_radial_distortion import depth_image_from_distance_image
+# from utils.correct_radial_distortion import depth_image_from_distance_image
 
 
 my_world = World(stage_units_in_meters=1.0)
@@ -82,11 +82,15 @@ while simulation_app.is_running():
     hand_instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
     hand_instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
 
-    if ep_num == 30:
+    if ep_num == max_ep_num:
         print(my_camera.get_current_frame()["instance_segmentation"])
         save_image(rgb_image, os.path.join(save_root, "semantic_img.png"))  #
         
-        save_image(depth_image, os.path.join(save_root, "depth_img.png"), mode="I")
+        depth_image[depth_image < 0.67] = 0.67
+        depth_image = depth_image - 0.5
+        depth_image = (depth_image*255*2).astype(np.uint8)
+        save_image(depth_image, os.path.join(save_root, "depth_img.png"))
+        # save_image(depth_image, os.path.join(save_root, "depth_img.png"), mode="I")
         save_image(hand_instance_segmentation_image, os.path.join(save_root, "semantic_mask.png"))  #
         
         origin_img_r = copy.deepcopy(hand_instance_segmentation_image)
