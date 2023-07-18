@@ -1,0 +1,7 @@
+{
+	"python.analysis.extraPaths": [
+		"/isaac-sim/exts/omni.isaac.core"
+	],
+	"editor.fontFamily": "Monaco, Menlo, 'Courier New', monospace",
+	"editor.fontSize": 16
+}

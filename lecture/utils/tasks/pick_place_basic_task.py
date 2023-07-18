@@ -7,7 +7,6 @@
 # license agreement from NVIDIA CORPORATION is strictly prohibited.
 #
 
-from omni.isaac.core.utils.stage import add_reference_to_stage
 import omni.isaac.core.tasks as tasks
 from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.objects import DynamicCuboid
@@ -25,8 +24,6 @@ from robots.ur5e_handeye import UR5eHandeye
 import random
 import numpy as np
 from typing import Optional
-from pxr import Gf
-import omni.usd
 
 
 class UR5ePickPlace(tasks.PickPlace):

@@ -167,20 +167,22 @@ class UR5ePickPlace(tasks.PickPlace):
 
     def set_usd_objects(self, object_number: int, object_position: np.ndarray) -> None:
         # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
-        define_prim(self.imported_objects_prim_path + f"_{object_number}")
-        define_prim(self.imported_objects_prim_path + f"/geometry_prim_{object_number}")
+        rigid_prim_path = self.imported_objects_prim_path + f"_{object_number}"
+        geometry_prim_path = rigid_prim_path + f"/geometry_prim_{object_number}"
+        define_prim(rigid_prim_path)
+        define_prim(geometry_prim_path)
 
         self._task_object = add_reference_to_stage(usd_path = self._objects[object_number],
-                                                   prim_path = self.imported_objects_prim_path + f"_{object_number}")
-        rigid_prim = RigidPrim(prim_path = self.imported_objects_prim_path + f"_{object_number}",
+                                                   prim_path = rigid_prim_path)
+        rigid_prim = RigidPrim(prim_path = rigid_prim_path,
                                position = object_position,
                                orientation = np.array([1, 0, 0, 0]),
                                name = "rigid_prim",
                                scale = np.array([0.2] * 3),
-                               mass = 0.01)
+                               mass = 0.1)
         rigid_prim.enable_rigid_body_physics()
 
-        geometry_prim = GeometryPrim(prim_path = self.imported_objects_prim_path + f"/geometry_prim_{object_number}",
+        geometry_prim = GeometryPrim(prim_path = geometry_prim_path,
                                      name = "geometry_prim",
                                      position = object_position,
                                      orientation = np.array([1, 0, 0, 0]),
@@ -189,7 +191,7 @@ class UR5ePickPlace(tasks.PickPlace):
                                     )
         geometry_prim.apply_physics_material(
             PhysicsMaterial(
-                prim_path = self.imported_objects_prim_path + f"/physics_material_{object_number}",
+                prim_path = rigid_prim_path + f"/physics_material_{object_number}",
                 static_friction = 10,
                 dynamic_friction = 10,
                 restitution = None

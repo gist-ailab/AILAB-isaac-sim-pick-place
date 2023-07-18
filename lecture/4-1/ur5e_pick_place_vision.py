@@ -26,7 +26,7 @@ from omni.isaac.examples.ailab_examples import AILab
 
 from detection import get_model_instance_segmentation
 from correct_radial_distortion import depth_image_from_distance_image
-from ggcnn.inferece_ggcnn import inference_ggcnn
+# from ggcnn.inferece_ggcnn import inference_ggcnn
 
 import numpy as np
 import os
@@ -151,18 +151,18 @@ for theta in range(0, 360, 45):
                     distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
-                    
+                    re_objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
                     image = Image.fromarray(rgb_image)
                     image, _ = transforms(image=image, target=None)
                     with torch.no_grad():
                         prediction = model([image.to(device)])
                     labels = prediction[0]['labels']
                     labels_name = []
-                    ycb_objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
+                    # ycb_objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
                     for i in range(len(list(prediction[0]['boxes'][:3]))):
-                        print(len(ycb_objects))
+                        # print(len(ycb_objects))
                         print((prediction[0]['labels'][i]-2))
-                        labels_name.append(ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                        labels_name.append(re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                     print(labels)
                     print(labels_name)
                     print('boxes')
@@ -172,20 +172,36 @@ for theta in range(0, 360, 45):
                     # print(target)
                     # if target in labels_name:
                     target = labels_name[0]
+                    
                     if target in labels_name:
                         index = labels_name.index(target)
                         print(index)
-                    
-                        #######draw bbox in image#############3
+
+                        #######draw bbox in image############
                         image = Image.fromarray(image.mul(255).permute(1, 2, 0).byte().numpy())
                         draw = ImageDraw.Draw(image)
-                        for i in range(len(list(prediction[0]['boxes'][:3]))):
-                            print(prediction[0]['boxes'][i])
-                            draw.multiline_text((list(prediction[0]['boxes'][i])), text = ycb_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
-                            draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
+                        for i in range(len(list(prediction[0]['boxes']))):
+                            if prediction[0]['scores'][i]>0.9:
+                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                                draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
                         image.show()
                                         
                         #########inference ggcnn##############3
+<<<<<<< HEAD
+                        # camera_intrinsics = camera.get_intrinsics_matrix()
+                        # n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
+                                                
+                        # ggcnn_angle, length, width, center = inference_ggcnn(
+                        #     rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
+                        # center = np.array(center)
+                        # depth = n_depth_image[center[1]][center[0]]
+                        
+                        # center = np.expand_dims(center, axis=0)
+                        # world_center = camera.get_world_points_from_image_coords(center, depth)
+                        # angle = theta * 2 * np.pi / 360 + ggcnn_angle
+                        # print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
+                        # found_obj = True
+=======
                         camera_intrinsics = camera.get_intrinsics_matrix()
                         depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         
@@ -200,6 +216,7 @@ for theta in range(0, 360, 45):
                         print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
                         found_obj = True
+>>>>>>> 0593d5c6cd52a86d1da9b8811cba142a6bf27668
                                                 
                     my_controller2.reset()
                     break
@@ -208,27 +225,27 @@ for theta in range(0, 360, 45):
         print('found object')
         break
 
-print('pick-and-place')
-change_world_center = False
-while simulation_app.is_running():
-    my_world.step(render=True)
-    if my_world.is_playing():
-        if my_world.current_time_step_index == 0:
-            my_world.reset()
-            my_controller.reset()
+# print('pick-and-place')
+# change_world_center = False
+# while simulation_app.is_running():
+#     my_world.step(render=True)
+#     if my_world.is_playing():
+#         if my_world.current_time_step_index == 0:
+#             my_world.reset()
+#             my_controller.reset()
         
         
-        observations = my_world.get_observations()              
-        actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
-            placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
-            current_joint_positions=my_ur5.get_joint_positions(),
-            end_effector_offset=np.array([0, 0, 0.25]),
-            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
-        )
-        if my_controller.is_done():
-            print("done picking and placing")
-        articulation_controller.apply_action(actions)
+#         observations = my_world.get_observations()              
+#         actions = my_controller.forward(
+#             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+#             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
+#             current_joint_positions=my_ur5.get_joint_positions(),
+#             end_effector_offset=np.array([0, 0, 0.25]),
+#             end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
+#         )
+#         if my_controller.is_done():
+#             print("done picking and placing")
+#         articulation_controller.apply_action(actions)
 
 
 simulation_app.close()

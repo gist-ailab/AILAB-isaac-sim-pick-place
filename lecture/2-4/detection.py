@@ -1,3 +1,16 @@
+# ---- ---- ---- ----
+# GIST-AILAB, 2023 summer school
+# Day2. 
+# 2-4.1 Custom YCB Dataset for detection
+# ---- ---- ---- ----
+
+#-----0. preliminary -----#
+
+# python path setting
+import os
+import sys
+lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
+sys.path.append(lecture_path)
 
 import os
 import sys

@@ -6,11 +6,11 @@
 # ---- ---- ---- ----
 
 {
-cp -Rv ./AILAB-isaac-sim-pick-place/_for_gui_code/ailab_examples ./exts/omni.isaac.examples/omni/isaac/examples/ \
+cp -Rv ailab_examples /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ \
 &&
-cp -Rv ./AILAB-isaac-sim-pick-place/_for_gui_code/ailab_script ./exts/omni.isaac.examples/omni/isaac/examples/ \
+cp -Rv ailab_script /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ \
 &&
-cp -v ./AILAB-isaac-sim-pick-place/_for_gui_code/extension.toml ./exts/omni.isaac.examples/config/ \
+cp -v extension.toml /isaac-sim/exts/omni.isaac.examples/config/ \
 &&
 echo "\n\n.. apply \'isaac-sim ailab ext\' complete\n"
 } ||

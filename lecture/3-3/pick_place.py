@@ -63,9 +63,8 @@ i = 0
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
-        
-        if my_controller._event == 1:
-            my_controller.pause()
+        # if my_controller._event == 1:
+        #     my_controller.pause()
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
@@ -74,8 +73,7 @@ while simulation_app.is_running():
             picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
             placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
             current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            end_effector_offset=np.array([0.125, 0.095, 0.03]), #TODO: change this to the correct offset ratio
-            # end_effector_offset=np.array([0, 0, 0.04]),
+            end_effector_offset=np.array([0, 0, 0.14])
         )
         # print('---------------------------------------------------------')
         # print(f'EE position: {observations["my_ur5e"]["end_effector_position"][:2]}')
