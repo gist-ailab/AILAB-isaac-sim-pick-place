@@ -169,6 +169,7 @@ for theta in range(0, 360, 45):
                     # if target in labels_name:
                     target = labels_name[0]
                     if target in labels_name:
+                        found_obj = True
                         index = labels_name.index(target)
                         print(index)
                     
@@ -187,25 +188,23 @@ for theta in range(0, 360, 45):
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
                         
-                        found_obj = True
                                                 
                     my_controller2.reset()
                     break
                 articulation_controller.apply_action(actions)
+                
     if found_obj:
         print('found object')
         break
 
 print('pick-and-place')
-change_world_center = False
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
-        
-        
+            
         observations = my_world.get_observations()              
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
