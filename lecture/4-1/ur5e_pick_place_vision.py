@@ -26,7 +26,7 @@ from omni.isaac.examples.ailab_examples import AILab
 
 from detection import get_model_instance_segmentation
 from correct_radial_distortion import depth_image_from_distance_image
-# from ggcnn.inferece_ggcnn import inference_ggcnn
+from ggcnn.inferece_ggcnn import inference_ggcnn
 
 import numpy as np
 import os
@@ -187,21 +187,6 @@ for theta in range(0, 360, 45):
                         image.show()
                                         
                         #########inference ggcnn##############3
-<<<<<<< HEAD
-                        # camera_intrinsics = camera.get_intrinsics_matrix()
-                        # n_depth_image = depth_image_from_distance_image(depth_image, camera_intrinsics)
-                                                
-                        # ggcnn_angle, length, width, center = inference_ggcnn(
-                        #     rgb=rgb_image, depth=n_depth_image, bbox=prediction[0]['boxes'][index])
-                        # center = np.array(center)
-                        # depth = n_depth_image[center[1]][center[0]]
-                        
-                        # center = np.expand_dims(center, axis=0)
-                        # world_center = camera.get_world_points_from_image_coords(center, depth)
-                        # angle = theta * 2 * np.pi / 360 + ggcnn_angle
-                        # print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
-                        # found_obj = True
-=======
                         camera_intrinsics = camera.get_intrinsics_matrix()
                         depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         
@@ -216,7 +201,6 @@ for theta in range(0, 360, 45):
                         print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
                         found_obj = True
->>>>>>> 0593d5c6cd52a86d1da9b8811cba142a6bf27668
                                                 
                     my_controller2.reset()
                     break
