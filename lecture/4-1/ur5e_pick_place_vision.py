@@ -19,15 +19,17 @@ from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_c
 
 from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController
+from inference_ggcnn import inference_ggcnn
+
 
 # from detection.inference_detection import inference_detection
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
 from detection import get_model_instance_segmentation
 from correct_radial_distortion import depth_image_from_distance_image
-from ggcnn.inferece_ggcnn import inference_ggcnn
-
 import numpy as np
 import os
 from PIL import Image, ImageDraw
@@ -160,13 +162,8 @@ for theta in range(0, 360, 45):
                     labels_name = []
                     # ycb_objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
                     for i in range(len(list(prediction[0]['boxes'][:3]))):
-                        # print(len(ycb_objects))
                         print((prediction[0]['labels'][i]-2))
                         labels_name.append(re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
-                    print(labels)
-                    print(labels_name)
-                    print('boxes')
-                    print(prediction[0]['boxes'])
                     
                     # target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
                     # print(target)
@@ -209,27 +206,27 @@ for theta in range(0, 360, 45):
         print('found object')
         break
 
-# print('pick-and-place')
-# change_world_center = False
-# while simulation_app.is_running():
-#     my_world.step(render=True)
-#     if my_world.is_playing():
-#         if my_world.current_time_step_index == 0:
-#             my_world.reset()
-#             my_controller.reset()
+print('pick-and-place')
+change_world_center = False
+while simulation_app.is_running():
+    my_world.step(render=True)
+    if my_world.is_playing():
+        if my_world.current_time_step_index == 0:
+            my_world.reset()
+            my_controller.reset()
         
         
-#         observations = my_world.get_observations()              
-#         actions = my_controller.forward(
-#             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
-#             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
-#             current_joint_positions=my_ur5.get_joint_positions(),
-#             end_effector_offset=np.array([0, 0, 0.25]),
-#             end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
-#         )
-#         if my_controller.is_done():
-#             print("done picking and placing")
-#         articulation_controller.apply_action(actions)
+        observations = my_world.get_observations()              
+        actions = my_controller.forward(
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+            placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
+            current_joint_positions=my_ur5.get_joint_positions(),
+            end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
+        )
+        if my_controller.is_done():
+            print("done picking and placing")
+        articulation_controller.apply_action(actions)
 
 
 simulation_app.close()
