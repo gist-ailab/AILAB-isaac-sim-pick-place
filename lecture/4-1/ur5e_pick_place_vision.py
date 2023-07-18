@@ -153,17 +153,16 @@ for theta in range(0, 360, 45):
                     distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
-                    re_objects = glob.glob("/home/ailab/Workspace/minhwan/ycb/*/*.usd")
+                    # re_objects = glob.glob("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture/dataset/ycb/*/*.usd")
                     image = Image.fromarray(rgb_image)
                     image, _ = transforms(image=image, target=None)
                     with torch.no_grad():
                         prediction = model([image.to(device)])
                     labels = prediction[0]['labels']
                     labels_name = []
-                    # ycb_objects = glob.glob("/home/nam/workspace/dataset/ycb_usd/ycb/*/*.usd")
                     for i in range(len(list(prediction[0]['boxes'][:3]))):
                         print((prediction[0]['labels'][i]-2))
-                        labels_name.append(re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                        labels_name.append(objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                     
                     
                     # target = labels_name[0]
@@ -179,7 +178,7 @@ for theta in range(0, 360, 45):
                         draw = ImageDraw.Draw(image)
                         for i in range(len(list(prediction[0]['boxes']))):
                             if prediction[0]['scores'][i]>0.9:
-                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = re_objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
                                 draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
                         image.show()
                                         

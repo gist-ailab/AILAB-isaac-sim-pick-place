@@ -166,10 +166,10 @@ for theta in range(0, 360, 45):
                     print('boxes')
                     print(prediction[0]['boxes'])
                     
-                    # target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
-                    # print(target)
-                    # if target in labels_name:
-                    target = labels_name[0]
+                    # target = labels_name[0]
+                    target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
+                    print(target)
+                    
                     if target in labels_name:
                         found_obj = True
                         index = labels_name.index(target)
