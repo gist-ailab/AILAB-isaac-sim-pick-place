@@ -155,9 +155,9 @@ RUN ln -sf /usr/lib64/libcuda.so.1 /usr/local/nvidia/lib64/libcuda.so
 
 # vscode setting
 COPY settings.json /root/.vscode-server/data/Machine/settings.json
-COPY ailab_examples/ /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/
-COPY ailab_script/ /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/
-COPY extension.toml /isaac-sim/exts/omni.isaac.examples/config/
+COPY ailab_examples/ /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ailab_examples/
+COPY ailab_script/ /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ailab_script/
+COPY extension.toml /isaac-sim/exts/omni.isaac.examples/config/extension.toml
 
 RUN ln -s exts/omni.isaac.examples/omni/isaac/examples extension_examples
 
