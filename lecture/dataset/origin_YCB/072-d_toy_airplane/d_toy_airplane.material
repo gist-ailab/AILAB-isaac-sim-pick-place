@@ -1,0 +1,14 @@
+material d_toy_airplane
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../072-d_toy_airplane/google_16k/texture_map.png
+      }
+    }
+  }
+}

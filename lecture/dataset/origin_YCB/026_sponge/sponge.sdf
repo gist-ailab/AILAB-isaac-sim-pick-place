@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="sponge">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.015842356573766914 0.011520562220217976 0.00937252508059704 -0.9824934086702146 1.5523706661387424 0.5776306754619863</pose> 
+        <mass>0.00011574257606853668</mass>
+        <inertia>
+          <ixx>1.4790695935686624e-07</ixx>
+          <ixy>6.546512016924604e-26</ixy>
+          <ixz>-1.352044653776286e-23</ixz>
+          <iyy>1.0220649167865078e-07</iyy>
+          <iyz>9.375642998693167e-26</iyz>
+          <izz>5.040066218025438e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://026_sponge/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://026_sponge/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://026_sponge/sponge.material</uri>
+            <name>sponge</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

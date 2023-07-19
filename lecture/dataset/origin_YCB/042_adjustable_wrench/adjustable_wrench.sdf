@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="adjustable_wrench">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.01450146241685899 -0.049664842094331994 0.004250780997626007 -1.0205516501683318 1.5340779965528404 -2.0839203161585824</pose> 
+        <mass>1.9821730387476e-05</mass>
+        <inertia>
+          <ixx>4.68812164277712e-08</ixx>
+          <ixy>8.011925726705155e-25</ixy>
+          <ixz>3.0180646055664565e-24</ixz>
+          <iyy>4.282249507787249e-08</iyy>
+          <iyz>-8.215550244094782e-24</iyz>
+          <izz>4.257478965991318e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://042_adjustable_wrench/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://042_adjustable_wrench/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://042_adjustable_wrench/adjustable_wrench.material</uri>
+            <name>adjustable_wrench</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

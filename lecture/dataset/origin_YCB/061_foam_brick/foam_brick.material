@@ -1,0 +1,14 @@
+material foam_brick
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../061_foam_brick/google_16k/texture_map.png
+      }
+    }
+  }
+}

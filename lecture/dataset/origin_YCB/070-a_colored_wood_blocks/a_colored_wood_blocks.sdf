@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="a_colored_wood_blocks">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.02119015620537026 0.008545373467665459 0.07390911070766724 3.1186793689628405 0.03979213980283004 2.836631720245267</pose> 
+        <mass>0.0023463367230017076</mass>
+        <inertia>
+          <ixx>7.759890525927944e-06</ixx>
+          <ixy>2.534036454735204e-23</ixy>
+          <ixz>-1.9710003320809621e-22</ixz>
+          <iyy>7.470598943639884e-06</iyy>
+          <iyz>-2.8196188405463796e-22</iyz>
+          <izz>6.172891559358153e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://070-a_colored_wood_blocks/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://070-a_colored_wood_blocks/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://070-a_colored_wood_blocks/a_colored_wood_blocks.material</uri>
+            <name>a_colored_wood_blocks</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

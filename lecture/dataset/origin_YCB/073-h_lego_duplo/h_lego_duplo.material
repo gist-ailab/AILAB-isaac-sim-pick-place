@@ -1,0 +1,14 @@
+material h_lego_duplo
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../073-h_lego_duplo/tsdf/textured.png
+      }
+    }
+  }
+}

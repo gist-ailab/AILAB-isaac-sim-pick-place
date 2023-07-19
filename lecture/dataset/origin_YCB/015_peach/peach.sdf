@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="peach">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.015047325763457797 0.006783997168206114 0.028259603076768534 1.6349407752171605 -0.806948775881182 -0.6699450846973171</pose> 
+        <mass>0.00011721380481271601</mass>
+        <inertia>
+          <ixx>4.5876541133456013e-08</ixx>
+          <ixy>6.824671211078382e-24</ixy>
+          <ixz>-4.976057697768975e-24</ixz>
+          <iyy>4.4440446186663605e-08</iyy>
+          <iyz>3.0375618849172078e-24</iyz>
+          <izz>4.0982746223781025e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://015_peach/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://015_peach/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://015_peach/peach.material</uri>
+            <name>peach</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

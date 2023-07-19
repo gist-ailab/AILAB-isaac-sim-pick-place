@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="golf_ball">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.006528858552747081 -0.03041729713329846 0.02092653007258482 1.2624848084584919 -1.4760519281924154 -1.1435261510309338</pose> 
+        <mass>4.0280065824670666e-05</mass>
+        <inertia>
+          <ixx>7.3017341992527055e-09</ixx>
+          <ixy>-1.671904984721422e-24</ixy>
+          <ixz>1.7842928104490935e-25</ixz>
+          <iyy>7.281135817609492e-09</iyy>
+          <iyz>-3.706727697751384e-25</iyz>
+          <izz>7.2757988108535084e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://058_golf_ball/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://058_golf_ball/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://058_golf_ball/golf_ball.material</uri>
+            <name>golf_ball</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

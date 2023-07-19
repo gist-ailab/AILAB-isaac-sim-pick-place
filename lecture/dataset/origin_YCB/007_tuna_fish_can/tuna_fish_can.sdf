@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="tuna_fish_can">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.025996325377627645 -0.02214035959406331 0.012989508195911936 -0.4484541480843958 -1.5705852276942327 0.2128510810215045</pose> 
+        <mass>0.00015261883396786033</mass>
+        <inertia>
+          <ixx>1.3941298546481143e-07</ixx>
+          <ixy>-1.7375619254255153e-23</ixy>
+          <ixz>-7.058407175149014e-24</ixz>
+          <iyy>7.961242909265219e-08</iyy>
+          <iyz>-4.213046493605349e-24</iyz>
+          <izz>7.951765546408445e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://007_tuna_fish_can/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://007_tuna_fish_can/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://007_tuna_fish_can/tuna_fish_can.material</uri>
+            <name>tuna_fish_can</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

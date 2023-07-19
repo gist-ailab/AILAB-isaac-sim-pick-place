@@ -1,0 +1,14 @@
+material nine_hole_peg_test
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../071_nine_hole_peg_test/google_16k/texture_map.png
+      }
+    }
+  }
+}

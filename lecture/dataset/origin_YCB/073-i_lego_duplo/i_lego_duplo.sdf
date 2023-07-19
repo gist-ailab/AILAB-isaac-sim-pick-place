@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="i_lego_duplo">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.0007234334344806385 -0.00308340114233082 0.025301049321047653 0.8687213328526036 -1.4762322508468178 -1.1937614547106805</pose> 
+        <mass>4.6561112974718803e-05</mass>
+        <inertia>
+          <ixx>1.00125552265245e-08</ixx>
+          <ixy>-3.6372882731392334e-25</ixy>
+          <ixz>-3.5295947928492667e-25</ixz>
+          <iyy>7.658100156448124e-09</iyy>
+          <iyz>-3.1058135308844186e-25</iyz>
+          <izz>7.520637840479156e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://073-i_lego_duplo/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://073-i_lego_duplo/tsdf/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://073-i_lego_duplo/i_lego_duplo.material</uri>
+            <name>i_lego_duplo</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

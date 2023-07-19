@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="strawberry">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.0014938727773305587 0.015432679933728788 0.02111450326881559 1.7931441754927437 -0.1980273936530318 -0.8594619155466211</pose> 
+        <mass>4.832344833863233e-05</mass>
+        <inertia>
+          <ixx>1.1142887364251795e-08</ixx>
+          <ixy>9.251929496783896e-25</ixy>
+          <ixz>2.0522770518953985e-24</ixz>
+          <iyy>1.0106109240846608e-08</iyy>
+          <iyz>-4.2342023492700045e-25</iyz>
+          <izz>9.086808374326581e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://012_strawberry/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://012_strawberry/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://012_strawberry/strawberry.material</uri>
+            <name>strawberry</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

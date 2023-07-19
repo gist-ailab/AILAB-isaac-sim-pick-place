@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="chain">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.034274940120650695 0.018175325943306266 0.009010247611937368 1.0572172745720791 -1.5612055829470524 -3.051669145964336</pose> 
+        <mass>0.00011189363696047932</mass>
+        <inertia>
+          <ixx>1.3307905578269502e-06</ixx>
+          <ixy>-2.9706615307710403e-24</ixy>
+          <ixz>-2.830200646146508e-23</ixz>
+          <iyy>7.338900067550512e-07</iyy>
+          <iyz>4.663563268167356e-23</iyz>
+          <izz>6.025740314983342e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://059_chain/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://059_chain/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://059_chain/chain.material</uri>
+            <name>chain</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

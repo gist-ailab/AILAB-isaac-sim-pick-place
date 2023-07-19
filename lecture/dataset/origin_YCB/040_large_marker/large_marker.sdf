@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="large_marker">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.035725124851894 -0.00788077074326952 0.009018296996191045 -1.5699074828201007 0.9271848404226295 0.021516163271664623</pose> 
+        <mass>2.7399944924772163e-05</mass>
+        <inertia>
+          <ixx>3.0985440909539734e-08</ixx>
+          <ixy>6.790944603058866e-24</ixy>
+          <ixz>-1.082212936072932e-25</ixz>
+          <iyy>3.098119463302472e-08</iyy>
+          <iyz>1.821983724886016e-26</iyz>
+          <izz>1.0631513526588337e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://040_large_marker/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://040_large_marker/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://040_large_marker/large_marker.material</uri>
+            <name>large_marker</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

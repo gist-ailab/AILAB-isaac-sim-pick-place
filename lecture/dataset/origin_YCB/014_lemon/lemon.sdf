@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="lemon">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.010770493044399379 0.02101421821337594 0.026208533597256233 -1.5558996786745052 0.5892078304576682 2.2807787847016825</pose> 
+        <mass>9.683451845782233e-05</mass>
+        <inertia>
+          <ixx>3.41085798454103e-08</ixx>
+          <ixy>1.4026000443507479e-24</ixy>
+          <ixz>6.657374072955688e-24</ixz>
+          <iyy>3.393718081001612e-08</iyy>
+          <iyz>-4.276566240104417e-24</iyz>
+          <izz>2.785774449123034e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://014_lemon/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://014_lemon/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://014_lemon/lemon.material</uri>
+            <name>lemon</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

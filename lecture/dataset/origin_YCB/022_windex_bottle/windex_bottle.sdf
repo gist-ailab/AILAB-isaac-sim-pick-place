@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="windex_bottle">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.013942564305577316 0.00843004384724436 0.10236853791650995 3.1170214258751607 -0.004835104148543597 2.8362535954806742</pose> 
+        <mass>0.0007354300167246426</mass>
+        <inertia>
+          <ixx>3.599403028749102e-06</ixx>
+          <ixy>1.5671014203232698e-22</ixy>
+          <ixz>3.676113843798971e-24</ixz>
+          <iyy>3.4888416388457247e-06</iyy>
+          <iyz>1.8731300446796854e-22</iyz>
+          <izz>5.245896766047286e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://022_windex_bottle/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://022_windex_bottle/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://022_windex_bottle/windex_bottle.material</uri>
+            <name>windex_bottle</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
