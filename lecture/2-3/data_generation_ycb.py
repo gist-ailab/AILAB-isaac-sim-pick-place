@@ -16,6 +16,7 @@ sys.path.append(lecture_path)
 from PIL import Image
 import numpy as np
 import random
+import glob
 
 # function for save image
 def save_image(image, path):
@@ -29,6 +30,7 @@ if __name__ == "__main__":
     robot_path = os.path.join(lecture_path, 'utils/tasks/ur5e_handeye_gripper.usd')
     data_path = os.path.join(lecture_path, 'dataset/ycb')
     save_path = os.path.join(lecture_path, 'dataset/detect_img')
+    
     if not os.path.isdir(save_path):    
         os.mkdir(save_path)
         os.mkdir(os.path.join(save_path, 'train'))
@@ -40,9 +42,11 @@ if __name__ == "__main__":
         os.mkdir(os.path.join(save_path, 'train/mask'))
         os.mkdir(os.path.join(save_path, 'val/mask'))
         os.mkdir(os.path.join(save_path, 'test/mask'))
+    
     # get object list
     obj_dirs = [os.path.join(data_path, obj_name) for obj_name in os.listdir(data_path)]
     obj_dirs.sort()
+    print(obj_dirs)
     object_info = {}
     total_object_num = len(obj_dirs)
     for obj_idx, obj_dir in enumerate(obj_dirs):
@@ -52,7 +56,7 @@ if __name__ == "__main__":
             'usd_file': usd_file,
             'label': obj_idx+2, # set object label 2 ~ 
         }
-
+    print(object_info)
 
     #-----1. Initialize simulation app and import packages
     from omni.isaac.kit import SimulationApp
@@ -88,7 +92,13 @@ if __name__ == "__main__":
     stage = get_current_stage()
 
     #-----4. Simulation loop
-    i = 0
+    if os.path.isfile(os.path.join(save_path, "val/img/img0.png")):
+        list = glob.glob(os.path.join(save_path, "val/img/*.png"))
+        list.sort()
+        i = int(list[-1].split("/")[-1].replace("img","").replace(".png",""))
+    else:
+        i = 0
+        
     while simulation_app.is_running():
         
         my_world.step(render=True)
@@ -157,3 +167,6 @@ if __name__ == "__main__":
             delete_prim("/World/object"+str(l))
         my_world.reset()
         i += 1
+
+        if i==100000:
+            simulation_app.close()
