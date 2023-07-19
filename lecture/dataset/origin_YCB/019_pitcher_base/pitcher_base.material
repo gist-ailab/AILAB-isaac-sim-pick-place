@@ -1,0 +1,14 @@
+material pitcher_base
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../019_pitcher_base/google_16k/texture_map.png
+      }
+    }
+  }
+}

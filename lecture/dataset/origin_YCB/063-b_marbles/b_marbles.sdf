@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="b_marbles">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.009111904265061218 -0.04511233142812526 0.016845139796964975 2.2620880343912653 -1.3669004722572824 -1.8273345059793722</pose> 
+        <mass>2.1892524856952828e-05</mass>
+        <inertia>
+          <ixx>2.6656817093021063e-09</ixx>
+          <ixy>-1.5036612760639884e-25</ixy>
+          <ixz>-3.5822857130212086e-26</ixz>
+          <iyy>2.633036799706381e-09</iyy>
+          <iyz>-3.3695802723984133e-25</iyz>
+          <izz>2.6154036321065136e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://063-b_marbles/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://063-b_marbles/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://063-b_marbles/b_marbles.material</uri>
+            <name>b_marbles</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

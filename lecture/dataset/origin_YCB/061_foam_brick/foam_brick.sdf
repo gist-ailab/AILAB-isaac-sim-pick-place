@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="foam_brick">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.01862531574247814 0.016954877906830403 0.0246441505284604 1.207143192851523 1.5217568314045977 -0.3788712481958979</pose> 
+        <mass>0.0001849265625643083</mass>
+        <inertia>
+          <ixx>1.284387350358337e-07</ixx>
+          <ixy>-3.0844677982639514e-25</ixy>
+          <ixz>-1.4545173206009998e-23</ixz>
+          <iyy>1.252294349283672e-07</iyy>
+          <iyz>2.521655032447048e-26</iyz>
+          <izz>7.768642722539467e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://061_foam_brick/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://061_foam_brick/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://061_foam_brick/foam_brick.material</uri>
+            <name>foam_brick</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

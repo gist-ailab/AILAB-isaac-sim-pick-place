@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="potted_meat_can">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.032840352216858736 -0.02635271439745596 0.03783085009135961 -1.577430392595329 -0.010759772887280477 1.6258710123374907</pose> 
+        <mass>0.0003541315255998319</mass>
+        <inertia>
+          <ixx>4.287366513749583e-07</ixx>
+          <ixy>2.020309373055796e-23</ixy>
+          <ixz>4.823406226388371e-24</ixz>
+          <iyy>3.228086963634995e-07</iyy>
+          <iyz>5.302497140952807e-25</iyz>
+          <izz>2.4925393166117206e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://010_potted_meat_can/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://010_potted_meat_can/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://010_potted_meat_can/potted_meat_can.material</uri>
+            <name>potted_meat_can</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

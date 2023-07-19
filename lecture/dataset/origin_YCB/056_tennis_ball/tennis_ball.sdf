@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="tennis_ball">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.008233239762589124 -0.044192426304665286 0.03288662063700162 -2.981037911586889 -1.017028758597156 -2.748123242054311</pose> 
+        <mass>0.00015596837466282982</mass>
+        <inertia>
+          <ixx>6.980131429454366e-08</ixx>
+          <ixy>-1.6995308950649315e-23</ixy>
+          <ixz>6.770465303416367e-24</ixz>
+          <iyy>6.951004823297155e-08</iyy>
+          <iyz>1.2326749863795835e-24</iyz>
+          <izz>6.942650877097581e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://056_tennis_ball/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://056_tennis_ball/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://056_tennis_ball/tennis_ball.material</uri>
+            <name>tennis_ball</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

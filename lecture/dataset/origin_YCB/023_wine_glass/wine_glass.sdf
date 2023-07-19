@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="wine_glass">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.10966660596471757 0.07902287511278182 -0.003177539420683033 1.9585941557881699 -0.21114046816482884 2.3011303265091705</pose> 
+        <mass>-1.3134104103720952e-05</mass>
+        <inertia>
+          <ixx>1.580740653873737e-07</ixx>
+          <ixy>-1.6467863963864912e-23</ixy>
+          <ixz>2.2624795394964265e-23</ixz>
+          <iyy>-1.1400608831630059e-07</iyy>
+          <iyz>-1.491958862307187e-23</iyz>
+          <izz>-2.9142407793484434e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://023_wine_glass/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://023_wine_glass/tsdf/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://023_wine_glass/wine_glass.material</uri>
+            <name>wine_glass</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

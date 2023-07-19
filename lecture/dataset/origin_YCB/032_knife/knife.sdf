@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="knife">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.008445076147284661 -0.029092631283473027 0.005000385834128536 1.800228867938422 1.3472770212681349 -1.3518243250561393</pose> 
+        <mass>2.1835475900861335e-05</mass>
+        <inertia>
+          <ixx>8.208165528866138e-08</ixx>
+          <ixy>-1.8772975746620642e-23</ixy>
+          <ixz>1.2751587465994122e-24</ixz>
+          <iyy>8.190889709718924e-08</iyy>
+          <iyz>-2.7523177094884886e-26</iyz>
+          <izz>5.818794340795607e-10</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://032_knife/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://032_knife/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://032_knife/knife.material</uri>
+            <name>knife</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

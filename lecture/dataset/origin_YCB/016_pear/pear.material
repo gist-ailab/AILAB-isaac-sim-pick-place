@@ -1,0 +1,14 @@
+material pear
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../016_pear/google_16k/texture_map.png
+      }
+    }
+  }
+}

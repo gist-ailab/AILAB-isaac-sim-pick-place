@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="mug">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.018858606464151616 0.01657296231165061 0.026898852026976835 2.2183437326530093 -1.4689543656478903 -2.2505049476744663</pose> 
+        <mass>0.00013812094844812262</mass>
+        <inertia>
+          <ixx>1.7285969013124893e-07</ixx>
+          <ixy>-9.374937893675512e-24</ixy>
+          <ixz>-4.708535091401486e-24</ixz>
+          <iyy>1.350707382312927e-07</iyy>
+          <iyz>1.5713125098061972e-24</iyz>
+          <izz>1.1879517405979696e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://025_mug/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://025_mug/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://025_mug/mug.material</uri>
+            <name>mug</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

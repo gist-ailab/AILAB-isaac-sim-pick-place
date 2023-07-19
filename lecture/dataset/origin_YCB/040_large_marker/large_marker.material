@@ -1,0 +1,14 @@
+material large_marker
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../040_large_marker/google_16k/texture_map.png
+      }
+    }
+  }
+}

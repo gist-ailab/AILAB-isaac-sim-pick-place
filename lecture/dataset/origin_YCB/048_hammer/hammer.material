@@ -1,0 +1,14 @@
+material hammer
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../048_hammer/google_16k/texture_map.png
+      }
+    }
+  }
+}

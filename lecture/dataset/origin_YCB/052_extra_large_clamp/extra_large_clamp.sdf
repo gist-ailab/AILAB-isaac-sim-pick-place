@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="extra_large_clamp">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.029549933960517274 -0.03660538138997692 0.018078943770709878 1.5611908920575857 -1.5631769305230083 -1.4359341346348478</pose> 
+        <mass>0.000121829850358556</mass>
+        <inertia>
+          <ixx>4.6401630147433604e-07</ixx>
+          <ixy>3.3806645119580536e-24</ixy>
+          <ixz>-2.90586627608841e-25</ixz>
+          <iyy>3.0310433535827647e-07</iyy>
+          <iyz>1.0349855592699035e-23</iyz>
+          <izz>1.7741274845683943e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://052_extra_large_clamp/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://052_extra_large_clamp/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://052_extra_large_clamp/extra_large_clamp.material</uri>
+            <name>extra_large_clamp</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

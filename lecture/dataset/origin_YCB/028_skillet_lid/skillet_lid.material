@@ -1,0 +1,14 @@
+material skillet_lid
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../028_skillet_lid/google_16k/texture_map.png
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+material flat_screwdriver
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../044_flat_screwdriver/google_16k/texture_map.png
+      }
+    }
+  }
+}

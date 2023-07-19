@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="e_toy_airplane">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.015461052619458251 -0.007752454040306524 0.021859940254387186 3.138280811092283 -0.010403554231041707 -2.964347618856298</pose> 
+        <mass>1.8408711748142497e-05</mass>
+        <inertia>
+          <ixx>5.511554416878706e-09</ixx>
+          <ixy>-2.457648570523617e-25</ixy>
+          <ixz>-1.3976840478141475e-25</ixz>
+          <iyy>5.4688798701743145e-09</iyy>
+          <iyz>9.687865722666957e-25</iyz>
+          <izz>1.688958445105133e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://072-e_toy_airplane/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://072-e_toy_airplane/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://072-e_toy_airplane/e_toy_airplane.material</uri>
+            <name>e_toy_airplane</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,8 @@
+<KinBody name="005_tomato_soup_can">
+  <Body type="static" name="005_tomato_soup_can">
+    <Geom type="trimesh">
+      <Render>./nontextured.stl</Render>
+      <Data>./nontextured.stl</Data>
+    </Geom>
+  </Body>
+</KinBody>

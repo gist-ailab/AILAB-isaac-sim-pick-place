@@ -1,0 +1,14 @@
+material adjustable_wrench
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../042_adjustable_wrench/google_16k/texture_map.png
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="spatula">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.046581043820340895 -0.07860574843636466 0.013189187861051138 -2.331561210495197 -1.5669207168488426 2.0663800682084794</pose> 
+        <mass>6.713356277814284e-05</mass>
+        <inertia>
+          <ixx>6.479497015474891e-07</ixx>
+          <ixy>-8.232292304091934e-25</ixy>
+          <ixz>-4.203413359169892e-25</ixz>
+          <iyy>6.389283657144583e-07</iyy>
+          <iyz>5.861407371947937e-25</iyz>
+          <izz>1.503831931878906e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://033_spatula/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://033_spatula/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://033_spatula/spatula.material</uri>
+            <name>spatula</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,8 @@
+<KinBody name="059_chain">
+  <Body type="static" name="059_chain">
+    <Geom type="trimesh">
+      <Render>./nontextured.stl</Render>
+      <Data>./nontextured.stl</Data>
+    </Geom>
+  </Body>
+</KinBody>

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="pear">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.032542733786051076 0.011075535445138571 0.030040521498604082 -1.1010518511194665 -0.742350689270459 2.744636464079532</pose> 
+        <mass>0.000192218040717369</mass>
+        <inertia>
+          <ixx>1.3071135406056031e-07</ixx>
+          <ixy>-5.0643641478648837e-23</ixy>
+          <ixz>-2.006411797503363e-24</ixz>
+          <iyy>1.280852023276797e-07</iyy>
+          <iyz>2.0107411295203735e-24</iyz>
+          <izz>7.720902655923692e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://016_pear/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://016_pear/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://016_pear/pear.material</uri>
+            <name>pear</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

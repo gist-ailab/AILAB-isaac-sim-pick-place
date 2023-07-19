@@ -1,0 +1,14 @@
+material tomato_soup_can
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../005_tomato_soup_can/google_16k/texture_map.png
+      }
+    }
+  }
+}

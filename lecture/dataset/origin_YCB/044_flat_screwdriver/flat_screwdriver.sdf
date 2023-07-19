@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="flat_screwdriver">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.023228351441964463 -0.02270556071884342 0.016179821688211804 -1.685465166296971 -1.2285699396955838 0.9119711789659977</pose> 
+        <mass>7.621626182656017e-05</mass>
+        <inertia>
+          <ixx>1.0455872762990073e-07</ixx>
+          <ixy>-1.2978673122254933e-23</ixy>
+          <ixz>-7.690434192648382e-24</ixz>
+          <iyy>1.045355134114841e-07</iyy>
+          <iyz>-8.454789472824443e-24</iyz>
+          <izz>8.5096611833145e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://044_flat_screwdriver/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://044_flat_screwdriver/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://044_flat_screwdriver/flat_screwdriver.material</uri>
+            <name>flat_screwdriver</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,14 @@
+material orange
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../017_orange/google_16k/texture_map.png
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="bowl">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.014272485683301438 -0.045728422080814235 0.026772347862895073 -2.626737890129878 -1.5492925649828464 1.5480864653340547</pose> 
+        <mass>3.335824015809766e-05</mass>
+        <inertia>
+          <ixx>1.3112180307477242e-07</ixx>
+          <ixy>-5.908389121786052e-25</ixy>
+          <ixz>6.692686523374115e-25</ixz>
+          <iyy>7.919484753160423e-08</iyy>
+          <iyz>-1.6708279366247233e-23</iyz>
+          <izz>7.620043698791454e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://024_bowl/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://024_bowl/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://024_bowl/bowl.material</uri>
+            <name>bowl</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

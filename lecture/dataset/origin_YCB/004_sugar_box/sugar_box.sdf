@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="sugar_box">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.007698415494577894 -0.017078163162294522 0.08602381422432334 -3.126326294796978 0.04012657164807798 3.103110966594215</pose> 
+        <mass>0.000637932730363638</mass>
+        <inertia>
+          <ixx>2.0142733073790606e-06</ixx>
+          <ixy>-4.354424043103993e-24</ixy>
+          <ixz>3.5002256818446126e-22</ixz>
+          <iyy>1.6869117109553225e-06</iyy>
+          <iyz>-4.373961869820827e-22</iyz>
+          <izz>5.036834967526003e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://004_sugar_box/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://004_sugar_box/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://004_sugar_box/sugar_box.material</uri>
+            <name>sugar_box</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="rubiks_cube">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.016219049878342388 -0.00048529056442859776 0.028589928178413302 2.3648333321941553 -0.1647337210077352 -2.669285494835177</pose> 
+        <mass>0.00018287731685751214</mass>
+        <inertia>
+          <ixx>9.85204038073643e-08</ixx>
+          <ixy>8.061824208102976e-24</ixy>
+          <ixz>-2.097640522420731e-24</ixz>
+          <iyy>9.833577391876143e-08</iyy>
+          <iyz>2.1321925661475815e-23</iyz>
+          <izz>9.818197457535545e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://077_rubiks_cube/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://077_rubiks_cube/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://077_rubiks_cube/rubiks_cube.material</uri>
+            <name>rubiks_cube</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

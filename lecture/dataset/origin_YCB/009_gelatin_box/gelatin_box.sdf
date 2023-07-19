@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="gelatin_box">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.02267551794293906 -0.007860203252540228 0.013877966045089096 -0.3812962283595558 -1.5653302217381688 -0.961483610330872</pose> 
+        <mass>0.0001730558194301085</mass>
+        <inertia>
+          <ixx>1.808808464126736e-07</ixx>
+          <ixy>-1.4602785412432844e-25</ixy>
+          <ixz>1.5848748448179987e-24</ixz>
+          <iyy>1.1880213011661255e-07</iyy>
+          <iyz>1.531563919376384e-23</iyz>
+          <izz>8.422039755656733e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://009_gelatin_box/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://009_gelatin_box/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://009_gelatin_box/gelatin_box.material</uri>
+            <name>gelatin_box</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

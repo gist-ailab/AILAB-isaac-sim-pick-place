@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="tomato_soup_can">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.009342099371394881 0.08422424437662782 0.05002583293554274 3.1365990876951546 0.00247077853043403 -1.5170937431765652</pose> 
+        <mass>0.00031936054545834833</mass>
+        <inertia>
+          <ixx>3.227283942943359e-07</ixx>
+          <ixy>-2.4896883315980456e-24</ixy>
+          <ixz>-1.0104684087327481e-22</ixz>
+          <iyy>3.202048833647145e-07</iyy>
+          <iyz>1.148110875858897e-23</iyz>
+          <izz>1.7554012836758343e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://005_tomato_soup_can/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://005_tomato_soup_can/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://005_tomato_soup_can/tomato_soup_can.material</uri>
+            <name>tomato_soup_can</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

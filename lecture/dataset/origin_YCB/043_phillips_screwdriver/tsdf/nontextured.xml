@@ -1,0 +1,8 @@
+<KinBody name="043_phillips_screwdriver">
+  <Body type="static" name="043_phillips_screwdriver">
+    <Geom type="trimesh">
+      <Render>./nontextured.stl</Render>
+      <Data>./nontextured.stl</Data>
+    </Geom>
+  </Body>
+</KinBody>

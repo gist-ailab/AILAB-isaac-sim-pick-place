@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="cracker_box">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.01485355781018036 -0.01420505447388014 0.10220486833098277 3.1335923663863205 0.010946297886107008 3.140976285001705</pose> 
+        <mass>0.0021732875685518717</mass>
+        <inertia>
+          <ixx>1.2667764335249046e-05</ixx>
+          <ixy>-1.729536435737038e-24</ixy>
+          <ixz>2.9969843650251416e-23</ixz>
+          <iyy>8.895223860935137e-06</iyy>
+          <iyz>-6.726307907846409e-22</iyz>
+          <izz>5.284067250610004e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://003_cracker_box/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://003_cracker_box/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://003_cracker_box/cracker_box.material</uri>
+            <name>cracker_box</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="e_cups">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.019152019112154205 -0.07367966947628142 0.030395630482407465 2.889324395039541 0.8389994336872635 -2.073327084841485</pose> 
+        <mass>4.532431815174534e-05</mass>
+        <inertia>
+          <ixx>4.15993721671486e-08</ixx>
+          <ixy>-2.537525515179568e-24</ixy>
+          <ixz>-1.486179286854304e-23</ixz>
+          <iyy>3.8396501136901025e-08</iyy>
+          <iyz>6.381829628351963e-24</iyz>
+          <izz>3.71999229534547e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://065-e_cups/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://065-e_cups/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://065-e_cups/e_cups.material</uri>
+            <name>e_cups</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

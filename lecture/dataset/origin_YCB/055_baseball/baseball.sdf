@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="baseball">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.009947985025210358 -0.04811623557140466 0.03592664752018525 -0.18362772655473586 -0.6241102896769392 -1.492658442479467</pose> 
+        <mass>0.00020274709259390355</mass>
+        <inertia>
+          <ixx>1.0826522744418533e-07</ixx>
+          <ixy>4.198136603109624e-24</ixy>
+          <ixz>-2.8724905993778676e-23</ixz>
+          <iyy>1.0766425403851136e-07</iyy>
+          <iyz>3.349964655893214e-24</iyz>
+          <izz>1.0729927220622785e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://055_baseball/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://055_baseball/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://055_baseball/baseball.material</uri>
+            <name>baseball</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
