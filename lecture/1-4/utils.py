@@ -15,29 +15,6 @@ import torchvision.transforms.functional as FT
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-classes = [
-    "aeroplane",
-    "bicycle",
-    "bird",
-    "boat",
-    "bottle",
-    "bus",
-    "car",
-    "cat",
-    "chair",
-    "cow",
-    "diningtable",
-    "dog",
-    "horse",
-    "motorbike",
-    "person",
-    "pottedplant",
-    "sheep",
-    "sofa",
-    "train",
-    "tvmonitor"
-]
-
 class SmoothedValue:
     """Track a series of values and provide access to smoothed values over a
     window or the global series average.
