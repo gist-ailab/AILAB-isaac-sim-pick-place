@@ -51,9 +51,10 @@ def get_model_instance_segmentation(num_classes):
 if __name__=="__main__":
     # set paths
     data_root = os.path.join(lecture_path, 'dataset/detect_img')
-    test_img_path = os.path.join(lecture_path, 'result/img')
     test_ckp_path = os.path.join(lecture_path, 'result/ckp')
     
+    if not os.path.isdir(test_ckp_path):
+        os.mkdir(test_ckp_path)
     # train on the GPU or on the CPU, if a GPU is not available
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print("Train device: ", device)
@@ -63,6 +64,7 @@ if __name__=="__main__":
         root=os.path.join(data_root, 'train'),
         transforms=get_transform(train=True))
     print("Train dataset: ", len(train_dataset))
+    
     test_dataset = YCBDataset(
         root=os.path.join(data_root, 'val'),
         transforms=get_transform(train=False))
@@ -101,8 +103,7 @@ if __name__=="__main__":
     for epoch in range(num_epochs):
         # train for one epoch, printing every 10 iterations
         train_one_epoch(model, optimizer, train_data_loader, device, epoch, print_freq=10)
-        if epoch % 5 == 4:
-            torch.save(model.state_dict(), os.path.join(test_ckp_path, 'model_{}.pth'.format(epoch)))
+        torch.save(model.state_dict(), os.path.join(test_ckp_path, 'model_{}.pth'.format(epoch)))
         # update the learning rate
         lr_scheduler.step()
         # evaluate on the test dataset

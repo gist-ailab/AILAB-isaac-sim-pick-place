@@ -9,6 +9,7 @@
 
 # python path setting
 from custom_dataset import *
+from train_model import *
 
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
 sys.path.append(lecture_path)
@@ -17,7 +18,6 @@ sys.path.append(lecture_path)
 from PIL import Image, ImageDraw
 
 import torch
-import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 
@@ -38,44 +38,24 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
     }
 label2name = {object_info[obj_idx]['label']: object_info[obj_idx]['name'] for obj_idx in object_info.keys()}
 
-# custom dataset class
-
-#-----2. model -----#
-# function for getting model
-# https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
-def get_model_instance_segmentation(num_classes):
-    # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.maskrcnn_resnet50_fpn(weights="DEFAULT")
-
-    # get number of input features for the classifier
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    # replace the pre-trained head with a new one
-    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-
-    # now get the number of input features for the mask classifier
-    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-    hidden_layer = 256
-    # and replace the mask predictor with a new one
-    model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
-                                                       hidden_layer,
-                                                       num_classes)
-
-    return model
-
 #-----3. inference -----#
 if __name__ == "__main__":
     # set paths
     data_root = os.path.join(lecture_path, 'dataset/detect_img')
+    test_img_path = os.path.join(lecture_path, 'result/img')
     test_ckp_path = os.path.join(lecture_path, 'result/ckp')
+    
+    if not os.path.isdir(test_img_path):
+        os.mkdir(test_img_path)
 
     # set device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     # load trained model
-    num_classes = 90
+    num_classes = 43
     model = get_model_instance_segmentation(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, '99.pth')
+    ckp_path = os.path.join(test_ckp_path, '100.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset
@@ -94,7 +74,7 @@ if __name__ == "__main__":
     
     # save inference result
     org_img = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
-    org_img.save("original_image.jpg")
+    org_img.save(os.path.join(test_img_path, "org_img.jpg"))
     
     # draw bbox
     draw = ImageDraw.Draw(org_img)
@@ -108,7 +88,7 @@ if __name__ == "__main__":
             predict_label = prediction[0]['labels'][i]
             draw.multiline_text((list(prediction[0]['boxes'][i])), text = label2name[predict_label])
             draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
-    org_img.save("visualize_bbox.jpg")
+    org_img.save(os.path.join(test_img_path, "visualize_bbox.jpg"))
     
     labels = prediction[0]['labels']
     for i in labels:
