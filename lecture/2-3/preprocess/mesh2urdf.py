@@ -1,23 +1,70 @@
 import os
 import trimesh
 import sys
-
+from natsort import natsorted
+from tqdm import tqdm
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))) # path to lecture
 sys.path.append(lecture_path)
-from file_utils import *
-
-from preprocess_utils import DataProcessing
 
 from object2urdf import ObjectUrdfBuilder
 
-from pathlib import Path
-sys.path.append(str(Path().absolute()))
 
+def get_file_list(path):
+    file_list = [join(path, f) for f in listdir(path) if isfile(join(path, f))]
+    
+    return file_list
+
+
+def get_YCB_mesh(data_root, texture=False):
+    """get YCB raw mesh from data_root
+    Args:
+            data_root (str): [ycb dataset root]
+            looks like >>>
+            ycb-tools/models/ycb # data root
+            ├── 001_chips_can
+            ├── 002_master_chef_can
+            ├── ...
+            ├── 076_timer
+            └── 077_rubiks_cube
+            
+            texture (bool): get ycb mesh with texture(*.dae)
+            *but cannot convert to point cloud
+    
+    Returns:
+            meta_info (dict): dict(object name, path to mesh file) for All google_16k mesh
+            
+    """
+    data_info = {}
+    ycb_list = [os.path.join(data_root, p) for p in os.listdir(data_root)]
+    ycb_sorted_list = natsorted(ycb_list)
+    for target_ycb_folder in tqdm(ycb_sorted_list):
+        target_name = target_ycb_folder.split('/')[-1]
+        target_name = target_name.replace("-", "_")
+        
+        # google_16k has high quality
+        if "google_16k" in os.listdir(target_ycb_folder):
+            pass
+        else:
+            continue
+
+        if not texture:
+            mesh_file = os.path.join(target_ycb_folder, "google_16k", "nontextured.ply")
+        else:
+            mesh_file = os.path.join(target_ycb_folder, "google_16k", "textured.obj")
+        data_info[target_name] = mesh_file
+    
+    meta_info = {}
+    meta_idx = 0
+    for target_name, mesh_file in data_info.items():
+        meta_info[target_name] = [meta_idx, mesh_file]
+        meta_idx += 1
+    
+    return meta_info
 
 def preprocess_ycb(data_root, save_root):
     os.makedirs(save_root, exist_ok=True)
     
-    mesh_info = DataProcessing.get_YCB_mesh(data_root, texture=True)
+    mesh_info = get_YCB_mesh(data_root, texture=True)
 
     for obj_name, v in mesh_info.items(): 
         obj_dir = os.path.join(save_root, obj_name)
@@ -88,7 +135,7 @@ def obj2urdf(root):
 if __name__ == "__main__":
     data_root = os.path.join(lecture_path, "dataset/origin_YCB")
     save_root = os.path.join(lecture_path, "dataset/test")
-    if not os.path.isdir(save_path):    
-        os.mkdir(save_path)
+    if not os.path.isdir(save_root):    
+        os.mkdir(save_root)
 
     preprocess_ycb(data_root=data_root, save_root=save_root)

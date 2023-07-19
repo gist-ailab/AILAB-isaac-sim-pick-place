@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     #-----1. Initialize simulation app and import packages
     from omni.isaac.kit import SimulationApp
-    simulation_app = SimulationApp({"headless": False})
+    simulation_app = SimulationApp({"headless": True})
 
     from omni.isaac.core import World
     from omni.isaac.core.utils.semantics import add_update_semantics
@@ -168,5 +168,5 @@ if __name__ == "__main__":
         my_world.reset()
         i += 1
 
-        if i==100000:
+        if i==1000000:
             simulation_app.close()
