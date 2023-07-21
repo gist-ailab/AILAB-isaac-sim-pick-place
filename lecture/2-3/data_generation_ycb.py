@@ -57,7 +57,7 @@ if __name__ == "__main__":
             'label': obj_idx+2, # set object label 2 ~ 
         }
     print(object_info)
-
+    
     #-----1. Initialize simulation app and import packages
     from omni.isaac.kit import SimulationApp
     simulation_app = SimulationApp({"headless": True})
