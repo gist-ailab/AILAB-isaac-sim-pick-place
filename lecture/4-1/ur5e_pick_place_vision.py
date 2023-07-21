@@ -19,7 +19,7 @@ from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
 from detection import get_model_instance_segmentation
-from correct_radial_distortion import depth_image_from_distance_image
+from depth_to_distance import depth_image_from_distance_image
 import numpy as np
 import os
 from PIL import Image, ImageDraw
@@ -27,7 +27,6 @@ import glob
 import random
 import torch
 from pathlib import Path
-
 
 from utils.tasks.pick_place_vision_task import UR5ePickPlace
 import coco.transforms as T
@@ -128,7 +127,7 @@ for theta in range(0, 360, 45):
         if my_world.is_playing():
             if my_world.current_time_step_index == 0:
                 my_world.reset()
-                my_controller.reset()
+                my_controller2.reset()
                     
             if gui_test.use_custom_updated:
                 observations = my_world.get_observations()
@@ -202,7 +201,6 @@ while simulation_app.is_running():
             my_world.reset()
             my_controller.reset()
         
-        
         observations = my_world.get_observations()              
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
@@ -214,6 +212,5 @@ while simulation_app.is_running():
         if my_controller.is_done():
             print("done picking and placing")
         articulation_controller.apply_action(actions)
-
 
 simulation_app.close()
