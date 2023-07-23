@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="chips_can">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.004935076789853457 0.012018813662666437 0.1233055043572925 3.1366784929366305 -5.2102373995591675e-05 1.9138462724181036</pose> 
+        <mass>0.0010817455855551142</mass>
+        <inertia>
+          <ixx>5.5349800451895955e-06</ixx>
+          <ixy>-6.3834715122061815e-22</ixy>
+          <ixz>-5.925324700153715e-22</ixz>
+          <iyy>5.508049224129916e-06</iyy>
+          <iyz>-1.0164283364776184e-21</iyz>
+          <izz>7.848117618937134e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://001_chips_can/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://001_chips_can/tsdf/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://001_chips_can/chips_can.material</uri>
+            <name>chips_can</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

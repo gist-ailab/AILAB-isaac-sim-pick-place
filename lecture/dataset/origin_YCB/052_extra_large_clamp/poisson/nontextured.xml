@@ -1,0 +1,8 @@
+<KinBody name="052_extra_large_clamp">
+  <Body type="static" name="052_extra_large_clamp">
+    <Geom type="trimesh">
+      <Render>./nontextured.stl</Render>
+      <Data>./nontextured.stl</Data>
+    </Geom>
+  </Body>
+</KinBody>

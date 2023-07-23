@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="dice">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.011207378509108022 0.00916334296155129 0.008407354793330487 -3.1051126373170956 -0.007934211730368929 1.3499916882079805</pose> 
+        <mass>4.312016842944167e-06</mass>
+        <inertia>
+          <ixx>1.8875564466856381e-10</ixx>
+          <ixy>-1.8308736823085508e-26</ixy>
+          <ixz>7.228727027785468e-26</ixz>
+          <iyy>1.8750567156962893e-10</iyy>
+          <iyz>-1.2087212358535085e-26</iyz>
+          <izz>1.7750670628379938e-10</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://062_dice/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://062_dice/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://062_dice/dice.material</uri>
+            <name>dice</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

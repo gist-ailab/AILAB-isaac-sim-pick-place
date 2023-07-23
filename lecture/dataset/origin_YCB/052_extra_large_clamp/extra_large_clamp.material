@@ -1,0 +1,14 @@
+material extra_large_clamp
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../052_extra_large_clamp/google_16k/texture_map.png
+      }
+    }
+  }
+}

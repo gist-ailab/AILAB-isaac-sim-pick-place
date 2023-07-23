@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="padlock">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.01707606691752894 0.00951738900221132 0.013626341524550546 2.927745012705898 -1.464562414265733 -3.127383472304368</pose> 
+        <mass>4.57020034268325e-05</mass>
+        <inertia>
+          <ixx>1.548488478544847e-08</ixx>
+          <ixy>2.8991985493440624e-24</ixy>
+          <ixz>-3.6896049559677124e-25</ixz>
+          <iyy>1.1426254423194741e-08</iyy>
+          <iyz>2.487050850367256e-25</iyz>
+          <izz>8.409682265277153e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://038_padlock/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://038_padlock/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://038_padlock/padlock.material</uri>
+            <name>padlock</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

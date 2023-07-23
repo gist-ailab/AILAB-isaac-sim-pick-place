@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="fork">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>0.008499561933269988 -0.021533112701872234 0.00670927433639299 1.6796656782873078 1.4455254973975005 -1.4638096901156632</pose> 
+        <mass>1.9601593273736498e-05</mass>
+        <inertia>
+          <ixx>4.7220439312838285e-08</ixx>
+          <ixy>-1.9229895271088358e-23</ixy>
+          <ixz>1.8779475393844756e-26</ixz>
+          <iyy>4.692445702053864e-08</iyy>
+          <iyz>5.699761622758414e-26</iyz>
+          <izz>6.556117942788107e-10</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://030_fork/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://030_fork/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://030_fork/fork.material</uri>
+            <name>fork</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="timer">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.008380210128086773 -0.01007806111086999 0.02309571069525015 1.6556263749894993 -1.4306219623776586 0.8011890136695218</pose> 
+        <mass>0.00022408566973574842</mass>
+        <inertia>
+          <ixx>2.742812455801343e-07</ixx>
+          <ixy>-2.6166007574881648e-23</ixy>
+          <ixz>1.6494164251839826e-23</ixz>
+          <iyy>1.595269665450607e-07</iyy>
+          <iyz>-3.978628266447819e-23</iyz>
+          <izz>1.3453376377096777e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://076_timer/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://076_timer/tsdf/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://076_timer/timer.material</uri>
+            <name>timer</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

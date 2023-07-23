@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="mini_soccer_ball">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.0059125914007175946 0.011530561800764411 0.06131555334762107 2.9532979512498687 0.7287431133262762 -2.1174877715257945</pose> 
+        <mass>0.0010465229343801772</mass>
+        <inertia>
+          <ixx>1.709206540462109e-06</ixx>
+          <ixy>2.9727771330438613e-22</ixy>
+          <ixz>-7.894662980534025e-23</ixz>
+          <iyy>1.6540960125901477e-06</iyy>
+          <iyz>-2.0899168628226547e-23</iyz>
+          <izz>1.6272467028315052e-06</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://053_mini_soccer_ball/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://053_mini_soccer_ball/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://053_mini_soccer_ball/mini_soccer_ball.material</uri>
+            <name>mini_soccer_ball</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="racquetball">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.009071044745210352 -0.12221649947970037 0.027571138362930195 1.0005117249207889 -1.1435365117103407 -2.4792474679428795</pose> 
+        <mass>9.106106830055334e-05</mass>
+        <inertia>
+          <ixx>2.8447206279737716e-08</ixx>
+          <ixy>-5.508452406312775e-25</ixy>
+          <ixz>2.290493547830896e-24</ixz>
+          <iyy>2.8427175241761365e-08</iyy>
+          <iyz>8.1849317855651595e-25</iyz>
+          <izz>2.8244091340000326e-08</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://057_racquetball/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://057_racquetball/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://057_racquetball/racquetball.material</uri>
+            <name>racquetball</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

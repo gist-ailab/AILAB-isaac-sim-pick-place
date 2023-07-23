@@ -1,0 +1,14 @@
+material phillips_screwdriver
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../043_phillips_screwdriver/google_16k/texture_map.png
+      }
+    }
+  }
+}

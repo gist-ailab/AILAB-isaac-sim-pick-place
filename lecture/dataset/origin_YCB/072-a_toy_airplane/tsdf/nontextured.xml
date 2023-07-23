@@ -1,0 +1,8 @@
+<KinBody name="072-a_toy_airplane">
+  <Body type="static" name="072-a_toy_airplane">
+    <Geom type="trimesh">
+      <Render>./nontextured.stl</Render>
+      <Data>./nontextured.stl</Data>
+    </Geom>
+  </Body>
+</KinBody>

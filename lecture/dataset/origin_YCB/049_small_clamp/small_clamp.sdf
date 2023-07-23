@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="small_clamp">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-1.1070945568674613 3.2370770157897395 -12.94687207407937 0.14912420545023877 0.21129167682747305 -0.620799371874961</pose> 
+        <mass>-9.654198206426395e-09</mass>
+        <inertia>
+          <ixx>1.7346459918652701e-06</ixx>
+          <ixy>-1.3965905855807586e-24</ixy>
+          <ixz>-1.1178497375140554e-22</ixz>
+          <iyy>1.7326213308860918e-06</iyy>
+          <iyz>4.157149342037405e-22</iyz>
+          <izz>-1.4260117570467074e-09</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://049_small_clamp/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://049_small_clamp/tsdf/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://049_small_clamp/small_clamp.material</uri>
+            <name>small_clamp</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

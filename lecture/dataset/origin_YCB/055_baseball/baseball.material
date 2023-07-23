@@ -1,0 +1,14 @@
+material baseball
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../055_baseball/google_16k/texture_map.png
+      }
+    }
+  }
+}

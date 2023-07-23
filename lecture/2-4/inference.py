@@ -1,74 +1,104 @@
+# ---- ---- ---- ----
+# GIST-AILAB, 2023 summer school
+# Day2. 
+# 2-4.3 Inference Trained Detection
+# reference: https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
+# ---- ---- ---- ----
+
+#-----0. preliminary -----#
+
+# python path setting
 import os
-import numpy as np
-import torch
-from PIL import Image, ImageDraw
 import sys
+lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
+sys.path.append(lecture_path)
 
-sys.path.append("/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture")
+# import packages
+from PIL import Image, ImageDraw
 
-import glob
+import torch
+
 import random
-import argparse
 
-from detection import YCBDataset, get_model_instance_segmentation, get_transform
+from custom_dataset import *
+from train_model import *
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--model_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/detect_pth/",
-    help="data usd directory",
-)
-parser.add_argument(
-    "--img_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/detect_img/",
-    help="img save path directory",
-)
-parser.add_argument(
-    "--data_path",
-    type=str,
-    default="/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture/dataset/ycb",
-    help="data usd directory",
-)
-args = parser.parse_args()
+# get object list
+ycb_path = os.path.join(lecture_path, 'dataset/ycb')
+obj_dirs = [os.path.join(ycb_path, obj_name) for obj_name in os.listdir(ycb_path)]
+obj_dirs.sort()
+object_info = {}
+label2name = {}
+total_object_num = len(obj_dirs)
+for obj_idx, obj_dir in enumerate(obj_dirs):
+    usd_file = os.path.join(obj_dir, 'final.usd')
+    object_info[obj_idx] = {
+        'name': os.path.basename(obj_dir),
+        'usd_file': usd_file,
+        'label': obj_idx, # set object label 2 ~ 
+    }
+    label2name[obj_idx]=os.path.basename(obj_dir)
+print(label2name)
+    
+# label2name = {object_info[obj_idx]['label']: object_info[obj_idx]['name'] for obj_idx in object_info.keys()
 
-def main():
+#-----3. inference -----#
+if __name__ == "__main__":
+    # set paths
+    data_root = os.path.join(lecture_path, 'dataset/detect_img')
+    test_img_path = os.path.join(lecture_path, 'result/img')
+    test_ckp_path = os.path.join(lecture_path, 'result/ckp')
+    
+    if not os.path.isdir(test_img_path):
+        os.mkdir(test_img_path)
+
+    # set device
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+    # load trained model
     num_classes = 43
-    model = get_model_instance_segmentation(num_classes)
+    model = get_model_object_detection(num_classes)
     model.to(device)
-    model.load_state_dict(torch.load(args.model_path+"/9.pth"))
+    ckp_path = os.path.join(test_ckp_path, 'model_99.pth')
+    model.load_state_dict(torch.load(ckp_path))
     model.eval()
+    # load test dataset
+    test_dataset = YCBDataset(
+        root=os.path.join(data_root, 'test'),
+        transforms=get_transform(train=False))
+    print("Test dataset: ", len(test_dataset))
     
-    dataset_test = YCBDataset(args.img_path+'train', get_transform(train=False))
-    a = random.randint(0,len(dataset_test)-1)
-    
-    img, _ = dataset_test[a]
-    
+    # get random sample from test dataset
+    random_idx = random.randint(0,len(test_dataset)-1)
+    img, trg = test_dataset[random_idx]
+
+    # inference
     with torch.no_grad():
         prediction = model([img.to(device)])
-    # save_origin image
-    img1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
-    img1.save("img.jpg")
-    # draw bbox
-    draw = ImageDraw.Draw(img1)
-    objects = glob.glob(args.data_path+"/*/*.usd")
-    # print(objects)
-    # print((prediction[0]['labels']))
-    # print((prediction[0]))
-    for i in range(len(list(prediction[0]['boxes']))):
-        if prediction[0]['scores'][i]>0.5:
-            print(prediction[0]['boxes'][i])
-            draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
-            draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
-    img1.save("bbox.jpg")
-    labels = prediction[0]['labels']
+    print(trg)
+    # save inference result
+    org_img = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
+    org_img.save(os.path.join(test_img_path, "org_img.jpg"))
     
+    # draw bbox
+    draw = ImageDraw.Draw(org_img)
+    # objects = glob.glob(ycb_path + "/*/*.usd")
+    # print(objects)
+    
+    print((prediction[0]['labels']))
+    print((prediction[0]))
+    prediction[0]['labels']=prediction[0]['labels'].cpu().detach().numpy()
+    
+    for i in range(len(list(prediction[0]['boxes']))):
+        if prediction[0]['scores'][i]>0.9:
+            print(prediction[0]['boxes'][i])
+            predict_label = prediction[0]['labels'][i]
+            draw.multiline_text((list(prediction[0]['boxes'][i])), text = label2name[predict_label])
+            draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
+    org_img.save(os.path.join(test_img_path, "visualize_bbox.jpg"))
+    
+    labels = prediction[0]['labels']
     for i in labels:
-        print(objects[i-2].split("/")[-2])
+        print(i,label2name[i])
     # print(objects)
     print("That's it!")
-    
-if __name__ == "__main__":
-    main()

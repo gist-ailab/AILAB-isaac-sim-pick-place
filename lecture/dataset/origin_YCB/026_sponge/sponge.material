@@ -1,0 +1,14 @@
+material sponge
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../026_sponge/google_16k/texture_map.png
+      }
+    }
+  }
+}

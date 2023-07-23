@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="nine_hole_peg_test">
+    <static>false</static>
+    <link name="link">
+      <inertial>       
+        <pose>-0.000188539225942058 0.024373721273276618 0.019952866039031774 -0.573192054832987 -1.5682548118819548 -1.2142461506381574</pose> 
+        <mass>0.0006265859969762233</mass>
+        <inertia>
+          <ixx>1.6556355079461083e-06</ixx>
+          <ixy>-4.446166175621472e-24</ixy>
+          <ixz>-5.0692044608912555e-24</ixz>
+          <iyy>9.576057723576261e-07</iyy>
+          <iyz>1.6308372078768095e-23</iyz>
+          <izz>8.65277925286308e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <!-- Use a downsampled mesh for collisions -->
+            <uri>model://071_nine_hole_peg_test/downsampled.obj</uri>
+	        </mesh>
+        </geometry>
+        <surface>
+        <!--<friction>
+          <ode>
+            <mu>0.8</mu>
+            <mu2>0.6</mu2>
+          </ode>
+        </friction>-->
+      </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://071_nine_hole_peg_test/google_16k/textured.obj</uri>
+	        </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://071_nine_hole_peg_test/nine_hole_peg_test.material</uri>
+            <name>nine_hole_peg_test</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,14 @@
+material wood_block
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../036_wood_block/google_16k/texture_map.png
+      }
+    }
+  }
+}

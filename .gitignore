@@ -1,6 +1,5 @@
 gqcnn/
 Pytorch-GQCNN/
-data/
 ur5_robotiq_2f140.usd
 ur5.usd
 ycb_usd/*

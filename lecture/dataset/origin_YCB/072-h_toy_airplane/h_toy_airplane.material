@@ -1,0 +1,14 @@
+material h_toy_airplane
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        // Relative to the location of the material script
+        texture ../072-h_toy_airplane/tsdf/textured.png
+      }
+    }
+  }
+}
