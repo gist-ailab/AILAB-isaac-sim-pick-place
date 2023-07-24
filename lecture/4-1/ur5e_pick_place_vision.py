@@ -18,12 +18,13 @@ sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
 from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
-from detection import get_model_instance_segmentation
+from train_model import get_model_object_detection
 from depth_to_distance import depth_image_from_distance_image
+
 import numpy as np
 import os
 from PIL import Image, ImageDraw
-import glob
+import matplotlib.pyplot as plt
 import random
 import torch
 from pathlib import Path
@@ -55,9 +56,25 @@ gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
 # get ycb directories to sys.path
 working_dir = os.path.dirname(os.path.realpath(__file__))
-objects_path = os.path.join(Path(working_dir).parent, "dataset/ycb/*/*.usd")
-objects = glob.glob(objects_path)
-objects_list = random.sample(objects, 3)
+ycb_path = os.path.join(Path(working_dir).parent, 'dataset/ycb')
+obj_dirs = [os.path.join(ycb_path, obj_name) for obj_name in os.listdir(ycb_path)]
+obj_dirs.sort()
+object_info = {}
+label2name = {}
+total_object_num = len(obj_dirs)
+for obj_idx, obj_dir in enumerate(obj_dirs):
+    usd_file = os.path.join(obj_dir, 'final.usd')
+    object_info[obj_idx] = {
+        'name': os.path.basename(obj_dir),
+        'usd_file': usd_file,
+        'label': obj_idx, # set object label 2 ~ 
+    }
+    label2name[obj_idx]=os.path.basename(obj_dir)
+
+objects_list = random.sample(list(object_info.values()), 3)
+objects_usd_list = []
+for obj_info in objects_list:
+    objects_usd_list.append(obj_info['usd_file'])
 
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([[0.5, 0.2, 0.1],
@@ -68,7 +85,7 @@ target_position = np.array([0.4, -0.33, 0.55])  # 0.55 for considering the lengt
 target_orientation = np.array([0, 0, 0, 1])
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = UR5ePickPlace(objects_list = objects_list,
+my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
                         offset=offset)  # releasing offset at the target position
 
@@ -98,10 +115,10 @@ articulation_controller = my_ur5.get_articulation_controller()
 ##########detection model load##############
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-num_classes = 90
-model = get_model_instance_segmentation(num_classes)
+num_classes = 43
+model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/99.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
 model.eval()
 
 transforms = []
@@ -119,7 +136,7 @@ r, theta, z = 4, 0, 0.3
 found_obj = False
 print('reach-target')
 for i in range(len(objects_list)):
-    print("object_{}: {}".format(i, objects_list[i].split('/')[-2]))
+    print("object_{}: {}".format(i, objects_list[i]['name']))
 for theta in range(0, 360, 45):
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
     while simulation_app.is_running():
@@ -146,35 +163,47 @@ for theta in range(0, 360, 45):
                     image, _ = transforms(image=image, target=None)
                     with torch.no_grad():
                         prediction = model([image.to(device)])
-                    labels = prediction[0]['labels']
+                    prediction[0]['labels']=prediction[0]['labels'].cpu().detach().numpy()
                     labels_name = []
-                    for i in range(len(list(prediction[0]['boxes'][:3]))):
-                        print((prediction[0]['labels'][i]-2))
-                        labels_name.append(objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
+                    scores = []
+                    for i in range(len(list(prediction[0]['boxes']))):
+                        if prediction[0]['scores'][i]>0.9:
+                            predict_label = prediction[0]['labels'][i]
+                            labels_name.append(label2name[predict_label])
+                        scores.append(prediction[0]['scores'][i])
                     
-                    
-                    # target = labels_name[0]
-                    target = objects_list[int(gui_test.current_target.split('_')[-1])].split('/')[-2]
+                    target = objects_list[int(gui_test.current_target.split('_')[-1])]['name']
                     
                     if target in labels_name:
-                        index = labels_name.index(target)
-                        print(index)
-
+                        found_obj = True
+                        labels_name = np.array(labels_name)
+                        indexes = np.where(labels_name == target)
+                    
                         #######draw bbox in image############
                         image = Image.fromarray(image.mul(255).permute(1, 2, 0).byte().numpy())
                         draw = ImageDraw.Draw(image)
                         for i in range(len(list(prediction[0]['boxes']))):
                             if prediction[0]['scores'][i]>0.9:
-                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = objects[(prediction[0]['labels'][i]-2)].split("/")[-2])
-                                draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=3)
-                        image.show()
+                                predict_label = prediction[0]['labels'][i]
+                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = label2name[predict_label])
+                                draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=5)
+                        image = np.array(image)
+                        plt.imshow(image)
+                        plt.show()
                                         
                         #########inference ggcnn##############3
                         camera_intrinsics = camera.get_intrinsics_matrix()
                         depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         
+                        target_scores = []
+                        for index in indexes:
+                            target_scores.append(scores[index[0]])
+                        max_score = max(target_scores)
+                        idx = scores.index(max_score)
+                        bbox = prediction[0]['boxes'][idx]
+                        
                         ggcnn_angle, length, width, center = inference_ggcnn(
-                            rgb=rgb_image, depth=depth_image, bbox=prediction[0]['boxes'][index])
+                            rgb=rgb_image, depth=depth_image, bbox=bbox)
                         center = np.array(center)
                         depth = distance_image[center[1]][center[0]]
                         
@@ -183,11 +212,11 @@ for theta in range(0, 360, 45):
                         angle = theta * 2 * np.pi / 360 + ggcnn_angle
                         print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
-                        found_obj = True
                                                 
                     my_controller2.reset()
                     break
                 articulation_controller.apply_action(actions)
+                
     if found_obj:
         print('found object')
         break

@@ -3,7 +3,7 @@ Pytorch-GQCNN/
 ur5_robotiq_2f140.usd
 ur5.usd
 ycb_usd/*
-/lecture/checkpoint/99.pth
+/lecture/checkpoint/model_99.pth
 
 */__pycache__/*
 
