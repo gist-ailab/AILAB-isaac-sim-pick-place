@@ -57,7 +57,7 @@ if __name__=="__main__":
     print("Train dataset: ", len(train_dataset))
     
     test_dataset = YCBDataset(
-        root=os.path.join(data_root, 'val'),
+        root=os.path.join(data_root, 'test'),
         transforms=get_transform(train=False))
     print("Test dataset: ", len(test_dataset))
 

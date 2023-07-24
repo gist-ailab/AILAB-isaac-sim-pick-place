@@ -9,7 +9,7 @@
 # python path setting
 import os
 import sys
-lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
+lecture_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) # path to lecture
 sys.path.append(lecture_path)
 
 # import packages
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             'label': obj_idx+2, # set object label 2 ~ 
         }
     print(object_info)
-
+    
     #-----1. Initialize simulation app and import packages
     from omni.isaac.kit import SimulationApp
     simulation_app = SimulationApp({"headless": True})

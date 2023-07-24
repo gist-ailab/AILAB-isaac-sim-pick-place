@@ -8,9 +8,8 @@
 #-----0. preliminary -----#
 
 # python path setting
-from custom_dataset import *
-from train_model import *
-
+import os
+import sys
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
 sys.path.append(lecture_path)
 
@@ -18,25 +17,30 @@ sys.path.append(lecture_path)
 from PIL import Image, ImageDraw
 
 import torch
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 
 import random
+
+from custom_dataset import *
+from train_model import *
 
 # get object list
 ycb_path = os.path.join(lecture_path, 'dataset/ycb')
 obj_dirs = [os.path.join(ycb_path, obj_name) for obj_name in os.listdir(ycb_path)]
 obj_dirs.sort()
 object_info = {}
+label2name = {}
 total_object_num = len(obj_dirs)
 for obj_idx, obj_dir in enumerate(obj_dirs):
     usd_file = os.path.join(obj_dir, 'final.usd')
     object_info[obj_idx] = {
         'name': os.path.basename(obj_dir),
         'usd_file': usd_file,
-        'label': obj_idx+2, # set object label 2 ~ 
+        'label': obj_idx, # set object label 2 ~ 
     }
-label2name = {object_info[obj_idx]['label']: object_info[obj_idx]['name'] for obj_idx in object_info.keys()}
+    label2name[obj_idx]=os.path.basename(obj_dir)
+print(label2name)
+    
+# label2name = {object_info[obj_idx]['label']: object_info[obj_idx]['name'] for obj_idx in object_info.keys()
 
 #-----3. inference -----#
 if __name__ == "__main__":
@@ -53,9 +57,9 @@ if __name__ == "__main__":
 
     # load trained model
     num_classes = 43
-    model = get_model_instance_segmentation(num_classes)
+    model = get_model_object_detection(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, '100.pth')
+    ckp_path = os.path.join(test_ckp_path, 'model_99.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset
@@ -71,7 +75,7 @@ if __name__ == "__main__":
     # inference
     with torch.no_grad():
         prediction = model([img.to(device)])
-    
+    print(trg)
     # save inference result
     org_img = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
     org_img.save(os.path.join(test_img_path, "org_img.jpg"))
@@ -80,10 +84,13 @@ if __name__ == "__main__":
     draw = ImageDraw.Draw(org_img)
     # objects = glob.glob(ycb_path + "/*/*.usd")
     # print(objects)
+    
     print((prediction[0]['labels']))
     print((prediction[0]))
+    prediction[0]['labels']=prediction[0]['labels'].cpu().detach().numpy()
+    
     for i in range(len(list(prediction[0]['boxes']))):
-        if prediction[0]['scores'][i]>0.5:
+        if prediction[0]['scores'][i]>0.9:
             print(prediction[0]['boxes'][i])
             predict_label = prediction[0]['labels'][i]
             draw.multiline_text((list(prediction[0]['boxes'][i])), text = label2name[predict_label])
@@ -92,6 +99,6 @@ if __name__ == "__main__":
     
     labels = prediction[0]['labels']
     for i in labels:
-        print(label2name[i])
+        print(i,label2name[i])
     # print(objects)
     print("That's it!")

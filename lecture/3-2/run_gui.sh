@@ -1,0 +1,1 @@
+source /isaac-sim/isaac-sim.sh --allow-root
