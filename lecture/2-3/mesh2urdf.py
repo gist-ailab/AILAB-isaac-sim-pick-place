@@ -1,10 +1,13 @@
 import os
-import trimesh
 import sys
+lecture_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) # path to lecture
+sys.path.append(lecture_path)
+print(lecture_path)
+
+import trimesh
 from natsort import natsorted
 from tqdm import tqdm
-lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))) # path to lecture
-sys.path.append(lecture_path)
+
 
 from object2urdf import ObjectUrdfBuilder
 
