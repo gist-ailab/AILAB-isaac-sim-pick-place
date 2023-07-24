@@ -1,11 +1,9 @@
-# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
+# ---- ---- ---- ----
+# GIST-AILAB, 2023 summer school
+# Day2. 
+# 2-2.6 Basic simulation loop with camera (RGBD)
+# ---- ---- ---- ----
+
 from omni.isaac.kit import SimulationApp
 
 simulation_app = SimulationApp({"headless": False})
@@ -21,13 +19,9 @@ from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.core.objects import DynamicCuboid
 from omni.isaac.sensor import Camera
-from omni.kit.viewport.utility import get_active_viewport, get_active_viewport_camera_path
 import numpy as np
 from PIL import Image
-# import matplotlib
-# # matplotlib.use('Qt5Agg')
-# matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+
 
 my_world = World(stage_units_in_meters=1.0)
 
@@ -51,6 +45,37 @@ def save_image(image, path):                                    #
     image = Image.fromarray(image)                              #
     image.save(path)                                            #
 
+
+def depth_image_from_distance_image(distance, intrinsics):
+    """Computes depth image from distance image.
+    
+    Background pixels have depth of 0
+    
+    Args:
+        distance: HxW float array (meters)
+        intrinsics: 3x3 float array
+    
+    Returns:
+        z: HxW float array (meters)
+    
+    """
+    fx = intrinsics[0][0]
+    cx = intrinsics[0][2]
+    fy = intrinsics[1][1]
+    cy = intrinsics[1][2]
+    
+    height, width = distance.shape
+    xlin = np.linspace(0, width - 1, width)
+    ylin = np.linspace(0, height - 1, height)
+    px, py = np.meshgrid(xlin, ylin)
+    
+    x_over_z = (px - cx) / fx
+    y_over_z = (py - cy) / fy
+    
+    z = distance / np.sqrt(1. + x_over_z**2 + y_over_z**2)
+    return z
+
+
 my_camera = Camera(                                             #
     prim_path="/World/RGB",                                     #
     frequency=20,                                               #
@@ -65,18 +90,13 @@ my_camera.set_vertical_aperture(1.48)                           #
 my_camera.set_clipping_range(0.01, 10000)                       #
 my_camera.add_distance_to_camera_to_frame()
 
-my_camera.initialize()        
+my_camera.initialize()
 
-
-# viewport = get_active_viewport()
-# viewport.set_active_camera('/World/ur5e/realsense/Depth')
-# viewport.set_active_camera('/OmniverseKit_Persp')
-
-i = 0
-
+camera_intrinsics = my_camera.get_intrinsics_matrix()
+print('camera_intrinsics: ', camera_intrinsics)
 
 ep_num = 0
-max_ep_num = 100
+max_ep_num = 12
 
 while simulation_app.is_running():    
     ep_num += 1                                      #
@@ -84,13 +104,15 @@ while simulation_app.is_running():
     print("Episode: ", ep_num)
 
     rgb_image = my_camera.get_rgba()
-    depth_image = my_camera.get_current_frame()["distance_to_camera"]
+    distance_image = my_camera.get_current_frame()["distance_to_camera"]
 
     if ep_num == max_ep_num:
-        depth_image[depth_image < 0.67] = 0.67
-        depth_image = depth_image - 0.5
-        depth_image = (depth_image*255*2).astype(np.uint8)
+        distance_image[distance_image < 0.67] = 0.67
+        distance_image = distance_image - 0.5
+        distance_image = (distance_image*255*2).astype(np.uint8)
+        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics).astype(np.uint8)
         save_image(rgb_image, os.path.join(save_root, "rgb{}.png".format(ep_num)))
+        save_image(distance_image, os.path.join(save_root, "distance{}.png".format(ep_num)))
         save_image(depth_image, os.path.join(save_root, "depth{}.png".format(ep_num)))
 
         simulation_app.close()

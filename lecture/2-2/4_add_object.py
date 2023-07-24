@@ -1,7 +1,7 @@
 # ---- ---- ---- ----
 # GIST-AILAB, 2023 summer school
 # Day2. 
-# 2-2.3 Basic simulation loop with primitive object load
+# 2-2.4 Basic simulation loop with primitive object load
 # ---- ---- ---- ----
 
 
@@ -20,7 +20,7 @@ my_world = World(stage_units_in_meters=1.0)
 scene = Scene()
 scene.add_default_ground_plane()
 
-scale = list(np.random.rand(3) * 0.5)               
+scale = list(np.random.rand(3) /2)               
 position = [0, 0, scale[2]/2]                       
 cube = DynamicCuboid(
     prim_path="/World/object", 

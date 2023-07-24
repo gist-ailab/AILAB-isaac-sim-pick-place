@@ -1,7 +1,7 @@
 # ---- ---- ---- ----
 # GIST-AILAB, 2023 summer school
 # Day2. 
-# 2-2.3 Basic simulation loop with camera
+# 2-2.5 Basic simulation loop with camera (RGB)
 # ---- ---- ---- ----
 
 
@@ -58,7 +58,7 @@ my_camera.set_clipping_range(0.01, 10000)                       #
 my_camera.initialize()                                          #
 
 ep_num = 0
-max_ep_num = 100
+max_ep_num = 11
 
 
 while simulation_app.is_running():

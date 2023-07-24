@@ -1,7 +1,7 @@
 # ---- ---- ---- ----
 # GIST-AILAB, 2023 summer school
 # Day2. 
-# 2-2.3 Basic simulation loop with camera
+# 2-2.7 Basic simulation loop with camera (RGBD/Mask)
 # ---- ---- ---- ----
 
 
@@ -10,7 +10,7 @@ simulation_app = SimulationApp({"headless": False})
 
 from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
-from omni.isaac.core.objects import DynamicCuboid, DynamicSphere, DynamicCone       #
+from omni.isaac.core.objects import DynamicCuboid
 from omni.isaac.sensor import Camera                            #
 from omni.isaac.core.utils.semantics import add_update_semantics
 
@@ -19,7 +19,6 @@ import sys
 from PIL import Image  
 import numpy as np                                      #
 import random
-import torchvision.transforms as T
 import copy
 lecture_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))) # path to lecture
 sys.path.append(lecture_path)
@@ -68,7 +67,7 @@ my_camera.add_distance_to_camera_to_frame()
 my_camera.initialize()                                          #
 
 ep_num = 0
-max_ep_num = 100
+max_ep_num = 10
 
 
 while simulation_app.is_running():
@@ -79,8 +78,8 @@ while simulation_app.is_running():
 
     rgb_image = my_camera.get_rgba()                        #
     depth_image = my_camera.get_current_frame()["distance_to_camera"]
-    hand_instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
-    hand_instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
+    instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
+    instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
 
     if ep_num == max_ep_num:
         print(my_camera.get_current_frame()["instance_segmentation"])
@@ -90,12 +89,10 @@ while simulation_app.is_running():
         depth_image = depth_image - 0.5
         depth_image = (depth_image*255*2).astype(np.uint8)
         save_image(depth_image, os.path.join(save_root, "depth_img.png"))
-        # save_image(depth_image, os.path.join(save_root, "depth_img.png"), mode="I")
-        save_image(hand_instance_segmentation_image, os.path.join(save_root, "semantic_mask.png"))  #
         
-        origin_img_r = copy.deepcopy(hand_instance_segmentation_image)
-        origin_img_g = copy.deepcopy(hand_instance_segmentation_image)
-        origin_img_b = copy.deepcopy(hand_instance_segmentation_image)
+        origin_img_r = copy.deepcopy(instance_segmentation_image)
+        origin_img_g = copy.deepcopy(instance_segmentation_image)
+        origin_img_b = copy.deepcopy(instance_segmentation_image)
         
         
         np.place(origin_img_r, origin_img_r==2, 255)
