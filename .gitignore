@@ -11,3 +11,5 @@ ycb_usd/*
 *.pyc
 dataset/*
 imp_file/
+data/
+parameters/
