@@ -92,10 +92,8 @@ if __name__ == "__main__":
     stage = get_current_stage()
 
     #-----4. Simulation loop
-    if os.path.isfile(os.path.join(save_path, "val/img/img0.png")):
-        list = glob.glob(os.path.join(save_path, "val/img/*.png"))
-        list.sort()
-        i = int(list[-1].split("/")[-1].replace("img","").replace(".png",""))
+    if os.path.isfile(os.path.join(save_path, "train/img/img2.png")):
+        i=8219
     else:
         i = 0
         
@@ -168,5 +166,5 @@ if __name__ == "__main__":
         my_world.reset()
         i += 1
 
-        if i==1000000:
+        if i==100000:
             simulation_app.close()

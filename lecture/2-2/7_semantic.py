@@ -106,8 +106,5 @@ while simulation_app.is_running():
         origin_img = np.array([origin_img_r,origin_img_g,origin_img_b])
         print(rgb_image.shape,origin_img.shape)
         
-        # origin_img = Image.fromarray(origin_img[1:2:0])
         save_image(origin_img.astype(np.uint8).transpose(1,2,0), os.path.join(save_root, "visualize_semantic_mask.png"))
         simulation_app.close()
-
-# np.place(origin_img, origin_image==2, class_list[c])

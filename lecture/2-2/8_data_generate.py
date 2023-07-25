@@ -39,13 +39,10 @@ my_world.reset()                                                    #
 # Setting save path for generated data
 work_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 save_path = os.path.join(work_path, "dataset/sample_data")
-# save_path = "/home/ailab/Workspace/minhwan/isaac_sim-2022.2.0/AILAB-isaac-sim-pick-place/lecture/dataset"
-if not os.path.isdir(save_path):
-    os.mkdir(save_path)
-if not os.path.isdir(save_path + "/img"):
-    os.mkdir(save_path + "/img")
-if not os.path.isdir(save_path + "/mask"):
-    os.mkdir(save_path + "/mask")
+
+os.makedirs(save_path, exist_ok=True)
+os.makedirs(save_path + "/img", exist_ok=True)
+os.makedirs(save_path + "/mask", exist_ok=True)
 print("save_path: ", save_path)
 
 

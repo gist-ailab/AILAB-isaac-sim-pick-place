@@ -16,7 +16,7 @@ from omni.isaac.core.scenes.scene import Scene          #
 my_world = World(stage_units_in_meters=1.0)
 
 
-scene = Scene()                                         #
+scene = Scene()                  
 scene.add_default_ground_plane()                        #
 
 

@@ -3,7 +3,7 @@
 # Day2. 
 # 2-2.1 Basic simulation loop
 # ---- ---- ---- ----
-
+import time
 
 from omni.isaac.kit import SimulationApp
 simulation_app = SimulationApp({"headless": False})
@@ -16,11 +16,13 @@ my_world = World(stage_units_in_meters=1.0)             #
 
 
 sim_step = 0                                            #
-max_sim_step = 10000                                    #
+max_sim_step = 1000                                    #
+start = time.time()
 while simulation_app.is_running():                      #
     my_world.step(render=True)                          #
     print("Simulation Step: ", sim_step)                #
     
     sim_step += 1                                       #
     if sim_step >= max_sim_step:                        #
+        print("Total Time"+str(time.time()-start))
         simulation_app.close()                          #
