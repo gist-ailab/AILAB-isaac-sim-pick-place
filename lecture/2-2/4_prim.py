@@ -1,9 +1,8 @@
 # ---- ---- ---- ----
 # GIST-AILAB, 2023 summer school
 # Day2. 
-# 2-2.3 Basic simulation loop with primitive object load
+# 2-2.4 Basic simulation loop for understand prim
 # ---- ---- ---- ----
-
 
 from omni.isaac.kit import SimulationApp
 simulation_app = SimulationApp({"headless": False}) 
