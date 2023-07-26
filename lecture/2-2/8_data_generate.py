@@ -37,8 +37,8 @@ my_world.reset()                                                    #
 
 
 # Setting save path for generated data
-work_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-save_path = os.path.join(work_path, "dataset/sample_data")
+work_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+save_path = os.path.join(work_path, "2-2/sample_data")
 
 os.makedirs(save_path, exist_ok=True)
 os.makedirs(save_path + "/img", exist_ok=True)
