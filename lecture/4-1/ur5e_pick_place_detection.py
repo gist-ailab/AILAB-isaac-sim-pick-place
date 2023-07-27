@@ -1,7 +1,3 @@
-import sys
-sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
-from omni.isaac.examples.ailab_script import AILabExtension
-from omni.isaac.examples.ailab_examples import AILab
 
 from omni.isaac.kit import SimulationApp
 
@@ -12,11 +8,12 @@ from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
-
 from omni.isaac.universal_robots.controllers import RMPFlowController
-from pick_place_controller import PickPlaceController # -> from utils.controllers.pick_place_controller_robotiq import PickPlaceController
-from utils.controllers.end_effector_controller import EndEffectorController
 
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
+from omni.isaac.examples.ailab_script import AILabExtension
+from omni.isaac.examples.ailab_examples import AILab
 
 from train_model import get_model_object_detection
 
@@ -28,6 +25,9 @@ import random
 import torch
 from pathlib import Path
 
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from utils.controllers.pick_place_controller_robotiq import PickPlaceController
+from utils.controllers.end_effector_controller import EndEffectorController
 from utils.tasks.pick_place_vision_task import UR5ePickPlace
 import coco.transforms as T
 
@@ -103,7 +103,7 @@ for l in range(3):
 
 my_world.reset()
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
+    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e
 )
 my_controller2 = EndEffectorController(
     name='end_effector_controller',
@@ -137,12 +137,12 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
-r, theta, z = 4, 0, 0.3
 found_obj = False
 print('reach-target')
 for i in range(len(objects_list)):
     print("object_{}: {}".format(i, objects_list[i]['name']))
 for theta in range(0, 360, 45):
+    r, z = 4, 0.3
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
     while simulation_app.is_running():
         my_world.step(render=True)
@@ -211,7 +211,6 @@ for theta in range(0, 360, 45):
                         world_center = camera.get_world_points_from_image_coords(center, distance)
                         print("world_center: {}".format(world_center))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
-
                     my_controller2.reset()
                     break
                 articulation_controller.apply_action(actions)
