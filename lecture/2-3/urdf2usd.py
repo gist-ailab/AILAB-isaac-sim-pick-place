@@ -8,7 +8,7 @@ sys.path.append(lecture_path)
 from omni.isaac.kit import SimulationApp
 
 simulation_app = SimulationApp({"headless": False})
-
+sys.path.append('isaac-sim/extscache/omni.kit.asset_converter-1.3.4+lx64.r.cp37')
 import omni.kit.asset_converter
 import omni.kit.commands
 from omni.isaac.core.prims.xform_prim import XFormPrim
@@ -26,8 +26,8 @@ import_config.self_collision = False
 import_config.create_physics_scene = False
 import_config.distance_scale = 0.5
 
-path = os.path.join(lecture_path, 'dataset/preprocessed_1')
-save_path = os.path.join(lecture_path, 'dataset/test/')
+path = os.path.join(lecture_path, '2-3/urdf')
+save_path = os.path.join(lecture_path, '2-3/usd')
 objects = os.listdir(path)
 obs = []
 
@@ -40,15 +40,5 @@ for i in range(len(objects)):
         "URDFParseAndImportFile",
         urdf_path = ycb_file,
         import_config = import_config,
-        dest_path = save_path+objects[i]+'/final.usd',
+        dest_path = os.path.join(save_path,objects[i],'final.usd'),
     )
-    ob = XFormPrim(stage_path)
-    
-    ob_world_scale = ob.get_world_scale()
-
-    ob.set_world_pose(np.array([1, 0.3, ob_world_scale[2]/2]), np.array([1, 0, 0, 0]))
-
-    # textured_material = OmniPBR(prim_path='{}/Looks'.format(stage_path), texture_path=os.path.join('/home/ailab/Workspace/minhwan/YCB', objects[i], 'google_16k/texture_map.png'))
-    print(ob.is_visual_material_applied())
-   
-    obs.append(ob)

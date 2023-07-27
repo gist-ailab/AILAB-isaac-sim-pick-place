@@ -39,6 +39,7 @@ class YCBDataset(torch.utils.data.Dataset):
         # load images and masks
         img_path = os.path.join(self.root, "img", self.imgs[idx])
         mask_path = os.path.join(self.root, "mask", self.masks[idx])
+        # print(img_path)
         img = Image.open(img_path).convert("RGB")
         mask = Image.open(mask_path)
         

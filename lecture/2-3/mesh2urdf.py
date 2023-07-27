@@ -3,7 +3,8 @@ import sys
 lecture_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) # path to lecture
 sys.path.append(lecture_path)
 print(lecture_path)
-
+from os import listdir
+from os.path import join, isfile
 import trimesh
 from natsort import natsorted
 from tqdm import tqdm
@@ -14,7 +15,6 @@ from object2urdf import ObjectUrdfBuilder
 
 def get_file_list(path):
     file_list = [join(path, f) for f in listdir(path) if isfile(join(path, f))]
-    
     return file_list
 
 
@@ -137,7 +137,7 @@ def obj2urdf(root):
 
 if __name__ == "__main__":
     data_root = os.path.join(lecture_path, "dataset/origin_YCB")
-    save_root = os.path.join(lecture_path, "dataset/test")
+    save_root = os.path.join(lecture_path, "2-3/urdf")
     if not os.path.isdir(save_root):    
         os.mkdir(save_root)
 
