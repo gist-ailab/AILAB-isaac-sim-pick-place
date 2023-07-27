@@ -11,3 +11,11 @@ ycb_usd/*
 *.pyc
 dataset/*
 imp_file/
+*.pth
+data_batch*
+*_batch
+*.html
+*.tar.gz
+*.meta
+cifar*
+PennFudanPed*
