@@ -18,7 +18,8 @@ sys.path.append(str(directory))
 
 from utils.tasks.basic_task import SetUpUR5e
 from omni.isaac.core import World
-from utils.controllers.ee import EndEffectorController
+from utils.controllers.end_effector_controller import EndEffectorController
+from omni.isaac.universal_robots.controllers import RMPFlowController
 from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
 
@@ -31,8 +32,13 @@ my_world.reset()
 task_params = my_task.get_params()
 my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
 my_controller = EndEffectorController(
-    name="end_effector_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e
-    )
+    name='end_effector_controller',
+    cspace_controller=RMPFlowController(
+        name="end_effector_controller_cspace_controller", robot_articulation=my_ur5e, attach_gripper=True
+    ),
+    gripper=my_ur5e.gripper,
+    events_dt=[0.008],
+)
 
 articulation_controller = my_ur5e.get_articulation_controller()
 my_controller.reset()
@@ -57,10 +63,11 @@ while simulation_app.is_running():
             actions = my_controller.forward(
                 target_position=ee_target_position,
                 current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
+                end_effector_offset = np.array([0, 0, 0.25])
             )
 
             if my_controller.is_done():
-                print("done positioning end-effector")
+                print("done position control of end-effector")
                 break
             articulation_controller.apply_action(actions)
 simulation_app.close()

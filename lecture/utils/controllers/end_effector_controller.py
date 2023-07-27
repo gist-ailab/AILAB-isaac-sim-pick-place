@@ -13,17 +13,18 @@ from omni.isaac.core.utils.rotations import euler_angles_to_quat
 import numpy as np
 import typing
 from omni.isaac.manipulators.grippers.gripper import Gripper
+from omni.isaac.universal_robots.controllers import RMPFlowController
 
 
 class EndEffectorController(BaseController):
     """ 
-        A simple end-effector position control state machine for tutorials
+        A simple end-effector position, open/close control state machine for tutorials
 
         The phase runs for 1 second, which is the internal time of the state machine
 
         Dt of each phase/ event step is defined
 
-        - Phase 0: Move end_effector above the cube center at the 'end_effector_initial_height'.
+        - Phase 0: Move end_effector at the target position.
 
         Args:
             name (str): Name id of the controller
@@ -42,8 +43,8 @@ class EndEffectorController(BaseController):
     def __init__(
         self,
         name: str,
-        cspace_controller: BaseController,
         gripper: Gripper,
+        cspace_controller: BaseController = RMPFlowController,
         end_effector_initial_height: typing.Optional[float] = None,
         events_dt: typing.Optional[typing.List[float]] = None,
     ) -> None:
@@ -69,6 +70,7 @@ class EndEffectorController(BaseController):
         self._pause = False
         return
 
+
     def is_paused(self) -> bool:
         """
 
@@ -77,6 +79,7 @@ class EndEffectorController(BaseController):
         """
         return self._pause
 
+
     def get_current_event(self) -> int:
         """
 
@@ -84,6 +87,7 @@ class EndEffectorController(BaseController):
             int: Current event/ phase of the state machine
         """
         return self._event
+
 
     def forward(
         self,
@@ -104,7 +108,7 @@ class EndEffectorController(BaseController):
             ArticulationAction: action to be executed by the ArticulationController
         """
         if end_effector_offset is None:
-            end_effector_offset = np.array([0, 0, 0])
+            end_effector_offset = np.array([0, 0, 0.25])
         if self._pause or self.is_done():
             self.pause()
             target_joint_positions = [None] * current_joint_positions.shape[0]
@@ -115,7 +119,8 @@ class EndEffectorController(BaseController):
         target_height = target_position[2]
 
         interpolated_xy = self._get_interpolated_xy(
-            0, 0, self._current_target_x, self._current_target_y
+            current_joint_positions[0], current_joint_positions[1],
+            self._current_target_x, self._current_target_y
         )
         position_target = np.array(
             [
@@ -134,11 +139,73 @@ class EndEffectorController(BaseController):
             self._event += 1
             self._t = 0
         return target_joint_positions
+    
+
+    def open(
+        self,
+        current_joint_positions: np.ndarray,
+        end_effector_offset: typing.Optional[np.ndarray] = None,
+    ) -> ArticulationAction:
+        """Runs the controller one step.
+
+        Args:
+            current_joint_positions (np.ndarray): Current joint positions of the robot.
+            end_effector_offset (typing.Optional[np.ndarray], optional): offset of the end effector target. Defaults to None.
+
+        Returns:
+            ArticulationAction: action to be executed by the ArticulationController
+        """
+        if end_effector_offset is None:
+            end_effector_offset = np.array([0, 0, 0.25])
+        if self._pause or self.is_done():
+            self.pause()
+            target_joint_positions = [None] * current_joint_positions.shape[0]
+            return ArticulationAction(joint_positions=target_joint_positions)
+        
+        target_joint_positions = self._gripper.forward(action="open")
+        
+        self._t += self._events_dt[self._event]
+        if self._t >= 1.0:
+            self._event += 1
+            self._t = 0
+        return target_joint_positions
+
+
+    def close(
+        self,
+        current_joint_positions: np.ndarray,
+        end_effector_offset: typing.Optional[np.ndarray] = None,
+    ) -> ArticulationAction:
+        """Runs the controller one step.
+
+        Args:
+            current_joint_positions (np.ndarray): Current joint positions of the robot.
+            end_effector_offset (typing.Optional[np.ndarray], optional): offset of the end effector target. Defaults to None.
+
+        Returns:
+            ArticulationAction: action to be executed by the ArticulationController
+        """
+        if end_effector_offset is None:
+            end_effector_offset = np.array([0, 0, 0.25])
+        if self._pause or self.is_done():
+            self.pause()
+            target_joint_positions = [None] * current_joint_positions.shape[0]
+            return ArticulationAction(joint_positions=target_joint_positions)
+        
+        target_joint_positions = self._gripper.forward(action="close")
+        
+        self._t += self._events_dt[self._event]
+        if self._t >= 1.0:
+            self._event += 1
+            self._t = 0
+        return target_joint_positions
+
 
     def _get_interpolated_xy(self, target_x, target_y, current_x, current_y):
         alpha = self._get_alpha()
         xy_target = (1 - alpha) * np.array([current_x, current_y]) + alpha * np.array([target_x, target_y])
         return xy_target
+
 
     def _get_alpha(self):
         return 0
@@ -147,8 +214,10 @@ class EndEffectorController(BaseController):
     def _mix_sin(self, t):
         return 0.5 * (1 - np.cos(t * np.pi))
 
+
     def _combine_convex(self, a, b, alpha):
         return (1 - alpha) * a + alpha * b
+
 
     def reset(
         self,
@@ -182,6 +251,7 @@ class EndEffectorController(BaseController):
                 raise Exception("events dt length must be less than 1")
         return
 
+
     def is_done(self) -> bool:
         """
         Returns:
@@ -192,11 +262,13 @@ class EndEffectorController(BaseController):
         else:
             return False
 
+
     def pause(self) -> None:
         """Pauses the state machine's time and phase.
         """
         self._pause = True
         return
+
 
     def resume(self) -> None:
         """Resumes the state machine's time and phase.

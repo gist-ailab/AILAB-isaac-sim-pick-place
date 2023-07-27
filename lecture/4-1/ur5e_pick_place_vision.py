@@ -9,9 +9,9 @@ from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
 
-from reach_target_controller import ReachTargetController
 from pick_place_controller import PickPlaceController # -> from utils.controllers.pick_place_controller_robotiq import PickPlaceController
-from utils.controllers.ee import EndEffectorController
+from utils.controllers.end_effector_controller import EndEffectorController
+from omni.isaac.universal_robots.controllers import RMPFlowController
 from inference_ggcnn import inference_ggcnn
 
 import sys
@@ -108,7 +108,12 @@ my_controller = PickPlaceController(
     name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
 )
 my_controller2 = EndEffectorController(
-    name="end_effector_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e
+    name='end_effector_controller',
+    cspace_controller=RMPFlowController(
+        name="end_effector_controller_cspace_controller", robot_articulation=my_ur5e, attach_gripper=True
+    ),
+    gripper=my_ur5e.gripper,
+    events_dt=[0.008],
 )
 articulation_controller = my_ur5e.get_articulation_controller()
 
