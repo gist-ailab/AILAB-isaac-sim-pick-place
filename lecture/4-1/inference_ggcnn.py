@@ -25,7 +25,7 @@ def inference_ggcnn(rgb, depth, bbox, crop_range=200):
     dir = os.path.dirname(os.path.realpath(__file__))
     path = "/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt"
     path = dir + path
-    net.load_state_dict(torch.load('/home/nam/.local/share/ov/pkg/isaac_sim-2022.2.0/workspace/lecture/4-1/ggcnn/ggcnn_weights_cornell/ggcnn_epoch_23_cornell_statedict.pt'))
+    net.load_state_dict(torch.load(path))
     net.cuda()
 
     with torch.no_grad():
