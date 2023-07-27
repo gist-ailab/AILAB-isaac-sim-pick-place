@@ -29,7 +29,6 @@ class EndEffectorController(ee_controller.EndEffectorController):
     ) -> None:
         if events_dt is None:
             events_dt = [0.008]
-            # events_dt = [0.01, 0.01, 1, 0.01, 0.1, 0.05, 0.005, 1, 0.01, 0.1]
         ee_controller.EndEffectorController.__init__(
             self,
             name=name,
@@ -51,8 +50,7 @@ class EndEffectorController(ee_controller.EndEffectorController):
         """[summary]
 
         Args:
-            picking_position (np.ndarray): [description]
-            placing_position (np.ndarray): [description]
+            target_position (np.ndarray): [description]
             current_joint_positions (np.ndarray): [description]
             end_effector_offset (Optional[np.ndarray], optional): [description]. Defaults to None.
             end_effector_orientation (Optional[np.ndarray], optional): [description]. Defaults to None.

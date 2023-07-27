@@ -143,12 +143,6 @@ class EndEffectorController(BaseController):
     def _get_alpha(self):
         return 0
 
-    def _get_target_hs(self, target_height):
-        if self._event == 0:
-            h = self._h1
-        else:
-            raise ValueError()
-        return h
 
     def _mix_sin(self, t):
         return 0.5 * (1 - np.cos(t * np.pi))

@@ -1,7 +1,3 @@
-import sys
-sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
-from omni.isaac.examples.ailab_script import AILabExtension
-from omni.isaac.examples.ailab_examples import AILab
 
 from omni.isaac.kit import SimulationApp
 
@@ -13,11 +9,17 @@ from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
 
-from pick_place_controller import PickPlaceController # -> from utils.controllers.pick_place_controller_robotiq import PickPlaceController
-from utils.controllers.ee import EndEffectorController
+from reach_target_controller import ReachTargetController
+from pick_place_controller import PickPlaceController
+from inference_ggcnn import inference_ggcnn
 
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
+from omni.isaac.examples.ailab_script import AILabExtension
+from omni.isaac.examples.ailab_examples import AILab
 
 from train_model import get_model_object_detection
+from depth_to_distance import depth_image_from_distance_image
 
 import numpy as np
 import os
@@ -75,7 +77,7 @@ for obj_info in objects_list:
     objects_usd_list.append(obj_info['usd_file'])
 
 # if you don't declare objects_position, the objects will be placed randomly
-objects_position = np.array([[0.5, 0, 0.1],
+objects_position = np.array([[0.5, 0.2, 0.1],
                              [-0.6, 0.3, 0.1],
                              [-0.6, -0.3, 0.1]])
 offset = np.array([0, 0, 0.1])  # releasing offset at the target position
@@ -91,7 +93,7 @@ my_world.add_task(my_task)
 my_world.reset()
 
 task_params = my_task.get_params()
-my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
+my_ur5 = my_world.scene.get_object(task_params["robot_name"]["value"])
 
 camera = my_task.get_camera()
 
@@ -102,12 +104,12 @@ for l in range(3):
 
 my_world.reset()
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
+    name="pick_place_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
 )
-my_controller2 = EndEffectorController(
-    name="end_effector_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e
+my_controller2 = ReachTargetController(
+    name="reach_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
 )
-articulation_controller = my_ur5e.get_articulation_controller()
+articulation_controller = my_ur5.get_articulation_controller()
 
 
 ##########detection model load##############
@@ -142,22 +144,21 @@ for theta in range(0, 360, 45):
         if my_world.is_playing():
             if my_world.current_time_step_index == 0:
                 my_world.reset()
-                my_controller.reset()
+                my_controller2.reset()
                     
             if gui_test.use_custom_updated:
                 observations = my_world.get_observations()
                 actions = my_controller2.forward(
-                    target_position=np.array([x, y, z]),
-                    current_joint_positions=my_ur5e.get_joint_positions(),
+                    picking_position=np.array([x, y, z]),
+                    current_joint_positions=my_ur5.get_joint_positions(),
                     end_effector_offset=np.array([0, 0, 0.25]),
-                    end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
+                    theta=theta
                 )
                 if my_controller2.is_done():
                     rgb_image = camera.get_rgba()[:, :, :3]
                     distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     ##############detection inference######################
-                    
                     image = Image.fromarray(rgb_image)
                     image, _ = transforms(image=image, target=None)
                     with torch.no_grad():
@@ -178,7 +179,7 @@ for theta in range(0, 360, 45):
                         labels_name = np.array(labels_name)
                         indexes = np.where(labels_name == target)
                     
-                        #######draw bbox in image#############
+                        #######draw bbox in image############
                         image = Image.fromarray(image.mul(255).permute(1, 2, 0).byte().numpy())
                         draw = ImageDraw.Draw(image)
                         for i in range(len(list(prediction[0]['boxes']))):
@@ -189,6 +190,10 @@ for theta in range(0, 360, 45):
                         image = np.array(image)
                         plt.imshow(image)
                         plt.show()
+                                        
+                        #########inference ggcnn##############3
+                        camera_intrinsics = camera.get_intrinsics_matrix()
+                        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         
                         target_scores = []
                         for index in indexes:
@@ -196,13 +201,18 @@ for theta in range(0, 360, 45):
                         max_score = max(target_scores)
                         idx = scores.index(max_score)
                         bbox = prediction[0]['boxes'][idx]
-                        cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        depth = distance_image[cx][cy]
-                        center = np.expand_dims(np.array([cx, cy]), axis=0)
+                        
+                        ggcnn_angle, length, width, center = inference_ggcnn(
+                            rgb=rgb_image, depth=depth_image, bbox=bbox)
+                        center = np.array(center)
+                        depth = distance_image[center[1]][center[0]]
+                        
+                        center = np.expand_dims(center, axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
-                        print("world_center: {}".format(world_center))
+                        angle = theta * 2 * np.pi / 360 + ggcnn_angle
+                        print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
-
+                                                
                     my_controller2.reset()
                     break
                 articulation_controller.apply_action(actions)
@@ -212,19 +222,21 @@ for theta in range(0, 360, 45):
         break
 
 print('pick-and-place')
+change_world_center = False
 while simulation_app.is_running():
     my_world.step(render=True)
     if my_world.is_playing():
         if my_world.current_time_step_index == 0:
             my_world.reset()
             my_controller.reset()
-            
+        
         observations = my_world.get_observations()              
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
-            current_joint_positions=my_ur5e.get_joint_positions(),
+            current_joint_positions=my_ur5.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
         if my_controller.is_done():
             print("done picking and placing")
