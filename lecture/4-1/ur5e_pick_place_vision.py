@@ -205,10 +205,10 @@ for theta in range(0, 360, 45):
                         ggcnn_angle, length, width, center = inference_ggcnn(
                             rgb=rgb_image, depth=depth_image, bbox=bbox)
                         center = np.array(center)
-                        depth = distance_image[center[1]][center[0]]
+                        distance = distance_image[center[1]][center[0]]
                         
                         center = np.expand_dims(center, axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, depth)
+                        world_center = camera.get_world_points_from_image_coords(center, distance)
                         angle = theta * 2 * np.pi / 360 + ggcnn_angle
                         print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))

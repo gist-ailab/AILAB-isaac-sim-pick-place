@@ -142,7 +142,7 @@ for theta in range(0, 360, 45):
         if my_world.is_playing():
             if my_world.current_time_step_index == 0:
                 my_world.reset()
-                my_controller.reset()
+                my_controller2.reset()
                     
             if gui_test.use_custom_updated:
                 observations = my_world.get_observations()
@@ -184,8 +184,10 @@ for theta in range(0, 360, 45):
                         for i in range(len(list(prediction[0]['boxes']))):
                             if prediction[0]['scores'][i]>0.9:
                                 predict_label = prediction[0]['labels'][i]
-                                draw.multiline_text((list(prediction[0]['boxes'][i])), text = label2name[predict_label])
-                                draw.rectangle((list(prediction[0]['boxes'][i])), outline=(1,0,0),width=5)
+                                draw.multiline_text((list(prediction[0]['boxes'][i])),
+                                                     text = label2name[predict_label])
+                                draw.rectangle((list(prediction[0]['boxes'][i])),
+                                                outline=(1,0,0),width=5)
                         image = np.array(image)
                         plt.imshow(image)
                         plt.show()
@@ -197,9 +199,9 @@ for theta in range(0, 360, 45):
                         idx = scores.index(max_score)
                         bbox = prediction[0]['boxes'][idx]
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        depth = distance_image[cx][cy]
+                        distance = distance_image[cx][cy]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, depth)
+                        world_center = camera.get_world_points_from_image_coords(center, distance)
                         print("world_center: {}".format(world_center))
                         print("object_position: {}".format(observations[task_params["task_object_name_0"]["value"]]["position"]))
 
