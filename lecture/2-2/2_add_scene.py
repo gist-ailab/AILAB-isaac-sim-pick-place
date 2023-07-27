@@ -16,8 +16,8 @@ from omni.isaac.core.scenes.scene import Scene          #
 my_world = World(stage_units_in_meters=1.0)
 
 
-scene = Scene()                                         #
-scene.add_default_ground_plane()                        #
+scene = Scene()                                         # Scene 선언 및 생성
+scene.add_default_ground_plane()                        # isaac sim에서 제공하는 default plane, light 생성
 
 
 sim_step = 0

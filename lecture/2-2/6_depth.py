@@ -10,10 +10,8 @@ simulation_app = SimulationApp({"headless": False})
 
 # add necessary directories to sys.path
 import sys, os
-from pathlib import Path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-directory = Path(current_dir).parent
-sys.path.append(str(directory))
+lecture_path = os.path.dirname(os.path.abspath(os.path.dirname(__file__))) # path to lecture
+sys.path.append(lecture_path)
 
 from omni.isaac.core import World
 from omni.isaac.core.scenes.scene import Scene
@@ -37,13 +35,13 @@ cube = DynamicCuboid(
 
 my_world.reset()
 
-save_root = os.path.join(os.getcwd(), "sample_data")  
+save_root = os.path.join(lecture_path, "2-2/sample_data")  
 print("Save root: ", save_root)
 os.makedirs(save_root, exist_ok=True)
 
-def save_image(image, path):                                    #
-    image = Image.fromarray(image)                              #
-    image.save(path)                                            #
+def save_image(image, path):                                    
+    image = Image.fromarray(image)                              
+    image.save(path)                                            
 
 
 def depth_image_from_distance_image(distance, intrinsics):
@@ -107,12 +105,10 @@ while simulation_app.is_running():
     distance_image = my_camera.get_current_frame()["distance_to_camera"]
 
     if ep_num == max_ep_num:
-        distance_image[distance_image < 0.67] = 0.67
-        distance_image = distance_image - 0.5
-        distance_image = (distance_image*255*2).astype(np.uint8)
+        distance_image = (distance_image*255).astype(np.uint8)
         depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics).astype(np.uint8)
-        save_image(rgb_image, os.path.join(save_root, "rgb{}.png".format(ep_num)))
-        save_image(distance_image, os.path.join(save_root, "distance{}.png".format(ep_num)))
-        save_image(depth_image, os.path.join(save_root, "depth{}.png".format(ep_num)))
+        save_image(rgb_image, os.path.join(save_root, "rgb.png"))
+        save_image(distance_image, os.path.join(save_root, "distance.png"))
+        save_image(depth_image, os.path.join(save_root, "depth.png"))
 
         simulation_app.close()

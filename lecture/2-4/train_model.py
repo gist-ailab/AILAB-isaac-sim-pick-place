@@ -22,7 +22,9 @@ from coco.engine import train_one_epoch, evaluate
 import coco.utils as utils
 
 from custom_dataset import *
+from PIL import ImageFile
 
+# ImageFile.LOAD_TRUNCATED_IMAGES = True
 #-----2. model -----#
 # function for getting model
 # https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
@@ -57,7 +59,7 @@ if __name__=="__main__":
     print("Train dataset: ", len(train_dataset))
     
     test_dataset = YCBDataset(
-        root=os.path.join(data_root, 'test'),
+        root=os.path.join(data_root, 'val'),
         transforms=get_transform(train=False))
     print("Test dataset: ", len(test_dataset))
 

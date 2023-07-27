@@ -1,4 +1,7 @@
-
+import sys
+sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
+from omni.isaac.examples.ailab_script import AILabExtension
+from omni.isaac.examples.ailab_examples import AILab
 
 from omni.isaac.kit import SimulationApp
 
@@ -7,15 +10,13 @@ simulation_app = SimulationApp({"headless": False})
 from omni.isaac.core import World
 from omni.isaac.core.utils.stage import get_current_stage
 from omni.isaac.core.utils.semantics import add_update_semantics
+from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
 
-from reach_target_controller import ReachTargetController
-from pick_place_controller import PickPlaceController
+from omni.isaac.universal_robots.controllers import RMPFlowController
+from pick_place_controller import PickPlaceController # -> from utils.controllers.pick_place_controller_robotiq import PickPlaceController
+from utils.controllers.end_effector_controller import EndEffectorController
 
-import sys
-sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
-from omni.isaac.examples.ailab_script import AILabExtension
-from omni.isaac.examples.ailab_examples import AILab
 
 from train_model import get_model_object_detection
 
@@ -91,7 +92,7 @@ my_world.add_task(my_task)
 my_world.reset()
 
 task_params = my_task.get_params()
-my_ur5 = my_world.scene.get_object(task_params["robot_name"]["value"])
+my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
 
 camera = my_task.get_camera()
 
@@ -102,12 +103,18 @@ for l in range(3):
 
 my_world.reset()
 my_controller = PickPlaceController(
-    name="pick_place_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
+    name="pick_place_controller", gripper=my_ur5e.gripper, robot_articulation=my_ur5e, end_effector_initial_height=0.3
 )
-my_controller2 = ReachTargetController(
-    name="reach_controller", gripper=my_ur5.gripper, robot_articulation=my_ur5, end_effector_initial_height=0.3
+my_controller2 = EndEffectorController(
+    name='end_effector_controller',
+    cspace_controller=RMPFlowController(
+        name="end_effector_controller_cspace_controller", robot_articulation=my_ur5e, attach_gripper=True
+    ),
+    gripper=my_ur5e.gripper,
+    events_dt=[0.008],
 )
-articulation_controller = my_ur5.get_articulation_controller()
+
+articulation_controller = my_ur5e.get_articulation_controller()
 
 
 ##########detection model load##############
@@ -147,10 +154,10 @@ for theta in range(0, 360, 45):
             if gui_test.use_custom_updated:
                 observations = my_world.get_observations()
                 actions = my_controller2.forward(
-                    picking_position=np.array([x, y, z]),
-                    current_joint_positions=my_ur5.get_joint_positions(),
+                    target_position=np.array([x, y, z]),
+                    current_joint_positions=my_ur5e.get_joint_positions(),
                     end_effector_offset=np.array([0, 0, 0.25]),
-                    theta=theta
+                    end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
                 )
                 if my_controller2.is_done():
                     rgb_image = camera.get_rgba()[:, :, :3]
@@ -225,7 +232,7 @@ while simulation_app.is_running():
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
-            current_joint_positions=my_ur5.get_joint_positions(),
+            current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
         )
         if my_controller.is_done():

@@ -31,7 +31,7 @@ objects_path = os.path.join(Path(working_dir).parent, "dataset/ycb/*/*.usd")
 objects_list = glob.glob(objects_path)
 # objects_list = random.sample(objects_list, 3)
 objects_list = [objects_list[0], objects_list[1], objects_list[2]]
-
+print('objects_list: ', objects_list)
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([[0.3, 0.3, 0.1],
                              [-0.3, 0.3, 0.1],
