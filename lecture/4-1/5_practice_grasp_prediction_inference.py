@@ -53,6 +53,9 @@ class AILabExtensions(AILabExtension):
 gui_test = AILabExtensions()
 gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
+
+############### Random한 YCB 물체 3개를 생성을 포함하는 Task 생성 ########################
+
 # YCB Dataset 물체들에 대한 정보 취득
 working_dir = os.path.dirname(os.path.realpath(__file__))
 ycb_path = os.path.join(Path(working_dir).parent, 'dataset/ycb')
@@ -102,6 +105,10 @@ my_task = UR5ePickPlace(objects_list = objects_usd_list,
 my_world.add_task(my_task)
 my_world.reset()
 
+####################################################################################
+
+######################### Robot controller 생성 ####################################
+
 # Task로부터 ur5e와 camera를 획득
 task_params = my_task.get_params()
 my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
@@ -129,9 +136,13 @@ my_controller2 = EndEffectorController(
 # robot control(PD control)을 위한 instance 선언
 articulation_controller = my_ur5e.get_articulation_controller()
 
+####################################################################################
+
+########################### Detection model load ###################################
+
 # detection model load
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-num_classes = 43
+num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
 model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
@@ -142,6 +153,8 @@ transforms = []
 transforms.append(T.PILToTensor())
 transforms.append(T.ConvertImageDtype(torch.float))
 transforms = T.Compose(transforms)
+
+####################################################################################
 
 # GUI 상에서 보는 view point 지정(Depth 카메라 view에서 Perspective view로 변환시, 전체적으로 보기 편함)
 viewport = get_active_viewport()
@@ -179,6 +192,9 @@ for theta in range(0, 360, 45):
                     end_effector_offset=np.array([0, 0, 0.25]),
                     end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
                 )
+                
+                
+########################### Detection model inference ###############################
                 
                 # controller의 동작이 끝났을 때, detection을 수행
                 if my_controller2.is_done():
@@ -231,6 +247,12 @@ for theta in range(0, 360, 45):
                         plt.imshow(image)
                         plt.show()
                         
+####################################################################################
+                        
+########################## Grasp prediction inference ###############################
+
+                        # camera intrinsics을 이용하여 distance image를 depth image로 변환
+                        
                         # Detection의 출력 중, target 물체에 대한 score가 가장 높은 bbox 선택 
                         target_scores = []
                         for index in indexes:
@@ -239,14 +261,13 @@ for theta in range(0, 360, 45):
                         idx = scores.index(max_score)
                         bbox = prediction[0]['boxes'][idx]
                         
-                        # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
-                        cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        distance = distance_image[cx][cy]
-                        center = np.expand_dims(np.array([cx, cy]), axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, distance)
-                        print("world_center: {}".format(world_center))
-
-                    # detection이 끝난 후, controller reset 및 while문 나가기
+                        # GGCNN model inference
+                        
+                        # GGCNN에서 출력된 이미지 상의 center 값을 world coordinate으로 변환
+                        
+####################################################################################
+                    
+                    # detection과 grasp prediction이 끝난 후, controller reset 및 while문 나가기
                     my_controller2.reset()
                     break
                 
@@ -259,7 +280,7 @@ for theta in range(0, 360, 45):
     if found_obj:
         print('found object')
         break
-
+    
 # 이전 실습(only pick place)에서 사용했던 code와 거의 동일
 print('pick-and-place')
 while simulation_app.is_running():
@@ -271,14 +292,15 @@ while simulation_app.is_running():
             
         observations = my_world.get_observations()
         
-        # picking position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
+        # picking position을 앞서 grasp prediction에서 얻는 center 값의 world coordinate으로 설정
+        # end effector orientation을 앞서 grasp prediction을 통해 얻은 angle 값으로 설정
         actions = my_controller.forward(
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, angle])),
         )
-        
         if my_controller.is_done():
             print("done picking and placing")
         articulation_controller.apply_action(actions)
