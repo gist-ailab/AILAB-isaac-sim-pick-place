@@ -59,7 +59,7 @@ if __name__ == "__main__":
     num_classes = 43
     model = get_model_object_detection(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, 'model_99.pth')
+    ckp_path = os.path.join(test_ckp_path, 'model_34.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset
@@ -68,7 +68,13 @@ if __name__ == "__main__":
         transforms=get_transform(train=False))
     print("Test dataset: ", len(test_dataset))
     
+    data_loader_test = torch.utils.data.DataLoader(
+        test_dataset, batch_size=4, shuffle=False, num_workers=8,
+        collate_fn=utils.collate_fn)
     # get random sample from test dataset
+    
+    evaluate(model, data_loader_test, device=device)
+    
     random_idx = random.randint(0,len(test_dataset)-1)
     img, trg = test_dataset[random_idx]
 
@@ -102,3 +108,4 @@ if __name__ == "__main__":
         print(i,label2name[i])
     # print(objects)
     print("That's it!")
+    

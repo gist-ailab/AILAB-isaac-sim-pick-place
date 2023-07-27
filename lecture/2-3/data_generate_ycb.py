@@ -16,7 +16,6 @@ sys.path.append(lecture_path)
 from PIL import Image
 import numpy as np
 import random
-import glob
 
 # function for save image
 def save_image(image, path):
@@ -31,17 +30,16 @@ if __name__ == "__main__":
     data_path = os.path.join(lecture_path, 'dataset/ycb')
     save_path = os.path.join(lecture_path, 'dataset/detect_img')
     
-    if not os.path.isdir(save_path):    
-        os.mkdir(save_path)
-        os.mkdir(os.path.join(save_path, 'train'))
-        os.mkdir(os.path.join(save_path, 'val'))
-        os.mkdir(os.path.join(save_path, 'test'))
-        os.mkdir(os.path.join(save_path, 'train/img'))
-        os.mkdir(os.path.join(save_path, 'val/img'))
-        os.mkdir(os.path.join(save_path, 'test/img'))
-        os.mkdir(os.path.join(save_path, 'train/mask'))
-        os.mkdir(os.path.join(save_path, 'val/mask'))
-        os.mkdir(os.path.join(save_path, 'test/mask'))
+    os.makedirs(save_path, exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'train'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'val'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'test'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'train/img'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'val/img'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'test/img'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'train/mask'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'val/mask'), exist_ok=True)
+    os.makedirs(os.path.join(save_path, 'test/mask'), exist_ok=True)
     
     # get object list
     obj_dirs = [os.path.join(data_path, obj_name) for obj_name in os.listdir(data_path)]
@@ -86,14 +84,12 @@ if __name__ == "__main__":
 
     my_ur5 = my_world.scene.get_object(task_params["robot_name"]["value"])
     hand_camera = my_task.get_camera()
-    # hand_camera.add_distance_to_camera_to_frame()
-    # hand_camera.add_instance_segmentation_to_frame()
 
     stage = get_current_stage()
 
     #-----4. Simulation loop
     if os.path.isfile(os.path.join(save_path, "train/img/img2.png")):
-        i=8219
+        i = 8219
     else:
         i = 0
         
@@ -166,5 +162,5 @@ if __name__ == "__main__":
         my_world.reset()
         i += 1
 
-        if i==100000:
+        if i==10000:
             simulation_app.close()
