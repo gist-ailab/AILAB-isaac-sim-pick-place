@@ -73,7 +73,7 @@ if __name__ == "__main__":
     - custom task for pick and place with UR5e + attached camera
     - TODO: summary of the task detail
     """
-    from utils.tasks.pick_place_vision_task import UR5ePickPlace
+    from utils.tasks.pick_place_task import UR5ePickPlace
     # add task to the world
     my_task = UR5ePickPlace(objects_list = [])  # releasing offset at the target position
     my_world.add_task(my_task)
