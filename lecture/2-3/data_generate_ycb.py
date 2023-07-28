@@ -126,8 +126,9 @@ if __name__ == "__main__":
 
         #-----4.2. Get camera image
         hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
-        hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
-        hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
+        current_frame = hand_camera.get_current_frame()
+        hand_instance_segmentation_image = current_frame["instance_segmentation"]["data"]
+        hand_instance_segmentation_dict = current_frame["instance_segmentation"]["info"]["idToSemantics"]
         
         print(hand_camera.get_current_frame()["instance_segmentation"])
         
