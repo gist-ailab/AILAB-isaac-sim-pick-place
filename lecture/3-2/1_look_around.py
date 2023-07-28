@@ -14,34 +14,32 @@ from utils.controllers.RMPFflow_pickplace import RMPFlowController
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
 
 
-############### 로봇의 기본적인 매니퓰레이션 동작을 위한 환경 설정 ################
-
 # World 생성
+my_world = World(stage_units_in_meters=1.0)
 
 
 # Task 생성
-
+my_task = UR5ePickPlace()
 
 # World에 Task 추가 및 World 리셋
-
-
+my_world.add_task(my_task)
+my_world.reset()
 
 # Task로부터 로봇과 카메라 획득
+task_params = my_task.get_params()
+my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
 
-
-
-# 로봇의 액션을 수행하는 Controller 생성
-
-
-
-
-
-
-
-
-
-
-#########################################################################
+# Controller 생성
+my_controller = BasicManipulationController(
+    name='basic_manipulation_controller',
+    cspace_controller=RMPFlowController(
+        name="basic_manipulation_controller_cspace_controller", 
+        robot_articulation=my_ur5e, 
+        attach_gripper=True
+    ),
+    gripper=my_ur5e.gripper,
+    events_dt=[0.008],
+)
 
 # robot control(PD control)을 위한 instance 선언
 articulation_controller = my_ur5e.get_articulation_controller()
@@ -71,16 +69,13 @@ for theta in range(0, 360, 45):
                 my_world.reset()
                 my_controller.reset()
                 
-############################# 로봇 액션 생성 ##############################
             # 획득한 observation을 pick place controller에 전달
-            
-            
-            
-            
-            
-            
-            
-#########################################################################
+            actions = my_controller.forward(
+                target_position=np.array([x, y, z]),
+                current_joint_positions=my_ur5e.get_joint_positions(),
+                end_effector_offset = np.array([0, 0, 0.14]),
+                end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
+            )
             
             # end effector가 원하는 위치에 도달하면
             # controller reset 및 while문 나가기
@@ -88,10 +83,8 @@ for theta in range(0, 360, 45):
                 my_controller.reset()
                 break
             
-############################# 로봇 액션 수행 ##############################
             # 선언한 action을 입력받아 articulation_controller를 통해 action 수행
             # Controller에서 계산된 joint position값을 통해 action을 수행함
-            
-#########################################################################
+            articulation_controller.apply_action(actions)
             
 simulation_app.close()

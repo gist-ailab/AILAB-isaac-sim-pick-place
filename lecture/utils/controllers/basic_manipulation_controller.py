@@ -42,20 +42,15 @@ class BasicManipulationController(BaseController):
 
     def __init__(
         self,
-        name: str,
-        gripper: Gripper,
-        cspace_controller: BaseController = RMPFlowController,
-        end_effector_initial_height: typing.Optional[float] = None,
-        events_dt: typing.Optional[typing.List[float]] = None,
+        name: str,              # 컨트롤러 이름
+        gripper: Gripper,       # 그리퍼
+        cspace_controller: BaseController = RMPFlowController,  # 모션 컨트롤러
+        events_dt: typing.Optional[typing.List[float]] = None,  # 이벤트 dt
     ) -> None:
         BaseController.__init__(self, name=name)
-        self._event = 0
-        self._t = 0
-        self._h1 = end_effector_initial_height
-        if self._h1 is None:
-            self._h1 = 0.3 / get_stage_units()
-        self._h0 = None
-        self._events_dt = events_dt
+        self._event = 0     # event 설정
+        self._t = 0         # 타임 설정
+        self._events_dt = events_dt # 이벤트 dt 설정. dt가 작을 수록 한 phase안에 더 많은 모션을 수행
         if self._events_dt is None:
             self._events_dt = [0.008]
         else:
@@ -65,30 +60,12 @@ class BasicManipulationController(BaseController):
                 self._events_dt = self._events_dt.tolist()
             if len(self._events_dt) > 1:
                 raise Exception("events dt length must be less than 1")
-        self._cspace_controller = cspace_controller
-        self._gripper = gripper
-        self._pause = False
+        self._cspace_controller = cspace_controller     # 모션 컨트롤러 설정
+        self._gripper = gripper                         # 그리퍼 설정
+        self._pause = False                             # 시뮬레이션 멈춤 해제
         return
 
-
-    def is_paused(self) -> bool:
-        """
-
-        Returns:
-            bool: True if the state machine is paused. Otherwise False.
-        """
-        return self._pause
-
-
-    def get_current_event(self) -> int:
-        """
-
-        Returns:
-            int: Current event/ phase of the state machine
-        """
-        return self._event
-
-
+    # end effector를 원하는 위치로 가게 하는 함수
     def forward(
         self,
         target_position: np.ndarray,
@@ -108,39 +85,47 @@ class BasicManipulationController(BaseController):
             ArticulationAction: action to be executed by the ArticulationController
         """
         if end_effector_offset is None:
-            end_effector_offset = np.array([0, 0, 0.25])
+            end_effector_offset = np.array([0, 0, 0.14])
+        # 시뮬레이션이 멈춰 있거나 끝났을 때 실행
         if self._pause or self.is_done():
+            # 시뮬레이션 멈춤
             self.pause()
+            # Action에 None 리턴
             target_joint_positions = [None] * current_joint_positions.shape[0]
             return ArticulationAction(joint_positions=target_joint_positions)
-            
-        self._current_target_x = target_position[0]
-        self._current_target_y = target_position[1]
-        target_height = target_position[2]
 
-        interpolated_xy = self._get_interpolated_xy(
-            current_joint_positions[0], current_joint_positions[1],
-            self._current_target_x, self._current_target_y
-        )
+        
+        # end effector offset을 고려한 타겟 x,y,z 위치 계산
+        # end effector offset은 end effector에서 그리퍼 끝까지의 길이때문에 발생하는 offset을 의미
         position_target = np.array(
             [
-                interpolated_xy[0] + end_effector_offset[0],
-                interpolated_xy[1] + end_effector_offset[1],
-                target_height + end_effector_offset[2],
+                target_position[0] + end_effector_offset[0],
+                target_position[1] + end_effector_offset[1],
+                target_position[2] + end_effector_offset[2],
             ]
         )
+        
+        # enf effector orientation 설정
         if end_effector_orientation is None:
             end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, 0]))
+        
+        # ArticulationAction 생성
         target_joint_positions = self._cspace_controller.forward(
             target_end_effector_position=position_target, target_end_effector_orientation=end_effector_orientation
         )
+        
+        # 이벤트 시간이 _event_dt만큼 흐르게 함
+        # _event_dt가 쌓여서 단위시간 1 만큼 흘렀다면 phase 종료 및 이벤트 시간 초기화
         self._t += self._events_dt[self._event]
         if self._t >= 1.0:
             self._event += 1
             self._t = 0
+        
+        # end effector가 어떤 위치(x,y,z)와 orientation을 향해 
+        # 어떤 속도로 가야 하는지에 대한 정보 리턴
         return target_joint_positions
     
-
+    # 그리퍼의 손가락을 여는 함수
     def open(
         self,
         current_joint_positions: np.ndarray,
@@ -156,21 +141,24 @@ class BasicManipulationController(BaseController):
             ArticulationAction: action to be executed by the ArticulationController
         """
         if end_effector_offset is None:
-            end_effector_offset = np.array([0, 0, 0.25])
+            end_effector_offset = np.array([0, 0, 0.14])
         if self._pause or self.is_done():
             self.pause()
             target_joint_positions = [None] * current_joint_positions.shape[0]
             return ArticulationAction(joint_positions=target_joint_positions)
         
+        # 그리퍼 open 액션을 통해 타겟 joint position 계산
         target_joint_positions = self._gripper.forward(action="open")
         
         self._t += self._events_dt[self._event]
         if self._t >= 1.0:
             self._event += 1
             self._t = 0
+            
+        # 그리퍼의 타겟 joint position 리턴
         return target_joint_positions
 
-
+    # 그리퍼의 손가락을 닫는 함수
     def close(
         self,
         current_joint_positions: np.ndarray,
@@ -186,37 +174,22 @@ class BasicManipulationController(BaseController):
             ArticulationAction: action to be executed by the ArticulationController
         """
         if end_effector_offset is None:
-            end_effector_offset = np.array([0, 0, 0.25])
+            end_effector_offset = np.array([0, 0, 0.14])
         if self._pause or self.is_done():
             self.pause()
             target_joint_positions = [None] * current_joint_positions.shape[0]
             return ArticulationAction(joint_positions=target_joint_positions)
         
+        # 그리퍼 close 액션을 통해 타겟 joint position 계산
         target_joint_positions = self._gripper.forward(action="close")
         
         self._t += self._events_dt[self._event]
         if self._t >= 1.0:
             self._event += 1
             self._t = 0
+            
+        # 그리퍼의 타겟 joint position 리턴
         return target_joint_positions
-
-
-    def _get_interpolated_xy(self, target_x, target_y, current_x, current_y):
-        alpha = self._get_alpha()
-        xy_target = (1 - alpha) * np.array([current_x, current_y]) + alpha * np.array([target_x, target_y])
-        return xy_target
-
-
-    def _get_alpha(self):
-        return 0
-
-
-    def _mix_sin(self, t):
-        return 0.5 * (1 - np.cos(t * np.pi))
-
-
-    def _combine_convex(self, a, b, alpha):
-        return (1 - alpha) * a + alpha * b
 
 
     def reset(
