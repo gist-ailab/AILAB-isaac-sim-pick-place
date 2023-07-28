@@ -6,14 +6,14 @@
 # ---- ---- ---- ----
 
 {
-cp -Rv ailab_examples /home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/exts/omni.isaac.examples/omni/isaac/examples/ \
+cp -Rv ailab_examples /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ \
 &&
-cp -Rv ailab_script /home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/exts/omni.isaac.examples/omni/isaac/examples/ \
+cp -Rv ailab_script /isaac-sim/exts/omni.isaac.examples/omni/isaac/examples/ \
 &&
-cp -v extension.toml /home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0/exts/omni.isaac.examples/config/ \
+cp -v extension.toml /isaac-sim/exts/omni.isaac.examples/config/ \
 &&
-echo "\n\n.. apply \'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0 ailab ext\' complete\n"
+echo "\n\n.. apply \'isaac-sim ailab ext\' complete\n"
 } ||
 {
-echo "\n\n!! apply \'/home/hse/.local/share/ov/pkg/isaac_sim-2022.2.0 ailab ext\' fail !!\n"
+echo "\n\n!! apply \'isaac-sim ailab ext\' fail !!\n"
 }
