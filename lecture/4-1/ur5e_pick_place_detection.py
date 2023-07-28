@@ -66,7 +66,7 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
     object_info[obj_idx] = {
         'name': os.path.basename(obj_dir),
         'usd_file': usd_file,
-        'label': obj_idx, # set object label 2 ~ 
+        'label': obj_idx,
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
 
@@ -272,7 +272,7 @@ while simulation_app.is_running():
             picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
-            end_effector_offset=np.array([0, 0, 0.25]),
+            end_effector_offset=np.array([0, 0, 0.14]),
         )
         
         if my_controller.is_done():
