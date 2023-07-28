@@ -6,7 +6,7 @@ simulation_app = SimulationApp({"headless": False})
 from omni.isaac.core import World
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
-from omni.isaac.universal_robots.controllers import RMPFlowController
+# from omni.isaac.universal_robots.controllers import RMPFlowController
 
 
 
@@ -14,6 +14,8 @@ import numpy as np
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+from utils.controllers.RMPFflow_pickplace import RMPFlowController
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
 from utils.tasks.pick_place_task import UR5ePickPlace
 
@@ -92,10 +94,7 @@ for theta in range(0, 360, 45):
             # 선언한 action을 입력받아 articulation_controller를 통해 action 수행
             # Controller 내부에서 계산된 joint position값을 통해 action을 수행함
             articulation_controller.apply_action(actions)
-        
         if ep_num == 8:
             print("done")
             break
-        
 simulation_app.close()
-                

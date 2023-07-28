@@ -19,7 +19,7 @@ sys.path.append(str(directory))
 from utils.tasks.pick_place_task import UR5ePickPlace
 from omni.isaac.core import World
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
-from omni.isaac.universal_robots.controllers import RMPFlowController
+from utils.controllers.RMPFflow_pickplace import RMPFlowController
 from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
 
@@ -61,7 +61,7 @@ while simulation_app.is_running():
             actions = my_controller.forward(
                 target_position=ee_target_position,
                 current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-                end_effector_offset = np.array([0, 0, 0.25])
+                end_effector_offset = np.array([0, 0, 0.14])
             )
 
             if my_controller.is_done():
