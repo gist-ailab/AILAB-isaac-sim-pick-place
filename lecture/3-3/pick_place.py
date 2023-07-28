@@ -104,6 +104,7 @@ while simulation_app.is_running():
         # controller의 동작이 끝났음을 출력
         if my_controller.is_done():
             print("done picking and placing")
+            break
             
         # 선언한 action을 입력받아 articulation_controller를 통해 action 수행. 
         # Controller 내부에서 계산된 joint position값을 통해 action을 수행함​

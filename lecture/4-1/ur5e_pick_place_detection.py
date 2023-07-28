@@ -278,6 +278,8 @@ while simulation_app.is_running():
         
         if my_controller.is_done():
             print("done picking and placing")
+            break
+        
         articulation_controller.apply_action(actions)
 
 simulation_app.close()
