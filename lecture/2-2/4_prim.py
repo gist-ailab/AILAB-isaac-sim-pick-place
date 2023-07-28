@@ -35,17 +35,24 @@ while simulation_app.is_running():
     
     if obj_idx % 600 == 0:
         cube = DynamicCuboid("/World/x/object"+str(int(obj_idx/100)), position=position, scale=scale)  # World/x에 object 생성
+
     if obj_idx % 600 == 100:
         delete_prim("/World/x/object"+str(int(obj_idx/100)-1))                                         # 해당 object 삭제
+
     if obj_idx % 600 == 200:
         cube = DynamicCuboid("/World/y/object"+str(int(obj_idx/100)), position=position, scale=scale)  # World/y에 object 생성
+
     if obj_idx % 600 == 300:
         delete_prim("/World/y/object"+str(int(obj_idx/100)-1))
+
     if obj_idx % 600 == 400:
         cube = DynamicCuboid("/World/z/object"+str(int(obj_idx/100)), position=position, scale=scale)  # World/z에 object 생성
+    
     if obj_idx % 600 == 500:
         delete_prim("/World/z/object"+str(int(obj_idx/100)-1))
     
     obj_idx += 1 
-    if obj_idx >= 60000:                            #
+    if obj_idx >= 60000:
         simulation_app.close()
+        
+simulation_app.close()
