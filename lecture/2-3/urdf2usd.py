@@ -8,7 +8,7 @@ sys.path.append(lecture_path)
 from omni.isaac.kit import SimulationApp
 
 simulation_app = SimulationApp({"headless": False})
-sys.path.append('isaac-sim/extscache/omni.kit.asset_converter-1.3.4+lx64.r.cp37')
+sys.path.append('/isaac-sim/extscache/omni.kit.asset_converter-1.3.4+lx64.r.cp37')
 import omni.kit.asset_converter
 import omni.kit.commands
 from omni.isaac.core.prims.xform_prim import XFormPrim
