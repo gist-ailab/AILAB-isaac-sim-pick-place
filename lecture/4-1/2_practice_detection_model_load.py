@@ -69,7 +69,7 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
     object_info[obj_idx] = {
         'name': os.path.basename(obj_dir),
         'usd_file': usd_file,
-        'label': obj_idx, # set object label 2 ~ 
+        'label': obj_idx,
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
 
