@@ -165,7 +165,7 @@ print('reach-target')
 # theta 값을 계속해서 달라지게 하기 위해 for문 사용(예제는 45도씩 회전하도록 하였음)
 for theta in range(0, 360, 45):
     # theta 값에 따라서 end effector의 위치를 지정(x, y, z)
-    r, z = 4, 0.55
+    r, z = 4, 0.3
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
     
     # 생성한 world 에서 physics simulation step​

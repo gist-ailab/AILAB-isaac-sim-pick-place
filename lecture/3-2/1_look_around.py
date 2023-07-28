@@ -56,7 +56,7 @@ viewport.set_active_camera('/OmniverseKit_Persp')
 for theta in range(0, 360, 45):
     
     # theta 값에 따라서 end effector의 위치를 지정(x, y, z)
-    r, z = 4, 0.55
+    r, z = 4, 0.3
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
     
     while simulation_app.is_running():
