@@ -1,32 +1,18 @@
-# Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
-#
-# NVIDIA CORPORATION and its licensors retain all intellectual property
-# and proprietary rights in and to this software, related documentation
-# and any modifications thereto.  Any use, reproduction, disclosure or
-# distribution of this software and related documentation without an express
-# license agreement from NVIDIA CORPORATION is strictly prohibited.
-#
+
 from omni.isaac.kit import SimulationApp
-
 simulation_app = SimulationApp({"headless": False})
-
-# add necessary directories to sys.path
-import sys, os
-from pathlib import Path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-directory = Path(current_dir).parent
-sys.path.append(str(directory))
 
 from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
 
-
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from utils.tasks.pick_place_task import UR5ePickPlace
-from utils.controllers.pick_place_controller_robotiq import PickPlaceController
-
+import sys, os
+from pathlib import Path
 import numpy as np
 import random
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from utils.controllers.pick_place_controller_robotiq import PickPlaceController
+from utils.tasks.pick_place_task import UR5ePickPlace
 
 # YCB Dataset 물체들에 대한 정보 취득
 working_dir = os.path.dirname(os.path.realpath(__file__))
