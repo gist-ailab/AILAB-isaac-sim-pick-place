@@ -16,21 +16,22 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 directory = Path(current_dir).parent
 sys.path.append(str(directory))
 
-from utils.tasks.basic_task import SetUpUR5eObject
+from utils.tasks.basic_task import SetUpUR5eObjectCamera
 from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
+
+
+## Add task to World
+my_world = World(stage_units_in_meters=1.0)
+my_task = SetUpUR5eObjectCamera()
+my_world.add_task(my_task)
+my_world.reset()
+
 
 ## Set viewport
 viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
-
-
-## Add task to World
-my_world = World(stage_units_in_meters=1.0)
-my_task = SetUpUR5eObject()
-my_world.add_task(my_task)
-my_world.reset()
 
 
 ## episode

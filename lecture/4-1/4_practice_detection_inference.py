@@ -53,6 +53,9 @@ class AILabExtensions(AILabExtension):
 gui_test = AILabExtensions()
 gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
+
+############### Random한 YCB 물체 3개를 생성을 포함하는 Task 생성 ########################
+
 # YCB Dataset 물체들에 대한 정보 취득
 working_dir = os.path.dirname(os.path.realpath(__file__))
 ycb_path = os.path.join(Path(working_dir).parent, 'dataset/ycb')
@@ -102,6 +105,10 @@ my_task = UR5ePickPlace(objects_list = objects_usd_list,
 my_world.add_task(my_task)
 my_world.reset()
 
+####################################################################################
+
+######################### Robot controller 생성 ####################################
+
 # Task로부터 ur5e와 camera를 획득
 task_params = my_task.get_params()
 my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
@@ -129,9 +136,13 @@ my_controller2 = EndEffectorController(
 # robot control(PD control)을 위한 instance 선언
 articulation_controller = my_ur5e.get_articulation_controller()
 
+####################################################################################
+
+########################### Detection model load ###################################
+
 # detection model load
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-num_classes = 43
+num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
 model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
@@ -142,6 +153,8 @@ transforms = []
 transforms.append(T.PILToTensor())
 transforms.append(T.ConvertImageDtype(torch.float))
 transforms = T.Compose(transforms)
+
+####################################################################################
 
 # GUI 상에서 보는 view point 지정(Depth 카메라 view에서 Perspective view로 변환시, 전체적으로 보기 편함)
 viewport = get_active_viewport()
@@ -180,29 +193,20 @@ for theta in range(0, 360, 45):
                     end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
                 )
                 
+                
+########################### Detection model inference ###############################
+                
                 # controller의 동작이 끝났을 때, detection을 수행
                 if my_controller2.is_done():
                     # camera에서부터 rgb, distance 이미지 획득
-                    rgb_image = camera.get_rgba()[:, :, :3]
-                    distance_image = camera.get_current_frame()["distance_to_camera"]
                     
                     # rgb 이미지를 detection model의 input에 맞게 transform
-                    image = Image.fromarray(rgb_image)
-                    image, _ = transforms(image=image, target=None)
                     
                     # detection model inference
-                    with torch.no_grad():
-                        prediction = model([image.to(device)])
                         
                     # Detection model의 출력을 object 카테고리 이름으로 변환 및 출력된 각 bbox의 score 값 확인
                     labels_name = []
                     scores = []
-                    prediction[0]['labels']=prediction[0]['labels'].cpu().detach().numpy()
-                    for i in range(len(list(prediction[0]['boxes']))):
-                        if prediction[0]['scores'][i]>0.9:
-                            predict_label = prediction[0]['labels'][i]
-                            labels_name.append(label2name[predict_label])
-                        scores.append(prediction[0]['scores'][i])
                     
                     # AILab Extention을 사용하여 지정된 target object의 카테고리 이름 찾기
                     target = objects_list[int(gui_test.current_target.split('_')[-1])]['name']
@@ -213,31 +217,11 @@ for theta in range(0, 360, 45):
                         found_obj = True
                         
                         # detection 결과 중, target object를 검출한 bbox의 index 확인
-                        labels_name = np.array(labels_name)
-                        indexes = np.where(labels_name == target)
                     
                         # Detection한 결과를 rgb 이미지 위에 그리기 ​
-                        image = Image.fromarray(image.mul(255).permute(1, 2, 0).byte().numpy())
-                        draw = ImageDraw.Draw(image)
-                        for i in range(len(list(prediction[0]['boxes']))):
-                            # 예측한 bbox의 score가 0.9 이상인 경우에 대해서 그리기
-                            if prediction[0]['scores'][i]>0.9:
-                                predict_label = prediction[0]['labels'][i]
-                                draw.multiline_text((list(prediction[0]['boxes'][i])),
-                                                     text = label2name[predict_label])
-                                draw.rectangle((list(prediction[0]['boxes'][i])),
-                                                outline=(1,0,0),width=5)
-                        image = np.array(image)
-                        plt.imshow(image)
-                        plt.show()
+                        # 예측한 bbox의 score가 0.9 이상인 경우에 대해서 그리기
                         
                         # Detection의 출력 중, target 물체에 대한 score가 가장 높은 bbox 선택 
-                        target_scores = []
-                        for index in indexes:
-                            target_scores.append(scores[index[0]])
-                        max_score = max(target_scores)
-                        idx = scores.index(max_score)
-                        bbox = prediction[0]['boxes'][idx]
                         
                         # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
@@ -245,7 +229,8 @@ for theta in range(0, 360, 45):
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, distance)
                         print("world_center: {}".format(world_center))
-
+####################################################################################
+                    
                     # detection이 끝난 후, controller reset 및 while문 나가기
                     my_controller2.reset()
                     break
@@ -259,7 +244,7 @@ for theta in range(0, 360, 45):
     if found_obj:
         print('found object')
         break
-
+    
 # 이전 실습(only pick place)에서 사용했던 code와 거의 동일
 print('pick-and-place')
 while simulation_app.is_running():
