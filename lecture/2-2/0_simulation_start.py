@@ -7,3 +7,7 @@
 from omni.isaac.kit import SimulationApp
 simulation_app = SimulationApp({"headless": False})  # 해당 코드 실행 시, 시뮬레이션이 시작됨
 print(simulation_app.DEFAULT_LAUNCHER_CONFIG)
+
+while simulation_app.is_running():
+    if input("c"):
+        simulation_app.close()
