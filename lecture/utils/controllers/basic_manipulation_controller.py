@@ -30,7 +30,6 @@ class BasicManipulationController(BaseController):
             name (str): Name id of the controller
             cspace_controller (BaseController): a cartesian space controller that returns an ArticulationAction type
             gripper (Gripper): a gripper controller for open/ close actions.
-            end_effector_initial_height (typing.Optional[float], optional): end effector initial picking height to start 
                 from (more info in phases above). If not defined, set to 0.3 meters. Defaults to None.
             events_dt (typing.Optional[typing.List[float]], optional): Dt of each phase/ event step. 1 phase dt has to
                 be defined. Defaults to None.
@@ -105,7 +104,7 @@ class BasicManipulationController(BaseController):
             ]
         )
         
-        # enf effector orientation 설정
+        # end effector orientation 설정
         if end_effector_orientation is None:
             end_effector_orientation = euler_angles_to_quat(np.array([0, np.pi, 0]))
         
@@ -194,13 +193,11 @@ class BasicManipulationController(BaseController):
 
     def reset(
         self,
-        end_effector_initial_height: typing.Optional[float] = None,
         events_dt: typing.Optional[typing.List[float]] = None,
     ) -> None:
         """Resets the state machine to start from the first phase/ event
 
         Args:
-            end_effector_initial_height (typing.Optional[float], optional): end effector initial picking height to start from. If not defined, set to 0.3 meters. Defaults to None.
             events_dt (typing.Optional[typing.List[float]], optional):  Dt of each phase/ event step. 1 phase dt has to be defined. Defaults to None.
 
         Raises:
@@ -211,8 +208,6 @@ class BasicManipulationController(BaseController):
         self._cspace_controller.reset()
         self._event = 0
         self._t = 0
-        if end_effector_initial_height is not None:
-            self._h1 = end_effector_initial_height
         self._pause = False
         if events_dt is not None:
             self._events_dt = events_dt

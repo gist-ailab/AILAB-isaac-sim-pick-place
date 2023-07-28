@@ -41,6 +41,7 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
+# 그리퍼 열기 / 닫기 명령어 입력받음
 while True:
     instruction = input('Enter the instruction [open/close]:')
     if instruction in ["o", "open", "c", "close"]:
@@ -63,6 +64,7 @@ while simulation_app.is_running():
             )
 
         articulation_controller.apply_action(actions)
+        # 컨트롤러가 끝나면 새로운 명령어 입력 받음
         if my_controller.is_done():
             if instruction == "o" or instruction == "open":
                 print("done opening the gripper\n")
