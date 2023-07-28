@@ -22,7 +22,6 @@ from coco.engine import train_one_epoch, evaluate
 import coco.utils as utils
 
 from custom_dataset import *
-from PIL import ImageFile
 
 # ImageFile.LOAD_TRUNCATED_IMAGES = True
 #-----2. model -----#
@@ -31,7 +30,7 @@ from PIL import ImageFile
 def get_model_object_detection(num_classes):
     # load an instance segmentation model pre-trained on COCO
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, weights_backbone=None)
-    model.backbone.body.load_state_dict(torch.load(os.path.join(lecture_path,"1-4/parameters/resnet50.pth"),strict=False))
+    model.backbone.body.load_state_dict(torch.load(os.path.join(lecture_path,"1-4/parameters/resnet50.pth")), strict=False)
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new one
