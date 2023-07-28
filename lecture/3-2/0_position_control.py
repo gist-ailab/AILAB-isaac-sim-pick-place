@@ -16,7 +16,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 directory = Path(current_dir).parent
 sys.path.append(str(directory))
 
-from utils.tasks.basic_task import SetUpUR5e
+from utils.tasks.pick_place_task import UR5ePickPlace
 from omni.isaac.core import World
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
 from omni.isaac.universal_robots.controllers import RMPFlowController
@@ -25,7 +25,7 @@ import numpy as np
 
 
 my_world = World(stage_units_in_meters=1.0)
-my_task = SetUpUR5e()
+my_task = UR5ePickPlace()
 my_world.add_task(my_task)
 my_world.reset()
 
@@ -47,17 +47,15 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
-ep_num = 0
-max_ep_num = 150
+max_step = 150
 
 ee_target_position = np.array([0.25, -0.23, 0.2]) 
 
 while simulation_app.is_running():
-    ep_num += 1                                      #
     my_world.step(render=True)
 
-    if ep_num >= max_ep_num:
-        if my_world.is_playing():
+    if my_world.is_playing():
+        if my_world.current_time_step_index < max_step:
             observations = my_world.get_observations()
 
             actions = my_controller.forward(
