@@ -57,7 +57,6 @@ class SetUpUR5e(tasks.BaseTask):
         self._robot = self.set_robot()
         scene.add(self._robot)
 
-        self.set_camera()
 
         return
 
@@ -244,8 +243,10 @@ class SetUpUR5eObjectCamera(tasks.BaseTask):
         cube_prim_path = "/World/Cube"
         cube_name = "cube1"
         if object_position is None:
-            pos_x = random.uniform(0.3, 0.6)
-            pos_y = random.uniform(0.3, 0.6)
+            # pos_x = random.uniform(0.3, 0.6)
+            pos_x = random.uniform(-0.6, -0.3)
+            pos_y = random.uniform(-0.6, -0.3)
+            # pos_y = random.uniform(0.3, 0.6)
             pos_z = 0.1
             self.object_position = np.array([[pos_x, pos_y, pos_z]])
 
@@ -257,7 +258,8 @@ class SetUpUR5eObjectCamera(tasks.BaseTask):
             size = 0.04,
             mass = 0.01,
         )
-
+        
+        self.set_camera()
 
         return
 
@@ -355,3 +357,6 @@ class SetUpUR5eObjectCamera(tasks.BaseTask):
         self.camera.add_bounding_box_2d_loose_to_frame()
         self.camera.add_bounding_box_2d_tight_to_frame()
         
+    
+    def get_camera(self):
+        return self.camera
