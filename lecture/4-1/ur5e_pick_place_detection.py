@@ -72,6 +72,7 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
 
 # 랜덤한 3개의 물체에 대한 usd file path 선택
 objects_list = random.sample(list(object_info.values()), 3)
+objects_list[0] = object_info[5]
 objects_usd_list = []
 for obj_info in objects_list:
     objects_usd_list.append(obj_info['usd_file'])
@@ -127,7 +128,7 @@ articulation_controller = my_ur5e.get_articulation_controller()
 
 # detection model load
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-num_classes = 29
+num_classes = 43
 model = get_model_object_detection(num_classes)
 model.to(device)
 model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))

@@ -60,7 +60,6 @@ class SetUpUR5e(tasks.BaseTask):
 
         return
 
-
     def set_robot(self) -> UR5eHandeye:
         """[summary]
 
@@ -68,6 +67,7 @@ class SetUpUR5e(tasks.BaseTask):
             UR5e: [description]
         """
         working_dir = os.path.dirname(os.path.realpath(__file__))   # same directory with this code
+        # ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         if os.path.isfile(ur5e_usd_path):
             pass
@@ -172,6 +172,7 @@ class SetUpUR5eObject(tasks.BaseTask):
             UR5e: [description]
         """
         working_dir = os.path.dirname(os.path.realpath(__file__))   # same directory with this code
+        # ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         if os.path.isfile(ur5e_usd_path):
             pass
@@ -289,6 +290,7 @@ class SetUpUR5eObjectCamera(tasks.BaseTask):
             UR5e: [description]
         """
         working_dir = os.path.dirname(os.path.realpath(__file__))   # same directory with this code
+        # ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         ur5e_usd_path = os.path.join(working_dir, "ur5e_handeye_gripper.usd")
         if os.path.isfile(ur5e_usd_path):
             pass
