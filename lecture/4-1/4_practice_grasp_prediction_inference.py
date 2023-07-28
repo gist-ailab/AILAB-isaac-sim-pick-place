@@ -165,7 +165,7 @@ print('reach-target')
 # theta 값을 계속해서 달라지게 하기 위해 for문 사용(예제는 45도씩 회전하도록 하였음)
 for theta in range(0, 360, 45):
     # theta 값에 따라서 end effector의 위치를 지정(x, y, z)
-    r, z = 4, 0.3
+    r, z = 4, 0.55
     x, y = r/10 * np.cos(theta/360*2*np.pi), r/10 * np.sin(theta/360*2*np.pi)
     
     # 생성한 world 에서 physics simulation step​
@@ -291,7 +291,7 @@ while simulation_app.is_running():
         # picking position을 앞서 grasp prediction에서 얻는 center 값의 world coordinate으로 설정
         # end effector orientation을 앞서 grasp prediction을 통해 얻은 angle 값으로 설정
         actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),
