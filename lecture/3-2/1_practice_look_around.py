@@ -12,7 +12,6 @@ from omni.isaac.universal_robots.controllers import RMPFlowController
 
 import numpy as np
 import os, sys
-from pathlib import Path
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
