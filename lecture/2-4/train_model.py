@@ -30,8 +30,8 @@ from PIL import ImageFile
 # https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 def get_model_object_detection(num_classes):
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
-
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, weights_backbone=None)
+    model.backbone.body = torch.load(os.path.join(lecture_path,"1-4/parameters/resnet50.pth"))
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new one
