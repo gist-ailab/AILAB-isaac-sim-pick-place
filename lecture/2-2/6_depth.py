@@ -105,10 +105,14 @@ while simulation_app.is_running():
     distance_image = my_camera.get_current_frame()["distance_to_camera"]
 
     if ep_num == max_ep_num:
+        distance_image[distance_image<0.67]=0.67
+        distance_image = 2*(distance_image-0.5)
         distance_image = (distance_image*255).astype(np.uint8)
-        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics).astype(np.uint8)
+        
         save_image(rgb_image, os.path.join(save_root, "rgb.png"))
         save_image(distance_image, os.path.join(save_root, "distance.png"))
+        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics).astype(np.uint8)
+        
         save_image(depth_image, os.path.join(save_root, "depth.png"))
 
         simulation_app.close()

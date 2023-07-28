@@ -39,8 +39,6 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
 print(label2name)
-    
-# label2name = {object_info[obj_idx]['label']: object_info[obj_idx]['name'] for obj_idx in object_info.keys()
 
 #-----3. inference -----#
 if __name__ == "__main__":
@@ -56,10 +54,10 @@ if __name__ == "__main__":
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     # load trained model
-    num_classes = 43
+    num_classes = 29
     model = get_model_object_detection(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, 'model_34.pth')
+    ckp_path = os.path.join(test_ckp_path, 'model_49.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset
@@ -88,8 +86,6 @@ if __name__ == "__main__":
     
     # draw bbox
     draw = ImageDraw.Draw(org_img)
-    # objects = glob.glob(ycb_path + "/*/*.usd")
-    # print(objects)
     
     print((prediction[0]['labels']))
     print((prediction[0]))
@@ -106,6 +102,4 @@ if __name__ == "__main__":
     labels = prediction[0]['labels']
     for i in labels:
         print(i,label2name[i])
-    # print(objects)
     print("That's it!")
-    

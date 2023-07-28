@@ -73,7 +73,7 @@ if __name__=="__main__":
         collate_fn=utils.collate_fn)
 
     # get number of classes
-    num_classes = 43
+    num_classes = 29
 
     # get the model using our helper function
     model = get_model_object_detection(num_classes)
