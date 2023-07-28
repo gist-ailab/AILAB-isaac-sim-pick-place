@@ -28,7 +28,7 @@ from pathlib import Path
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from utils.controllers.pick_place_controller_robotiq import PickPlaceController
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
-from utils.tasks.pick_place_vision_task import UR5ePickPlace
+from utils.tasks.pick_place_task import UR5ePickPlace
 import coco.transforms as T
 
 # set AILab GUI Extension

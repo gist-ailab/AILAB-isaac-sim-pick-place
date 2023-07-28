@@ -18,16 +18,9 @@ from omni.isaac.core.utils.prims import create_prim, get_prim_path, define_prim
 from omni.isaac.core.utils.stage import get_stage_units
 from omni.isaac.core.materials import PhysicsMaterial
 from omni.isaac.core.prims import RigidPrim, GeometryPrim
-
-# add necessary directories to sys.path
-import sys, os
-from pathlib import Path
-current_dir = os.path.dirname(os.path.realpath(__file__))
-directory = Path(current_dir).parent
-sys.path.append(str(directory))
-
-from robots.ur5e_handeye import UR5eHandeye
-import random
+from omni.isaac.sensor import Camera
+from utils.robots.ur5e_handeye import UR5eHandeye
+import os, random
 import numpy as np
 from typing import Optional
 from pxr import Gf
@@ -58,19 +51,19 @@ class UR5ePickPlace(tasks.PickPlace):
         if (objects_position is None) and (objects_list is not None):
             for i in range(len(objects_list)):
                 if i == 0:
-                    pos_x = random.uniform(0.3, 0.6)
-                    pos_y = random.uniform(0.3, 0.6)
+                    pos_x = random.uniform(0.4, 0.7)
+                    pos_y = random.uniform(0.4, 0.7)
                     pos_z = 0.1
                     self.objects_position = np.array([[pos_x, pos_y, pos_z]])
                 elif i == 1:
-                    pos_x = random.uniform(-0.3, -0.6)
-                    pos_y = random.uniform(0.3, 0.6)
+                    pos_x = random.uniform(-0.4, -0.7)
+                    pos_y = random.uniform(0.4, 0.7)
                     pos_z = 0.1
                     self.objects_position = np.concatenate((self.objects_position, np.array([[pos_x, pos_y, pos_z]])),
                                                           axis=0)
                 elif i == 2:
-                    pos_x = random.uniform(-0.3, -0.6)
-                    pos_y = random.uniform(-0.3, -0.6)
+                    pos_x = random.uniform(-0.4, -0.7)
+                    pos_y = random.uniform(-0.4, -0.7)
                     pos_z = 0.1
                     self.objects_position = np.concatenate((self.objects_position, np.array([[pos_x, pos_y, pos_z]])),
                                                           axis=0)
@@ -135,6 +128,7 @@ class UR5ePickPlace(tasks.PickPlace):
 
         self._robot = self.set_robot()
         scene.add(self._robot)
+        self.set_camera()
 
         self._move_task_objects_to_their_frame()
         return
@@ -167,22 +161,20 @@ class UR5ePickPlace(tasks.PickPlace):
 
     def set_usd_objects(self, object_number: int, object_position: np.ndarray) -> None:
         # https://forums.developer.nvidia.com/t/set-mass-and-physicalmaterial-properties-to-prim/229727/4
-        rigid_prim_path = self.imported_objects_prim_path + f"_{object_number}"
-        geometry_prim_path = rigid_prim_path + f"/geometry_prim_{object_number}"
-        define_prim(rigid_prim_path)
-        define_prim(geometry_prim_path)
+        define_prim(self.imported_objects_prim_path + f"_{object_number}")
+        define_prim(self.imported_objects_prim_path + f"/geometry_prim_{object_number}")
 
         self._task_object = add_reference_to_stage(usd_path = self._objects[object_number],
-                                                   prim_path = rigid_prim_path)
-        rigid_prim = RigidPrim(prim_path = rigid_prim_path,
+                                                   prim_path = self.imported_objects_prim_path + f"_{object_number}")
+        rigid_prim = RigidPrim(prim_path = self.imported_objects_prim_path + f"_{object_number}",
                                position = object_position,
                                orientation = np.array([1, 0, 0, 0]),
                                name = "rigid_prim",
                                scale = np.array([0.2] * 3),
-                               mass = 0.1)
+                               mass = 0.01)
         rigid_prim.enable_rigid_body_physics()
 
-        geometry_prim = GeometryPrim(prim_path = geometry_prim_path,
+        geometry_prim = GeometryPrim(prim_path = self.imported_objects_prim_path + f"/geometry_prim_{object_number}",
                                      name = "geometry_prim",
                                      position = object_position,
                                      orientation = np.array([1, 0, 0, 0]),
@@ -191,7 +183,7 @@ class UR5ePickPlace(tasks.PickPlace):
                                     )
         geometry_prim.apply_physics_material(
             PhysicsMaterial(
-                prim_path = rigid_prim_path + f"/physics_material_{object_number}",
+                prim_path = self.imported_objects_prim_path + f"/physics_material_{object_number}",
                 static_friction = 10,
                 dynamic_friction = 10,
                 restitution = None
@@ -267,4 +259,22 @@ class UR5ePickPlace(tasks.PickPlace):
                                                   }
         return observation_dict
     
-
+    
+        
+    def set_camera(self):
+        self.camera = Camera(
+            prim_path="/World/ur5e/realsense/Depth",
+            frequency=20,
+            resolution=(1920, 1080),
+        )
+        
+        self.camera.initialize()
+        self.camera.add_distance_to_camera_to_frame()
+        self.camera.add_instance_segmentation_to_frame()
+        self.camera.add_instance_id_segmentation_to_frame()
+        self.camera.add_semantic_segmentation_to_frame()
+        self.camera.add_bounding_box_2d_loose_to_frame()
+        self.camera.add_bounding_box_2d_tight_to_frame()
+        
+    def get_camera(self):
+        return self.camera
