@@ -33,13 +33,6 @@
     pip install -r requirements.txt
     ```
 
-### 3. YCB object  Dataset Download
- - You can get ycb dataset in MAT
-    ```
-    /ailab_mat/dataset/ycb_usd
-    ```
-
-
 ## Run Pick and Place
 
 - Run Pick and Place
