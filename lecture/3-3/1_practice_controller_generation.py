@@ -15,6 +15,8 @@ from utils.controllers.pick_place_controller_robotiq import PickPlaceController
 from utils.tasks.pick_place_task import UR5ePickPlace
 
 
+############### Random한 YCB 물체 생성을 포함하는 Task 생성 ######################
+
 # YCB Dataset 물체들에 대한 정보 취득
 working_dir = os.path.dirname(os.path.realpath(__file__))
 ycb_path = os.path.join(Path(working_dir).parent, 'dataset/ycb')
@@ -59,19 +61,18 @@ my_task = UR5ePickPlace(objects_list = [objects_usd],
 my_world.add_task(my_task)
 my_world.reset()
 
+########################################################################
+
+
+################### Pick place controller 생성 ##########################
+
 # Task로부터 ur5e 획득
-task_params = my_task.get_params()
-my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
 
 # PickPlace controller 생성
-my_controller = PickPlaceController(
-    name="pick_place_controller", 
-    gripper=my_ur5e.gripper, 
-    robot_articulation=my_ur5e
-)
 
 # robot control(PD control)을 위한 instance 선언
-articulation_controller = my_ur5e.get_articulation_controller()
+
+########################################################################
 
 # GUI 상에서 보는 view point 지정(Depth 카메라 view에서 Perspective view로 변환시, 전체적으로 보기 편함)
 viewport = get_active_viewport()
@@ -81,33 +82,3 @@ viewport.set_active_camera('/OmniverseKit_Persp')
 # 생성한 world 에서 physics simulation step​
 while simulation_app.is_running():
     my_world.step(render=True)
-    
-    # world가 동작하는 동안 작업 수행
-    if my_world.is_playing():
-        
-        # step이 0일때, world와 controller를 reset
-        if my_world.current_time_step_index == 0:
-            my_world.reset()
-            my_controller.reset()
-            
-        # my_world로 부터 observation 값들 획득​
-        observations = my_world.get_observations()
-        
-        # 획득한 observation을 pick place controller에 전달
-        actions = my_controller.forward(
-            picking_position=observations[task_params["task_object_name_0"]["value"]]["position"],
-            placing_position=observations[task_params["task_object_name_0"]["value"]]["target_position"],
-            current_joint_positions=observations[task_params["robot_name"]["value"]]["joint_positions"],
-            end_effector_offset=np.array([0, 0, 0.14])
-        )
-        
-        # controller의 동작이 끝났음을 출력
-        if my_controller.is_done():
-            print("done picking and placing")
-            
-        # 선언한 action을 입력받아 articulation_controller를 통해 action 수행. 
-        # Controller 내부에서 계산된 joint position값을 통해 action을 수행함​
-        articulation_controller.apply_action(actions)
-
-# simulation 종료​
-simulation_app.close()

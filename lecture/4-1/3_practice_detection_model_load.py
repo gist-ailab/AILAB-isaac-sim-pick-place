@@ -151,6 +151,7 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
+# 생성한 world 에서 physics simulation step​
 while simulation_app.is_running():                      
     my_world.step(render=True)
                     

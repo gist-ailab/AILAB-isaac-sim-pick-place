@@ -54,7 +54,7 @@ gui_test = AILabExtensions()
 gui_test.on_startup(ext_id='omni.isaac.examples-1.5.1')
 
 
-############### Random한 YCB 물체 3개를 생성을 포함하는 Task 생성 ########################3
+############### Random한 YCB 물체 3개를 생성을 포함하는 Task 생성 ######################
 # YCB Dataset path
 working_dir = os.path.dirname(os.path.realpath(__file__))
 ycb_path = os.path.join(Path(working_dir).parent, 'dataset/ycb')
@@ -83,6 +83,7 @@ viewport = get_active_viewport()
 viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
+# 생성한 world 에서 physics simulation step​
 while simulation_app.is_running():
     my_world.step(render=True)
                     
