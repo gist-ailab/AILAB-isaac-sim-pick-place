@@ -73,20 +73,10 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
 
-# 랜덤한 3개의 물체에 대한 usd file path 선택
-objects_list = random.sample(list(object_info.values()), 3)
-objects_usd_list = []
-for obj_info in objects_list:
-    objects_usd_list.append(obj_info['usd_file'])
-
-# Random하게 생성된 물체들의 ​번호와 카테고리 출력 
-for i in range(len(objects_list)):
-    print("object_{}: {}".format(i, objects_list[i]['name']))
-
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.6, 0.3, 0.1],
-                             [-0.6, -0.3, 0.1]])
+                             [-0.1, 0.5, 0.1],
+                             [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
@@ -291,7 +281,7 @@ while simulation_app.is_running():
         # picking position을 앞서 grasp prediction에서 얻는 center 값의 world coordinate으로 설정
         # end effector orientation을 앞서 grasp prediction을 통해 얻은 angle 값으로 설정
         actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1218]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),

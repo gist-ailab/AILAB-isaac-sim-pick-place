@@ -85,8 +85,8 @@ for i in range(len(objects_list)):
 
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.6, 0.3, 0.1],
-                             [-0.6, -0.3, 0.1]])
+                             [-0.1, 0.5, 0.1],
+                             [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
@@ -101,7 +101,7 @@ my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
                         offset=offset)
                         
-# World에 Task 추가
+# World에 Task 추가[-0.1, 0.5, 0.1],
 my_world.add_task(my_task)
 my_world.reset()
 
@@ -258,7 +258,7 @@ while simulation_app.is_running():
         
         # picking position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
         actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1218]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),
