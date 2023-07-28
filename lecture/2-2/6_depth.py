@@ -116,3 +116,4 @@ while simulation_app.is_running():
         save_image(depth_image, os.path.join(save_root, "depth.png"))
 
         simulation_app.close()
+simulation_app.close()

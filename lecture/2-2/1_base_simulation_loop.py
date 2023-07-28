@@ -26,3 +26,4 @@ while simulation_app.is_running():
     if sim_step >= max_sim_step:                        
         print("Total Time"+str(time.time()-start))
         simulation_app.close()                          # 10000 step 실행 후, 시뮬레이션 종료
+simulation_app.close()

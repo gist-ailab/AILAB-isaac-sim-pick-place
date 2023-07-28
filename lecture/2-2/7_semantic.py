@@ -98,3 +98,4 @@ while simulation_app.is_running():
         
         save_image(origin_img.astype(np.uint8).transpose(1,2,0), os.path.join(save_root, "visualize_semantic_mask.png"))
         simulation_app.close()
+simulation_app.close()

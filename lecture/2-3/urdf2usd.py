@@ -42,3 +42,5 @@ for i in range(len(objects)):
         import_config = import_config,
         dest_path = os.path.join(save_path,objects[i],'final.usd'),
     )
+    
+simulation_app.close()

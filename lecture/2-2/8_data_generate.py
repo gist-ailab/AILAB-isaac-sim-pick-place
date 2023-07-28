@@ -124,3 +124,4 @@ while simulation_app.is_running():
         simulation_app.close()
 
     i += 1
+simulation_app.close()

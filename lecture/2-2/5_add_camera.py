@@ -72,3 +72,4 @@ while simulation_app.is_running():
     if ep_num == max_ep_num:                        # 10 step 이후
         save_image(rgb_image, os.path.join(save_root, "rgb.png"))  # 사진 저장
         simulation_app.close()
+simulation_app.close()

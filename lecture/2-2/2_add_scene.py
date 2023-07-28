@@ -29,3 +29,4 @@ while simulation_app.is_running():
     sim_step += 1
     if sim_step >= max_sim_step:
         simulation_app.close()
+simulation_app.close()

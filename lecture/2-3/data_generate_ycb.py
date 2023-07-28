@@ -165,3 +165,5 @@ if __name__ == "__main__":
 
         if i==10000:
             simulation_app.close()
+            
+simulation_app.close()

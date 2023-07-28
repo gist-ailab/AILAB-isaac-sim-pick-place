@@ -50,3 +50,4 @@ cube = VisualCuboid(                          # VisualCuboid 선언 및 생성
 
 while simulation_app.is_running():
     my_world.step(render=True)
+simulation_app.close()
