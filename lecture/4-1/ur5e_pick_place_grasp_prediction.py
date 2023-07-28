@@ -29,7 +29,7 @@ from pathlib import Path
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from utils.controllers.pick_place_controller_robotiq import PickPlaceController
-from utils.controllers.end_effector_controller import EndEffectorController
+from utils.controllers.basic_manipulation_controller import BasicManipulationController
 from utils.tasks.pick_place_vision_task import UR5ePickPlace
 import coco.transforms as T
 
@@ -117,10 +117,10 @@ my_controller = PickPlaceController(
 )
 
 # EndEffector Controller 생성
-my_controller2 = EndEffectorController(
-    name='end_effector_controller',
+my_controller2 = BasicManipulationController(
+    name='basic_manipulation_controller',
     cspace_controller=RMPFlowController(
-        name="end_effector_controller_cspace_controller", 
+        name="basic_manipulation_controller_cspace_controller", 
         robot_articulation=my_ur5e, 
         attach_gripper=True
     ),

@@ -16,7 +16,7 @@ from omni.isaac.manipulators.grippers.gripper import Gripper
 from omni.isaac.universal_robots.controllers import RMPFlowController
 
 
-class EndEffectorController(BaseController):
+class BasicManipulationController(BaseController):
     """ 
         A simple end-effector position, open/close control state machine for tutorials
 

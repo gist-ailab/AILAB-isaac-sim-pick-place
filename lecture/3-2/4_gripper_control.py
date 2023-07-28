@@ -21,7 +21,7 @@ from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
 from omni.isaac.universal_robots.controllers import RMPFlowController
-from utils.controllers.end_effector_controller import EndEffectorController
+from utils.controllers.basic_manipulation_controller import BasicManipulationController
 
 # if you don't declare objects_position, the objects will be placed randomly
 objects_position = np.array([0.4, 0.4, 0.1])
@@ -36,8 +36,8 @@ my_world.reset()
 
 task_params = my_task.get_params()
 my_ur5e = my_world.scene.get_object(task_params["robot_name"]["value"])
-my_controller = EndEffectorController(
-    name='end_effector_controller',
+my_controller = BasicManipulationController(
+    name='basic_manipulation_controller',
     cspace_controller=RMPFlowController(
         name="end_effector_controller_cspace_controller", robot_articulation=my_ur5e, attach_gripper=True
     ),

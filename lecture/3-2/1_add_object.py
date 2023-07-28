@@ -20,11 +20,6 @@ from utils.tasks.basic_task import SetUpUR5eObject
 from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
 
-## Set viewport
-viewport = get_active_viewport()
-viewport.set_active_camera('/World/ur5e/realsense/Depth')
-viewport.set_active_camera('/OmniverseKit_Persp')
-
 
 ## Add task to World
 my_world = World(stage_units_in_meters=1.0)
@@ -33,9 +28,15 @@ my_world.add_task(my_task)
 my_world.reset()
 
 
+## Set viewport
+viewport = get_active_viewport()
+viewport.set_active_camera('/World/ur5e/realsense/Depth')
+viewport.set_active_camera('/OmniverseKit_Persp')
+
+
 ## episode
 ep_num = 0
-max_ep_num = 100
+max_ep_num = 300
 
 
 ## Run simulation
