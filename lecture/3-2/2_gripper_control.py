@@ -21,7 +21,7 @@ from utils.tasks.pick_place_task import UR5ePickPlace
 from omni.isaac.core import World
 from omni.kit.viewport.utility import get_active_viewport
 import numpy as np
-from omni.isaac.universal_robots.controllers import RMPFlowController
+from utils.controllers.RMPFflow_pickplace import RMPFlowController
 from utils.controllers.basic_manipulation_controller import BasicManipulationController
 
 # if you don't declare objects_position, the objects will be placed randomly
