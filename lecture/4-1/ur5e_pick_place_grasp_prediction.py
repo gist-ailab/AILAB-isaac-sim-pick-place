@@ -285,7 +285,7 @@ while simulation_app.is_running():
         # picking position을 앞서 grasp prediction에서 얻는 center 값의 world coordinate으로 설정
         # end effector orientation을 앞서 grasp prediction을 통해 얻은 angle 값으로 설정
         actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),

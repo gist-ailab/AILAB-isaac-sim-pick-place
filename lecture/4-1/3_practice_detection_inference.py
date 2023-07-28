@@ -258,7 +258,7 @@ while simulation_app.is_running():
         
         # picking position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
         actions = my_controller.forward(
-            picking_position=np.array([world_center[0][0], world_center[0][1], 0.01]),
+            picking_position=np.array([world_center[0][0], world_center[0][1], 0.1]),
             placing_position=observations[task_params[gui_test.current_target]["value"]]["target_position"],
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),
