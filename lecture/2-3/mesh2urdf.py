@@ -70,6 +70,8 @@ def preprocess_ycb(data_root, save_root):
     mesh_info = get_YCB_mesh(data_root, texture=True)
 
     for obj_name, v in mesh_info.items(): 
+        if obj_name not in ['002_master_chef_can']:
+            continue
         obj_dir = os.path.join(save_root, obj_name)
         os.makedirs(obj_dir, exist_ok=True)
 
@@ -86,16 +88,15 @@ def preprocess_ycb(data_root, save_root):
 
 
     for obj_name, _ in mesh_info.items():
+        if obj_name not in ['002_master_chef_can']:
+            continue
         obj_dir = os.path.join(save_root, obj_name)
         origin = obj_dir + "/" + "raw_mesh.obj.urdf"
         target = obj_dir + "/" + "raw_mesh.urdf"
-        files = get_file_list(obj_dir)
-
-        source = [x for x in files if x in origin]
-        if len(source) == 0 or len(source) == 1:
+        if not os.path.isfile(origin):
             continue
         else:
-            os.rename(source[1], target)
+            os.rename(origin, target)
     
 
 def build_prototype_urdf(root):
