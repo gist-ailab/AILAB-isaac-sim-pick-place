@@ -279,7 +279,7 @@ while simulation_app.is_running():
         
         # target position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
         actions = my_controller2.forward(
-            target_position=np.array([world_center[0][0] - 0.1*math.cos(theta), world_center[0][1] + 0.1*math.sin(theta), 0.3]),
+            target_position=np.array([world_center[0][0] - 0.1*math.cos(theta), world_center[0][1] - 0.1*math.sin(theta), 0.3]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),
             end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
