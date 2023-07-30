@@ -20,6 +20,7 @@
 
  ## 2-1. Conda
  - Create env create
+   Check [Python Environment Installation]
     ```
     conda env create -f environment.yml
     conda activate isaac-sim
