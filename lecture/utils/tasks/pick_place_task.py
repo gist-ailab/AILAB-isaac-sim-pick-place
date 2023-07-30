@@ -102,8 +102,8 @@ class UR5ePickPlace(tasks.PickPlace):
 
         self._offset = offset
         if target_position is None:
-            self.target_position = np.array([0.4, -0.33, 0])
-            self.target_position[2] = 0.05 # considering the length of the gripper tip
+            target_position = np.array([0.4, -0.33, 0])
+            target_position[2] = 0.05 # considering the length of the gripper tip
         self.target_position = target_position + self._offset
         return
 
