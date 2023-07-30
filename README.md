@@ -20,7 +20,7 @@
 
  ## 2-1. Conda
 
- Check [Python Environment Installation]
+ Check [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
  
  - Create env create
     ```
