@@ -246,9 +246,9 @@ for theta in range(0, 360, 45):
                         
                         # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        distance = depth_image[cx][cy]
+                        depth = depth_image[cx][cy]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, distance)
+                        world_center = camera.get_world_points_from_image_coords(center, depth)
                         print("world_center: {}".format(world_center))
 
                     # detection이 끝난 후, controller reset 및 while문 나가기
@@ -357,11 +357,11 @@ while simulation_app.is_running():
             # GGCNN model inference
             ggcnn_angle, length, width, center = inference_ggcnn(rgb=rgb_image, depth=depth_image, bbox=bbox)
             center = np.array(center)
-            distance = depth_image[center[1]][center[0]]
+            detph = depth_image[center[1]][center[0]]
             
             # GGCNN에서 출력된 이미지 상의 center 값을 world coordinate으로 변환
             center = np.expand_dims(center, axis=0)
-            world_center = camera.get_world_points_from_image_coords(center, distance)
+            world_center = camera.get_world_points_from_image_coords(center, detph)
             angle = theta * 2 * np.pi / 360 + ggcnn_angle
             print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                                     
