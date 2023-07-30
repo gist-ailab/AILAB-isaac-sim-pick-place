@@ -15,6 +15,7 @@ from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
 from train_model import get_model_object_detection
+from depth_to_distance import depth_image_from_distance_image
 
 import numpy as np
 import os
@@ -224,10 +225,12 @@ for theta in range(0, 360, 45):
                         # Detection의 출력 중, target 물체에 대한 score가 가장 높은 bbox 선택 
                         
                         # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
+                        camera_intrinsics = camera.get_intrinsics_matrix()
+                        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        distance = distance_image[cy][cx]
+                        depth = depth_image[cy][cx]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, distance)
+                        world_center = camera.get_world_points_from_image_coords(center, depth)
                         print("world_center: {}".format(world_center))
 ####################################################################################
                     

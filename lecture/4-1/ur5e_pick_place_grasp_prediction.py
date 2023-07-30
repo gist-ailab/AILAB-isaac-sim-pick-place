@@ -136,7 +136,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_44.pth")))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성
@@ -248,11 +248,11 @@ for theta in range(0, 360, 45):
                         # GGCNN model inference
                         ggcnn_angle, length, width, center = inference_ggcnn(rgb=rgb_image, depth=depth_image, bbox=bbox)
                         center = np.array(center)
-                        distance = distance_image[center[1]][center[0]]
+                        depth = depth_image[center[1]][center[0]]
                         
                         # GGCNN에서 출력된 이미지 상의 center 값을 world coordinate으로 변환
                         center = np.expand_dims(center, axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, distance)
+                        world_center = camera.get_world_points_from_image_coords(center, depth)
                         angle = theta * 2 * np.pi / 360 + ggcnn_angle
                         print("world_center: {}, length: {}, width: {}, angle: {}".format(world_center, length, width, angle))
                                                 
