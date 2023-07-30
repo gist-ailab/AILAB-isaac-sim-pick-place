@@ -35,7 +35,7 @@
     pip install -r requirements.txt
     ```
 
-## 2-2. Docker
+## 2-2. Docker (recommended)
 - Install Init file
   ```
   wget https://raw.githubusercontent.com/gist-ailab/AILAB-isaac-sim-pick-place/main/dockers/init_script.sh
