@@ -137,7 +137,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_44.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_64.pth")))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성
