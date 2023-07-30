@@ -89,7 +89,7 @@ objects_position = np.array([[0.5, 0, 0.1],
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
-target_position = np.array([0.4, -0.33, 0.55])
+target_position = np.array([0.4, 0.4, 0])
 target_orientation = np.array([0, 0, 0, 1])
 
 # World 생성
@@ -98,6 +98,7 @@ my_world = World(stage_units_in_meters=1.0)
 # Task 생성
 my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
+                        target_position = target_position,
                         offset=offset)
                         
 # World에 Task 추가

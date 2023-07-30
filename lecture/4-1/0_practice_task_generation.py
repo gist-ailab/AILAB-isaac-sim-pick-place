@@ -87,3 +87,4 @@ viewport.set_active_camera('/OmniverseKit_Persp')
 while simulation_app.is_running():
     my_world.step(render=True)
                     
+simulation_app.close()
