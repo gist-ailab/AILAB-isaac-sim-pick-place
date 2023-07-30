@@ -72,10 +72,20 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
         'label': obj_idx, 
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
+    
+# 랜덤한 3개의 물체에 대한 usd file path 선택
+objects_list = random.sample(list(object_info.values()), 3)
+objects_usd_list = []
+for obj_info in objects_list:
+    objects_usd_list.append(obj_info['usd_file'])
+    
+# Random하게 생성된 물체들의 ​번호와 카테고리 출력 
+for i in range(len(objects_list)):
+    print("object_{}: {}".format(i, objects_list[i]['name']))
 
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.1, 0.5, 0.1],
+                             [-0.2, 0.5, 0.1],
                              [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
