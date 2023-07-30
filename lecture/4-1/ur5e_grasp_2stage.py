@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import random
 import torch
 from pathlib import Path
+import math
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from utils.controllers.pick_place_controller_robotiq import PickPlaceController
@@ -136,7 +137,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "result/lowlow_ckp/model_49.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_44.pth")))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성
@@ -246,7 +247,7 @@ for theta in range(0, 360, 45):
                         
                         # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        depth = depth_image[cx][cy]
+                        depth = depth_image[cy][cx]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
                         world_center = camera.get_world_points_from_image_coords(center, depth)
                         print("world_center: {}".format(world_center))
@@ -265,7 +266,7 @@ for theta in range(0, 360, 45):
         print('found object')
         break
 
-# 이전 실습(only pick place)에서 사용했던 code와 거의 동일
+# 위에서 찾은 물체 중심위치로 camera를 이동
 print('1stage_move')
 while simulation_app.is_running():
     my_world.step(render=True)
@@ -276,9 +277,9 @@ while simulation_app.is_running():
             
         observations = my_world.get_observations()
         
-        # picking position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
+        # target position을 앞서 detection을 통해서 찾은 bbox의 중심 값으로 지정
         actions = my_controller2.forward(
-            target_position=np.array([world_center[0][0], world_center[0][1], 0.3]),
+            target_position=np.array([world_center[0][0] - 0.1*math.cos(theta), world_center[0][1] + 0.1*math.sin(theta), 0.3]),
             current_joint_positions=my_ur5e.get_joint_positions(),
             end_effector_offset=np.array([0, 0, 0.14]),
             end_effector_orientation=euler_angles_to_quat(np.array([0, np.pi, theta * 2 * np.pi / 360]))
