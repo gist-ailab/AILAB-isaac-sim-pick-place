@@ -16,7 +16,9 @@
  - [Workstation Setup](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_basic.html)
  - [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
 
-### 2. Conda Enviroment Setup
+### 2. Environment Setup
+
+ ## 2-1. Conda
  - Create env create
     ```
     conda env create -f environment.yml
@@ -32,3 +34,10 @@
     ```
     pip install -r requirements.txt
     ```
+
+## 2-2. Docker
+- Install Init file
+  '''
+  wget https://raw.githubusercontent.com/gist-ailab/AILAB-isaac-sim-pick-place/main/dockers/init_script.sh
+  zsh init_script.sh
+  '''
