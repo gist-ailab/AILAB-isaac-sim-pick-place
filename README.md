@@ -32,11 +32,3 @@
     ```
     pip install -r requirements.txt
     ```
-
-## Run Pick and Place
-
-- Run Pick and Place
-    ```
-    ## change directories of usd files, and ggcnn pth file ##
-    python isaac-sim-pick-place/ur5e_pick_place.py
-    ```
