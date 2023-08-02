@@ -152,8 +152,65 @@ RUN true \
     ## Cleanup
     && rm -rf ~/.git
 
+# Install picom (X Compositor)
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libxext-dev \
+    libxcb1-dev \
+    libxcb-damage0-dev \
+    libxcb-dpms0-dev \
+    libxcb-xfixes0-dev \
+    libxcb-shape0-dev \
+    libxcb-render-util0-dev \
+    libxcb-render0-dev \
+    libxcb-randr0-dev \
+    libxcb-composite0-dev \
+    libxcb-image0-dev \
+    libxcb-present-dev \
+    libxcb-glx0-dev \
+    libxcb-util-dev \
+    libpixman-1-dev \
+    libdbus-1-dev \
+    libconfig-dev \
+    libgl-dev \
+    libegl-dev \
+    libpcre2-dev \
+    libevdev-dev \
+    uthash-dev \
+    libev-dev \
+    libx11-xcb-dev \
+    meson \
+    && git clone "https://github.com/yshui/picom.git" \
+    && cd ./picom \
+    && meson setup --buildtype=release build \
+    && ninja -C build \
+    && ninja -C build install \
+    && cd - \
+    && rm -rf ./picom \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && rm -rf /var/lib/apt/lists/*
+USER user
+
 # Tune for MobileX Station
+ARG SHELL="/bin/bash"
+ARG SHELL_WORKDIR="/home/user/Desktop"
 RUN true \
+    ## Desktop Settings
+    ### Picom
+    && sed -i 's/ *\-\-experimental\-backends//g' ~/.config/autostart/Picom.desktop \
+    ### Plank (Desktop Dock)
+    && rm -f ~/.config/autostart/plank.desktop \
+    && ln -sf /usr/share/applications/plank.desktop ~/.config/autostart/ \
+    ### VSCode
+    && mkdir -p ~/.config/Code/User/ \
+    && cp /home/user/.vscode-server/data/Machine/settings.json ~/.config/Code/User/settings.json \
+    ### XFCE4 Termimal
+    && sed -i 's/^ColorUseTheme\=[A-Z]\+//g' ~/.config/xfce4/terminal/terminalrc \
+    && sudo sed -i "s/^Exec\=xfce4\-terminal\$/Exec\=bash \-c \'cd $(echo "${SHELL_WORKDIR}" | sed 's/\//\\\//g') \&\& xfce4\-terminal\'/g" /usr/share/applications/xfce4-terminal.desktop \
+    && sed -i "s/exo\-open \-\-launch TerminalEmulator/\0 \-\-working\-directory $(echo "${SHELL_WORKDIR}" | sed 's/\//\\\//g')/g" ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml \
+    ## Configure default shell
+    && sudo chsh -s "${SHELL}" user \
     ## Remove native Vulkan ICD Loaders (Automatically loaded!)
     && sudo rm -rf /usr/share/vulkan/icd.d \
     ## Make Isaac Sim script directory path Absolute
@@ -165,17 +222,17 @@ RUN true \
     && sudo rm -rf /isaac-sim/kit/data && sudo ln -sf "${_BASEDIR}/kit/data" /isaac-sim/kit/data \
     && sudo rm -rf /isaac-sim/kit/documents && sudo ln -sf "${_BASEDIR}/kit/documents" /isaac-sim/kit/documents \
     && sudo rm -rf /isaac-sim/kit/logs && sudo ln -sf "${_BASEDIR}/kit/logs" /isaac-sim/kit/logs \
-    ## Edit entrypoint (NOTE: `init-desktop-podman.sh` does nothing but executed on init.)
-    && ENTRYPOINT="/opt/scripts/init-desktop-podman.sh" \
-    && echo '#1/bin/bash' | sudo tee "${ENTRYPOINT}" \
+    ## Edit entrypoint (NOTE: `init-desktop-custom.sh` does nothing but executed on init.)
+    && ENTRYPOINT="/opt/scripts/init-desktop-custom.sh" \
     ### Create `AILAB-isaac-sim-pick-place` directory on Desktop and Make it persistent
     && echo '_BASEDIR="${HOME}/Desktop/.isaac-sim"' | sudo tee -a "${ENTRYPOINT}" \
     && echo '_LOWERDIR="${HOME}/AILAB-isaac-sim-pick-place"' | sudo tee -a "${ENTRYPOINT}" \
     && echo '_UPPERDIR="${_BASEDIR}/upperdir"' | sudo tee -a "${ENTRYPOINT}" \
     && echo '_WORKDIR="${_BASEDIR}/workdir"' | sudo tee -a "${ENTRYPOINT}" \
     && echo '_DST="${HOME}/Desktop/AILAB-isaac-sim-pick-place"' | sudo tee -a "${ENTRYPOINT}" \
-    && echo 'mkdir -p "${_UPPERDIR}" "${_WORKDIR}" "${_DST}"' | sudo tee -a "${ENTRYPOINT}" \
-    && echo 'sudo fuse-overlayfs -o "auto_unmount,lowerdir=${_LOWERDIR},upperdir=${_UPPERDIR},workdir=${_WORKDIR}" "${_DST}"' | sudo tee -a "${ENTRYPOINT}" \
+    && echo 'mkdir -p "${_UPPERDIR}" "${_WORKDIR}"' | sudo tee -a "${ENTRYPOINT}" \
+    # && echo 'mkdir -p "${_DST}"' | sudo tee -a "${ENTRYPOINT}" \
+    # && echo 'sudo fuse-overlayfs -o "auto_unmount,lowerdir=${_LOWERDIR},upperdir=${_UPPERDIR},workdir=${_WORKDIR}" "${_DST}"' | sudo tee -a "${ENTRYPOINT}" \
     ### Enable the suitable ICD Loader and Disable the others
     && echo 'cp /etc/vulkan/icd.d/nvidia_icd.$(uname -m).json ~/nvidia_icd.$(uname -m).json' | sudo tee -a "${ENTRYPOINT}" \
     && echo 'sudo umount /etc/vulkan/icd.d/' | sudo tee -a "${ENTRYPOINT}" \
