@@ -5,12 +5,18 @@
 # ---- ---- ---- ----
 
 # 수업 중 말씀드렸던 cloner에 대한 코드입니다. 
-# 해당 코드는 xformprim X를 선언하여 카메라와 object를 X라는 prim의 하위 prim으로 선언하였습니다. 
+# 해당 코드는 xformprim X를 선언하여 카메라와 object를 하위 prim으로 선언하였습니다. 
 # grid cloner를 통해 4개로 clone하여 총 5개의 이미지를 동시에 얻을 수 있습니다.
 # 하지만, 1개의 카메라를 사용했을 때는 10 step 정도의 안정화 스텝이 필요한 반면 저희가 구현한 해당 코드에서는 200~300 정도의 step이 필요합니다.
 # 이미지도 기존 (1920,1080)의 해상도는 메모리 부족으로 가능하지 않아 (960,540)으로 지정하였습니다.
-# 이미지를 획득하는 과정에서는 오히려 cloner를 쓰는 것이 data 수집 성능이 저하된다고 말할 수 있습니다.
+# 이미지를 획득하는 과정에서는 오히려 cloner를 쓰는 것이 이미지 data 수집 성능이 저하된다고 말할 수 있습니다.
 
+# 공식 도큐에서는 cloner가 for문을 사용하여 linear한 성능을 보인다고 하였습니다.
+
+# 하지만, cloner를 사용하지 않고, 카메라와 cube를 for문을 사용하여 4개씩 더 추가하여 선언하였을 때는 성능 저하가 덜 되는 것을 확인하였습니다.
+# cloner라는 큰 객체를 복사하는 과정(카메라와 큐브의 관계) 에서 많은 메모리가 소모되는 것으로 예상됩니다.
+
+# Nvidia 공식 document : Note that the cloning process is performed in a for-loop, so performance should be expected to follow linear scaling with an increase of clones.
 
 import os 
 import sys
