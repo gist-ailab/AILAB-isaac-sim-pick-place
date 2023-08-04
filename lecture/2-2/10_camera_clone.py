@@ -4,7 +4,8 @@
 # 2-2.5 Basic simulation loop with camera (RGB)
 # ---- ---- ---- ----
 
-# 수업 중 말씀드렸던 cloner에 대한 코드입니다. 해당 코드는 카메라와 object를 X라는 prim의 하위 prim으로 선언하여 
+# 수업 중 말씀드렸던 cloner에 대한 코드입니다. 
+# 해당 코드는 xformprim X를 선언하여 카메라와 object를 X라는 prim의 하위 prim으로 선언하였습니다. 
 # grid cloner를 통해 4개로 clone하여 총 5개의 이미지를 동시에 얻을 수 있습니다.
 # 하지만, 1개의 카메라를 사용했을 때는 10 step 정도의 안정화 스텝이 필요한 반면 저희가 구현한 해당 코드에서는 200~300 정도의 step이 필요합니다.
 # 이미지도 기존 (1920,1080)의 해상도는 메모리 부족으로 가능하지 않아 (960,540)으로 지정하였습니다.
@@ -77,7 +78,7 @@ target_paths = cloner.generate_paths("/World/X",4)
 cloner.clone("/World/X", target_paths)
 
 ep_num = 0
-max_ep_num = 300
+max_ep_num = 10
 
 resol = (960, 540)
 rgb_annotators = []
