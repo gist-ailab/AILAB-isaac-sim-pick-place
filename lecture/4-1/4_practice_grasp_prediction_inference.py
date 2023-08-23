@@ -72,15 +72,25 @@ for obj_idx, obj_dir in enumerate(obj_dirs):
         'label': obj_idx, 
     }
     label2name[obj_idx]=os.path.basename(obj_dir)
+    
+# 랜덤한 3개의 물체에 대한 usd file path 선택
+objects_list = random.sample(list(object_info.values()), 3)
+objects_usd_list = []
+for obj_info in objects_list:
+    objects_usd_list.append(obj_info['usd_file'])
+    
+# Random하게 생성된 물체들의 ​번호와 카테고리 출력 
+for i in range(len(objects_list)):
+    print("object_{}: {}".format(i, objects_list[i]['name']))
 
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.1, 0.5, 0.1],
+                             [-0.2, 0.5, 0.1],
                              [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
-target_position = np.array([0.4, -0.33, 0.55])
+target_position = np.array([0.4, 0.4, 0])
 target_orientation = np.array([0, 0, 0, 1])
 
 # World 생성
@@ -89,6 +99,7 @@ my_world = World(stage_units_in_meters=1.0)
 # Task 생성
 my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
+                        target_position = target_position,
                         offset=offset)
                         
 # World에 Task 추가
@@ -131,7 +142,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_64.pth")))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성

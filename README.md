@@ -16,7 +16,12 @@
  - [Workstation Setup](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_basic.html)
  - [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
 
-### 2. Conda Enviroment Setup
+### 2. Environment Setup
+
+ ## 2-1. Conda
+
+ Check [Python Environment Installation](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_python.html#advanced-running-with-anaconda)
+ 
  - Create env create
     ```
     conda env create -f environment.yml
@@ -33,10 +38,9 @@
     pip install -r requirements.txt
     ```
 
-## Run Pick and Place
-
-- Run Pick and Place
-    ```
-    ## change directories of usd files, and ggcnn pth file ##
-    python isaac-sim-pick-place/ur5e_pick_place.py
-    ```
+## 2-2. Docker (recommended)
+- Install Init file
+  ```
+  wget https://raw.githubusercontent.com/gist-ailab/AILAB-isaac-sim-pick-place/main/dockers/init_script.sh
+  zsh init_script.sh
+  ```

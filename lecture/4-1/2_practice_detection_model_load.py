@@ -85,12 +85,12 @@ for i in range(len(objects_list)):
 
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.1, 0.5, 0.1],
+                             [-0.2, 0.5, 0.1],
                              [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
-target_position = np.array([0.4, -0.33, 0.55])
+target_position = np.array([0.4, 0.4, 0])
 target_orientation = np.array([0, 0, 0, 1])
 
 # World 생성
@@ -99,6 +99,7 @@ my_world = World(stage_units_in_meters=1.0)
 # Task 생성
 my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
+                        target_position = target_position,
                         offset=offset)
                         
 # World에 Task 추가
@@ -155,3 +156,4 @@ viewport.set_active_camera('/OmniverseKit_Persp')
 while simulation_app.is_running():                      
     my_world.step(render=True)
                     
+simulation_app.close()

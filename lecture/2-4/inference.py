@@ -57,7 +57,7 @@ if __name__ == "__main__":
     num_classes = 29
     model = get_model_object_detection(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, 'model_49.pth')
+    ckp_path = os.path.join(test_ckp_path, 'model_64.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset

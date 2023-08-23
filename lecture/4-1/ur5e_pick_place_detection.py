@@ -15,6 +15,7 @@ from omni.isaac.examples.ailab_script import AILabExtension
 from omni.isaac.examples.ailab_examples import AILab
 
 from train_model import get_model_object_detection
+from depth_to_distance import depth_image_from_distance_image
 
 import numpy as np
 import os
@@ -82,12 +83,12 @@ for i in range(len(objects_list)):
 
 # 3개의 물체를 생성할 위치 지정(너무 멀어지는 경우 로봇이 닿지 않을 수 있음, 물체 사이의 거리가 가까울 경우 충돌이 발생할 수 있음)
 objects_position = np.array([[0.5, 0, 0.1],
-                             [-0.1, 0.5, 0.1],
+                             [-0.2, 0.5, 0.1],
                              [-0.55, 0.2, 0.1]])
 offset = np.array([0, 0, 0.1])
 
 # 물체를 놓을 위치(place position) 지정
-target_position = np.array([0.4, -0.33, 0.55])
+target_position = np.array([0.4, 0.4, 0])
 target_orientation = np.array([0, 0, 0, 1])
 
 # World 생성
@@ -96,6 +97,7 @@ my_world = World(stage_units_in_meters=1.0)
 # Task 생성
 my_task = UR5ePickPlace(objects_list = objects_usd_list,
                         objects_position = objects_position,
+                        target_position = target_position,
                         offset=offset)
                         
 # World에 Task 추가
@@ -130,7 +132,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_99.pth")))
+model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_64.pth")))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성
@@ -236,10 +238,12 @@ for theta in range(0, 360, 45):
                         bbox = prediction[0]['boxes'][idx]
                         
                         # 선택한 bbox의 중심으로 grasp 하기 위해서,​bbox 중점을 world coordinate으로 변환
+                        camera_intrinsics = camera.get_intrinsics_matrix()
+                        depth_image = depth_image_from_distance_image(distance_image, camera_intrinsics)
                         cx, cy = int((bbox[0]+bbox[2])/2), int((bbox[1]+bbox[3])/2)
-                        distance = distance_image[cy][cx]
+                        depth = depth_image[cy][cx]
                         center = np.expand_dims(np.array([cx, cy]), axis=0)
-                        world_center = camera.get_world_points_from_image_coords(center, distance)
+                        world_center = camera.get_world_points_from_image_coords(center, depth)
                         print("world_center: {}".format(world_center))
 
                     # detection이 끝난 후, controller reset 및 while문 나가기
