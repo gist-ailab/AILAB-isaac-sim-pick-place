@@ -6,14 +6,14 @@
 import time
 
 from omni.isaac.kit import SimulationApp
-simulation_app = SimulationApp({"headless": True})
+simulation_app = SimulationApp({"headless": False})
 print(simulation_app.DEFAULT_LAUNCHER_CONFIG)
 
+# After simulation is started, you can access the other functions from the isaac sim library
 from omni.isaac.core import World                       # isaac sim 라이브러리 내 함수 import
 
-
 my_world = World(stage_units_in_meters=1.0)             # World 선언 및 생성
-
+my_world.scene.add_default_ground_plane()               # Ground Plane 추가
 
 sim_step = 0                                            
 max_sim_step = 1000                                     # max_step 설정
@@ -25,5 +25,35 @@ while simulation_app.is_running():
     sim_step += 1                                       
     if sim_step >= max_sim_step:                        
         print("Total Time"+str(time.time()-start))
-        simulation_app.close()                          # 10000 step 실행 후, 시뮬레이션 종료
+        break
+
 simulation_app.close()
+print("Simulation is Closed")
+
+# ---- ---- ---- ---- Convert to Class ---- ---- ---- ----
+
+class BaseSim:
+    def __init__(self, stage_units_in_meters=1.0):
+        self.world = World(stage_units_in_meters=stage_units_in_meters)
+        self.world.scene.add_default_ground_plane()
+        self.frame = 0
+
+    def step(self, render=True):    
+        self.world.step(render=render)
+        self.frame += 1
+
+"""Example with Class(Same as above)
+from omni.isaac.kit import SimulationApp
+simulation_app = SimulationApp({"headless": True})
+print(simulation_app.DEFAULT_LAUNCHER_CONFIG)
+
+from omni.isaac.core import World
+
+base_world = BaseSim(stage_units_in_meters=1.0)
+
+while simulation_app.is_running():
+    base_world.step(render=True)
+    print("Simulation frame: ", base_world.frame)
+
+
+"""
