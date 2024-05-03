@@ -29,31 +29,3 @@ while simulation_app.is_running():
 
 simulation_app.close()
 print("Simulation is Closed")
-
-# ---- ---- ---- ---- Convert to Class ---- ---- ---- ----
-
-class BaseSim:
-    def __init__(self, stage_units_in_meters=1.0):
-        self.world = World(stage_units_in_meters=stage_units_in_meters)
-        self.world.scene.add_default_ground_plane()
-        self.frame = 0
-
-    def step(self, render=True):    
-        self.world.step(render=render)
-        self.frame += 1
-
-"""Example with Class(Same as above)
-from omni.isaac.kit import SimulationApp
-simulation_app = SimulationApp({"headless": True})
-print(simulation_app.DEFAULT_LAUNCHER_CONFIG)
-
-from omni.isaac.core import World
-
-base_world = BaseSim(stage_units_in_meters=1.0)
-
-while simulation_app.is_running():
-    base_world.step(render=True)
-    print("Simulation frame: ", base_world.frame)
-
-
-"""
