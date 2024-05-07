@@ -9,10 +9,9 @@ from omni.isaac.core.utils.semantics import add_update_semantics
 from omni.isaac.core.utils.rotations import euler_angles_to_quat
 from omni.kit.viewport.utility import get_active_viewport
 
-import sys
-sys.path.append('/isaac-sim/exts/omni.isaac.examples/')
-from omni.isaac.examples.ailab_script import AILabExtension
-from omni.isaac.examples.ailab_examples import AILab
+import os, sys
+sys.path.append(os.path.dirname(__file__))
+from ext.ailab_examples import AILab, AILabExtension
 
 from train_model import get_model_object_detection
 from depth_to_distance import depth_image_from_distance_image
@@ -137,7 +136,7 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 num_classes = 29
 model = get_model_object_detection(num_classes)
 model.to(device)
-model.load_state_dict(torch.load(os.path.join(Path(working_dir).parent, "checkpoint/model_64.pth")))
+model.load_state_dict(torch.load("/home/raeyo/.local/share/ov/pkg/isaac_sim-2023.1.0-hotfix.1/AILAB-isaac-sim-pick-place/lecture/result/ckp/model_24.pth"))
 model.eval()
 
 # detection model input을 맞춰주기 위한 transform 생성
