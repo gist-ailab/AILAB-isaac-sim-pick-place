@@ -40,8 +40,7 @@ from PIL import Image
 import numpy as np                                      
 
 my_world = World(stage_units_in_meters=1.0)
-
-scene = Scene()
+scene = my_world.scene
 scene.add_default_ground_plane()
 
 x = XFormPrim("/World/X")                           # object와 camera의 상위 prim x 선언
@@ -71,16 +70,16 @@ my_camera = Camera(
     position=[0.48176, 0.13541, 0.71],             # 로봇 팔의 위치   
     orientation=[0.5,-0.5,0.5,0.5]                 # quaternion                 
 )                                                               
+my_camera.initialize()                             # 카메라 시작                
 my_camera.set_focal_length(1.93)                   # 카메라 설정값 세팅      
 my_camera.set_focus_distance(4)                                 
 my_camera.set_horizontal_aperture(2.65)                        
 my_camera.set_vertical_aperture(1.48)                           
 my_camera.set_clipping_range(0.01, 10000)                       
 
-my_camera.initialize()                             # 카메라 시작                
 
 cloner = GridCloner(spacing=3)                      # cloner 선언
-target_paths = cloner.generate_paths("/World/X",4)
+target_paths = cloner.generate_paths("/World/X",3)
 cloner.clone("/World/X", target_paths)
 
 ep_num = 0
@@ -101,14 +100,12 @@ for target_path in target_paths:
 
 rep.orchestrator.run()
 
-while simulation_app.is_running():
-    ep_num += 1                                      
+# initialize the camera
+initialize_steps = 10
+for i_step in range(initialize_steps):
     my_world.step(render=True)
-    print("Episode: ", ep_num)
-                   
-    if ep_num == max_ep_num:                       # 300 step 이후
-        for i, rgb_annotator in enumerate(rgb_annotators):
-            rgb_image = rgb_annotator.get_data()
-            save_image(rgb_image, os.path.join(save_root, "rgb_{}.png".format(i)))  # 사진 저장
-        simulation_app.close()
+
+for i, rgb_annotator in enumerate(rgb_annotators):
+    rgb_image = rgb_annotator.get_data()
+    save_image(rgb_image, os.path.join(save_root, "rgb_{}.png".format(i)))  # 사진 저장
 simulation_app.close()

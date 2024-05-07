@@ -25,8 +25,7 @@ sys.path.append(lecture_path)
 print(lecture_path)
 
 my_world = World(stage_units_in_meters=1.0)
-
-scene = Scene()
+scene = my_world.scene
 scene.add_default_ground_plane()
 
 for i in range(3):
@@ -54,48 +53,52 @@ my_camera = Camera(
     position=[0.48176, 0.13541, 0.71],  
     orientation=[0.5,-0.5,0.5,0.5]                
 )                                                               
+my_camera.initialize()                                          
 my_camera.set_focal_length(1.93)                                
 my_camera.set_focus_distance(4)                                 
 my_camera.set_horizontal_aperture(2.65)                         
 my_camera.set_vertical_aperture(1.48)                           
 my_camera.set_clipping_range(0.01, 10000)                      
 my_camera.add_instance_segmentation_to_frame()
-my_camera.initialize()                                          
 
-ep_num = 0
-max_ep_num = 10
 
+# initialize the camera
+initialize_steps = 10
+for i_step in range(initialize_steps):
+    my_world.step(render=True)
+is_semantic_initialized = False
+while not is_semantic_initialized:
+    my_world.step(render=True)
+    if my_camera.get_current_frame()["instance_segmentation"] is not None:
+        is_semantic_initialized = True
 
 while simulation_app.is_running():
-    
-    ep_num += 1                                      #
     my_world.step(render=True)
-    print("Episode: ", ep_num)
 
-    rgb_image = my_camera.get_rgba()                        #
-    instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
-    instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
+    rgb_image = my_camera.get_rgba()
+    
+    current_frame = my_camera.get_current_frame()
+    instance_segmentation_image = current_frame["instance_segmentation"]["data"]
+    instance_segmentation_dict = current_frame["instance_segmentation"]["info"]["idToSemantics"]
 
-    if ep_num == max_ep_num:
-        print(my_camera.get_current_frame()["instance_segmentation"])
-        save_image(rgb_image, os.path.join(save_root, "semantic_img.png"))  #
-        
-        origin_img_r = copy.deepcopy(instance_segmentation_image)
-        origin_img_g = copy.deepcopy(instance_segmentation_image)
-        origin_img_b = copy.deepcopy(instance_segmentation_image)
-        
-        
-        np.place(origin_img_r, origin_img_r==2, 255)
-        np.place(origin_img_g, origin_img_g==3, 255)
-        np.place(origin_img_b, origin_img_b==4, 255)
-        
-        np.place(origin_img_r, origin_img_r!=255, 0)
-        np.place(origin_img_g, origin_img_g!=255, 0)
-        np.place(origin_img_b, origin_img_b!=255, 0)
-        
-        origin_img = np.array([origin_img_r,origin_img_g,origin_img_b])
-        print(rgb_image.shape,origin_img.shape)
-        
-        save_image(origin_img.astype(np.uint8).transpose(1,2,0), os.path.join(save_root, "visualize_semantic_mask.png"))
-        simulation_app.close()
+    print(current_frame["instance_segmentation"])
+    
+    origin_img_r = copy.deepcopy(instance_segmentation_image)
+    origin_img_g = copy.deepcopy(instance_segmentation_image)
+    origin_img_b = copy.deepcopy(instance_segmentation_image)
+    
+    np.place(origin_img_r, origin_img_r==2, 255)
+    np.place(origin_img_g, origin_img_g==3, 255)
+    np.place(origin_img_b, origin_img_b==4, 255)
+    
+    np.place(origin_img_r, origin_img_r!=255, 0)
+    np.place(origin_img_g, origin_img_g!=255, 0)
+    np.place(origin_img_b, origin_img_b!=255, 0)
+    
+    origin_img = np.array([origin_img_r,origin_img_g,origin_img_b])
+    print(rgb_image.shape,origin_img.shape)
+    
+    save_image(rgb_image, os.path.join(save_root, "semantic_img.png"))
+    save_image(origin_img.astype(np.uint8).transpose(1,2,0), os.path.join(save_root, "visualize_semantic_mask.png"))
+    simulation_app.close()
 simulation_app.close()

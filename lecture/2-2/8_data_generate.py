@@ -14,9 +14,9 @@ from omni.isaac.core.scenes.scene import Scene
 from omni.isaac.sensor import Camera
 from omni.isaac.core.objects import DynamicCuboid
 
-from omni.isaac.core.utils.stage import get_current_stage           #
-from omni.isaac.core.utils.prims import delete_prim                 #
-from omni.isaac.core.utils.semantics import add_update_semantics    #
+from omni.isaac.core.utils.stage import get_current_stage
+from omni.isaac.core.utils.prims import delete_prim
+from omni.isaac.core.utils.semantics import add_update_semantics
 
 import os
 import numpy as np
@@ -24,17 +24,9 @@ from PIL import Image as im
 import torchvision.transforms as T
 import random
 
-
-sim_step = 0
 my_world = World(stage_units_in_meters=1.0)
-
-
-scene = Scene()
+scene = my_world.scene
 scene.add_default_ground_plane()
-
-stage = get_current_stage()                                         #
-my_world.reset()                                                    #
-
 
 # Setting save path for generated data
 work_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,34 +39,42 @@ print("save_path: ", save_path)
 
 
 # camera initialize
-hand_camera = Camera(
+my_camera = Camera(
     prim_path="/World/RGB",
     frequency=20,
     resolution=(1920, 1080),
     position=[0.48176, 0.13541, 0.71],
     orientation=[0.5,-0.5,0.5,0.5]
 )
+my_camera.initialize()
+my_camera.set_focal_length(1.93)
+my_camera.set_focus_distance(4)
 
-hand_camera.set_focal_length(1.93)
-hand_camera.set_focus_distance(4)
+my_camera.set_horizontal_aperture(2.65)
+my_camera.set_vertical_aperture(1.48)
 
-hand_camera.set_horizontal_aperture(2.65)
-hand_camera.set_vertical_aperture(1.48)
+my_camera.set_clipping_range(0.01, 10000)
 
-hand_camera.set_clipping_range(0.01, 10000)
-my_world.reset()
-hand_camera.initialize()
-
-i = 0
-hand_camera.add_distance_to_camera_to_frame()
-hand_camera.add_instance_segmentation_to_frame()
+my_camera.add_distance_to_camera_to_frame()
+my_camera.add_instance_segmentation_to_frame()
 
 stage = get_current_stage()
-
 my_world.reset()
+
+# initialize the camera
+initialize_steps = 10
+for i_step in range(initialize_steps):
+    my_world.step(render=True)
+is_semantic_initialized = False
+while not is_semantic_initialized:
+    my_world.step(render=True)
+    if my_camera.get_current_frame()["instance_segmentation"] is not None:
+        is_semantic_initialized = True
+
 
 transform = T.ToPILImage()
 
+i = 0
 while simulation_app.is_running():
     my_world.step(render=True)
     # random 1 ~ 3 data generation in camera boundary
@@ -92,11 +92,11 @@ while simulation_app.is_running():
            
             
     if i % 15 == 12:
-        hand_rgb_image = hand_camera.get_rgba()[:, :, :3]
-        hand_instance_segmentation_image = hand_camera.get_current_frame()["instance_segmentation"]["data"]
-        hand_instance_segmentation_dict = hand_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
+        hand_rgb_image = my_camera.get_rgba()[:, :, :3]
+        hand_instance_segmentation_image = my_camera.get_current_frame()["instance_segmentation"]["data"]
+        hand_instance_segmentation_dict = my_camera.get_current_frame()["instance_segmentation"]["info"]["idToSemantics"]
                 
-        print(hand_camera.get_current_frame()["instance_segmentation"])
+        print(my_camera.get_current_frame()["instance_segmentation"])
         
         hand_imgplot = transform(hand_rgb_image)
         # class가 2,3,4로 순서대로 나타나는게 아니라 (2,3) (3,4) 등으로 나타날 때도 있음 해당 예외 처리를 위해 다음과 같은 dict 생성 

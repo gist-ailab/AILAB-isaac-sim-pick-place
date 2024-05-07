@@ -81,6 +81,8 @@ my_camera = Camera(                                             #
     position=[0.48176, 0.13541, 0.71], # attach to robot hand   #
     orientation=[0.5,-0.5,0.5,0.5] # quaternion                 #
 )                                                               #
+my_camera.initialize()
+
 my_camera.set_focal_length(1.93)                                #
 my_camera.set_focus_distance(4)                                 #
 my_camera.set_horizontal_aperture(2.65)                         #
@@ -88,7 +90,6 @@ my_camera.set_vertical_aperture(1.48)                           #
 my_camera.set_clipping_range(0.01, 10000)                       #
 my_camera.add_distance_to_camera_to_frame()
 
-my_camera.initialize()
 
 camera_intrinsics = my_camera.get_intrinsics_matrix()
 print('camera_intrinsics: ', camera_intrinsics)

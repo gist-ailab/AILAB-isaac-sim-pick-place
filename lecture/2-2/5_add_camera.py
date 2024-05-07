@@ -22,7 +22,7 @@ import numpy as np
 
 my_world = World(stage_units_in_meters=1.0)
 
-scene = Scene()
+scene = my_world.scene
 scene.add_default_ground_plane()
 
 scale = list(np.random.rand(3) * 0.2)               
@@ -50,13 +50,13 @@ my_camera = Camera(
     position=[0.48176, 0.13541, 0.71],             # 로봇 팔의 위치   
     orientation=[0.5,-0.5,0.5,0.5]                 # quaternion                 
 )                                                               
+my_camera.initialize()                             # 카메라 시작                
+
 my_camera.set_focal_length(1.93)                   # 카메라 설정값 세팅      
 my_camera.set_focus_distance(4)                                 
 my_camera.set_horizontal_aperture(2.65)                        
 my_camera.set_vertical_aperture(1.48)                           
 my_camera.set_clipping_range(0.01, 10000)                       
-
-my_camera.initialize()                             # 카메라 시작                
 
 ep_num = 0
 max_ep_num = 11

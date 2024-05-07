@@ -19,7 +19,7 @@ import numpy as np
 
 my_world = World(stage_units_in_meters=1.0)
 
-scene = Scene()
+scene = my_world.scene
 scene.add_default_ground_plane()
 
 obj_idx = 0                                             
