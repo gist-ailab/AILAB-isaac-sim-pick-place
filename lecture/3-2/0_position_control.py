@@ -46,7 +46,7 @@ viewport.set_active_camera('/World/ur5e/realsense/Depth')
 viewport.set_active_camera('/OmniverseKit_Persp')
 
 # 시뮬레이션 앱 실행 후 dalay를 위한 변수
-max_step = 150
+max_step = 30
 
 # 시뮬레이션 앱이 실행 중이면 동작
 ee_target_position = np.array([0.25, -0.23, 0.4]) 
