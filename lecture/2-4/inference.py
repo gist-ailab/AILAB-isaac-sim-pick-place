@@ -7,18 +7,16 @@
 
 #-----0. preliminary -----#
 
+# import packages
+from PIL import Image, ImageDraw
+import torch
+import random
+
 # python path setting
 import os
 import sys
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
 sys.path.append(lecture_path)
-
-# import packages
-from PIL import Image, ImageDraw
-
-import torch
-
-import random
 
 from custom_dataset import *
 from train_model import *
@@ -57,7 +55,7 @@ if __name__ == "__main__":
     num_classes = 29
     model = get_model_object_detection(num_classes)
     model.to(device)
-    ckp_path = os.path.join(test_ckp_path, 'model_64.pth')
+    ckp_path = os.path.join(test_ckp_path, 'model_24.pth')
     model.load_state_dict(torch.load(ckp_path))
     model.eval()
     # load test dataset

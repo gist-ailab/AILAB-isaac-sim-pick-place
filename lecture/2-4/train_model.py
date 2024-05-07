@@ -7,20 +7,20 @@
 
 #-----0. preliminary -----#
 
+# import packages
+import torch
+import torchvision
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision.models import ResNet50_Weights
+
 # python path setting
 import os
 import sys
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
 sys.path.append(lecture_path)
 
-# import packages
-import torch
-import torchvision
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-
 from coco.engine import train_one_epoch, evaluate
 import coco.utils as utils
-
 from custom_dataset import *
 
 # ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -29,8 +29,7 @@ from custom_dataset import *
 # https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 def get_model_object_detection(num_classes):
     # load an instance segmentation model pre-trained on COCO
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, weights_backbone=None)
-    model.backbone.body.load_state_dict(torch.load(os.path.join(lecture_path,"1-4/parameters/resnet50.pth")), strict=False)
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, weights_backbone=ResNet50_Weights.IMAGENET1K_V2)
     # get number of input features for the classifier
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     # replace the pre-trained head with a new one
@@ -45,8 +44,7 @@ if __name__=="__main__":
     data_root = os.path.join(lecture_path, 'dataset/detect_img')
     test_ckp_path = os.path.join(lecture_path, 'result/ckp')
     
-    if not os.path.isdir(test_ckp_path):
-        os.mkdir(test_ckp_path)
+    os.makedirs(test_ckp_path, exist_ok=True)
     # train on the GPU or on the CPU, if a GPU is not available
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print("Train device: ", device)

@@ -6,16 +6,16 @@
 
 #-----0. preliminary -----#
 
+# import packages
+import torch
+from PIL import Image
+import numpy as np
+
 # python path setting
 import os
 import sys
 lecture_path = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))) # path to lecture
 sys.path.append(lecture_path)
-
-# import packages
-import torch
-from PIL import Image
-import numpy as np
 import coco.transforms as T
 
 # function for getting transform
