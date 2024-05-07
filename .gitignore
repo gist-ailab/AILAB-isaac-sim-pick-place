@@ -19,3 +19,5 @@ data_batch*
 *.meta
 cifar*
 PennFudanPed*
+
+sample_data
